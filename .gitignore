@@ -1,0 +1,5 @@
+hms-venv/
+db.sqlite3
+.DS_Store
+core/__pycache__
+.env
