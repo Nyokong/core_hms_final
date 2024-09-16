@@ -59,6 +59,9 @@ INSTALLED_APPS = [
 
     # install app api
     'api',
+
+    # integrate daphne
+    'daphne',
 ]
 
 REST_FRAMEWORK = {
@@ -100,6 +103,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+ASGI_APPLICATION = "core.asgi.application"
+
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -113,12 +118,11 @@ DATABASES = {
 
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'asgi_redis.RedisChannelLayer',
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [('localhost', 6379)],
+            'hosts': [('redis', 6379)],  # Use the Redis service name from docker-compose.yml
         },
-        'ROUTING': 'core.routing.channel_routing',
-    }
+    },
 }
 
 
