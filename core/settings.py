@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG")
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").splits(",")
+# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
 
 
 ALLOWED_HOSTS = []
@@ -41,8 +41,19 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # restframework
-    'restframework',
+    'rest_framework',
+
+    # channels
+    'channels',
 ]
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
