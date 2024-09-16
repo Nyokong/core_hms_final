@@ -1,3 +1,10 @@
+```bash
+
+    pip install -r requirements.txt
+
+```
+
+// install from requirements
 pip install -r requirements.txt
 pip freeze > requirements.txt
 docker-compose up -d --build
