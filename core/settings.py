@@ -26,8 +26,19 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG")
 # ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
 
-
 ALLOWED_HOSTS = []
+
+# only for development
+CORS_ALLOW_ALL_ORIGINS = True
+
+# For development
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     "http://localhost:5432",
+# ]
+
+# custom Auth user model
+AUTH_USER_MODEL = 'api.custUser'
 
 
 # Application definition
@@ -45,9 +56,13 @@ INSTALLED_APPS = [
 
     # channels
     'channels',
+
+    # install app api
+    'api',
 ]
 
 REST_FRAMEWORK = {
+
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
@@ -93,6 +108,16 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'asgi_redis.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('localhost', 6379)],
+        },
+        'ROUTING': 'core.routing.channel_routing',
     }
 }
 
