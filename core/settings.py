@@ -32,10 +32,10 @@ ALLOWED_HOSTS = []
 CORS_ALLOW_ALL_ORIGINS = True
 
 # For development
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",
-#     "http://localhost:5432",
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    # "http://localhost:5432",
+]
 
 # custom Auth user model
 AUTH_USER_MODEL = 'api.custUser'
@@ -74,6 +74,8 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

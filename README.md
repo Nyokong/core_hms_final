@@ -20,6 +20,19 @@ please dont be in the core folder
     ├── entrypoint.sh
     ├── manage.py
     └── requirements.txt
+
+HMS-app/
+├── backend/
+│   ├── core/
+│   ├── manage.py
+│   ├── requirements.txt
+│   └── Dockerfile
+├── frontend/
+│   ├── pages/
+│   ├── public/
+│   ├── package.json
+│   └── Dockerfile
+└── docker-compose.yml
 ```
 
 run this command in the DjangoMainFolder
@@ -38,6 +51,12 @@ NB:Ignore
 
 ```bash
     pip freeze > requirements.txt
+```
+
+creating a new nextjs app
+
+```bash
+    npx create-next-app@latest hms-web
 ```
 
 docker-compose up -d --build
