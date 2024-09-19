@@ -44,10 +44,15 @@ CORS_ALLOWED_ORIGINS = [
 # custom Auth user model
 AUTH_USER_MODEL = 'api.custUser'
 
-
 # Application definition
 
 INSTALLED_APPS = [
+    # channels
+    'channels',
+
+    # daphne
+    'daphne',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -60,9 +65,6 @@ INSTALLED_APPS = [
 
     # restframework
     'rest_framework',
-
-    # channels
-    'channels',
 
     # install app api
     'api',
@@ -129,7 +131,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-ASGI_APPLICATION = "core.asgi.application"
+ASGI_APPLICATION = "core.routing.application"
 
 
 # Database
@@ -153,16 +155,36 @@ DATABASES = {
     }
 }
 
-
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [('redis', 6379)],  # Use the Redis service name from docker-compose.yml
+            # 'hosts': [
+            #     {
+            #         "host": "redis-1",
+            #         "port": 6379,
+            #     },
+            # ],  # Use the Redis service name from docker-compose.yml
+            "hosts": [os.environ.get('REDIS_URL', 'redis://redis:6379/1')],
         },
     },
 }
 
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer"
+#     }
+# }
+
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django_redis.cache.RedisCache',
+#         'LOCATION': [os.environ.get('REDIS_URL', 'redis://redis:6379/1')],  # Update with your Redis server details if necessary
+#         'OPTIONS': {
+#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+#         }
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

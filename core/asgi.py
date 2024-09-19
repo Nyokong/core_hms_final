@@ -7,6 +7,29 @@ For more information on this file, see
 https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
 """
 
+# import os
+# import django
+
+# from django.conf import settings
+# django.setup()
+
+
+# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
+
+# from channels.routing import ProtocolTypeRouter, URLRouter
+# from channels.auth import AuthMiddlewareStack
+
+# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
+# from django.core.asgi import get_asgi_application
+
+# import api.routing 
+
+# application = application = ProtocolTypeRouter({
+#     "http": get_asgi_application(),
+#     "websocket": URLRouter(api.routing.websocket_urlpatterns)
+# })
+
+
 import os
 import django
 
@@ -16,11 +39,8 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 django.setup()
 from django.core.asgi import get_asgi_application
 
-
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
-
-
 
 import api.routing
 
@@ -34,3 +54,4 @@ application = application = ProtocolTypeRouter({
         )
     ),
 })
+
