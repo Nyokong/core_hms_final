@@ -55,3 +55,18 @@ application = application = ProtocolTypeRouter({
     ),
 })
 
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                {
+                    "host": "redis",  # Replace with the actual Redis container name
+                    "port": 6379,
+                    "password": None,  # Optional: Redis password
+                },
+            ],
+        },
+    },
+}
