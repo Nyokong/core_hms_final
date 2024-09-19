@@ -9,6 +9,13 @@ from .serializers import FeedbackMsgSerializer
 
 # Create your views here.
 
+# sample view
+class MyView(generics.ListAPIView):
+    def get(self, request, *args, **kwargs):
+        response = {
+            'message': 'token works.'
+        }
+        return Response(response, status=200)
 
 # feedback messages go here
 # Read all feed back messages

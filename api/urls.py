@@ -9,4 +9,7 @@ urlpatterns = [
     # feedback http endpoints
     path('feedback/msgs', views.FeedbackMessages.as_view(), name='feedback-msgs'),
 
+    # testing/sample views
+    # path('sample', views.MyView.as_view(), name='sample-view'),
+
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
