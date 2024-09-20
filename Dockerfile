@@ -13,6 +13,7 @@ RUN pip install --upgrade pip
 COPY ./requirements.txt /usr/src/app/requirements.txt
 
 RUN pip install -r requirements.txt
+# RUN pip install whitenoise
 
 COPY ./entrypoint.sh /usr/src/app/entrypoint.sh
 
