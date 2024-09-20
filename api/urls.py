@@ -5,6 +5,11 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
 urlpatterns = [
     path('usr/create', views.UserCreateView.as_view(), name="create-user"),
     path('usr/update', views.UserUpdateView.as_view(), name='user-update'),
@@ -12,6 +17,9 @@ urlpatterns = [
     path('usrs', views.UserListViewSet.as_view(), name='users'),
     path('verify-email/<uidb64>/<token>/', views.VerifyEmailView.as_view(), name='verify-email'),
     path('usr/delete/<int:pk>/', views.DeleteUserView.as_view(), name='user-delete'),
+
+    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     path('list/assign/',views.AssignmentListView.as_view(), name='list-assignment'),
     path('assign/assignment/',views. AssignmentCreateView.as_view(), name='create-assignments'),
