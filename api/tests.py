@@ -69,13 +69,8 @@ class UrlsTestCase(TestCase):
 #         self.assertEqual(response.status_code, 200)
 #         self.assertEqual(response.data, [])  # Expect an empty list
 
-# #View Tests
-# class MyViewTest(TestCase):
-#     def setUp(self):
-#         self.user = custUser.objects.create_user(username='testuser', password='testpass')
-#         self.client.login(username='testuser', password='testpass')  # Log in the user
-
-#     def test_my_view(self):
-#         response = self.client.get(reverse('sample-view'))
-#         self.assertEqual(response.status_code, 200)
-#         self.assertEqual(response.data, {'message': 'token works.'})
+class FeedbackMessagesTest(TestCase):
+    def setUp(self):
+        # Create a sample feedback message for testing
+        self.user = custUser.objects.create_user(username='testuser', password='testpass')
+        self.feedback_message = FeedbackMessage.objects.create(user=self.user, message="This is a test message.")
