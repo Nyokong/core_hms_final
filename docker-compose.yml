@@ -29,6 +29,14 @@ services:
       - CELERY_BACKEND=redis://redis:6379/0
       - DATABASE_URL=postgres://gitgang_postgres:gitgang_postgres@db:5432/gitgang_postgres
 
+  # daphne:
+  #   image: fundanie/daphne
+  #   command: ["daphne", "-b", "0.0.0.0:8000", "core.asgi:application"]
+  #   volumes:
+  #     - ./core:/app
+
+      
+
   celery:
     build: 
       context: ./core
