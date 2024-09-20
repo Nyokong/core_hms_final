@@ -3,6 +3,7 @@ from django.shortcuts import render
 from rest_framework import viewsets, permissions, generics, permissions, status
 from rest_framework.response import Response
 from rest_framework import status 
+from rest_framework.permissions import AllowAny
 
 from .models import FeedbackMessage
 from .serializers import FeedbackMsgSerializer
@@ -11,6 +12,7 @@ from .serializers import FeedbackMsgSerializer
 
 # sample view
 class MyView(generics.ListAPIView):
+    permission_classes = [AllowAny]
     def get(self, request, *args, **kwargs):
         response = {
             'message': 'token works.'
