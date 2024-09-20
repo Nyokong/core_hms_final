@@ -8,7 +8,7 @@ from .models import custUser, Lecturer, Student, FeedbackMessage
 class CustUserModelTest(TestCase):
 
     def setUp(self):
-        self.user = custUser.objects.create(username="testuser")
+        self.user = custUser.objects.create(username="testuser", password="testpass")
 
     def test_email_default(self):
         self.assertEqual(self.user.email, "testuser@mynwu.ac.za")
