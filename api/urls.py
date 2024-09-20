@@ -18,6 +18,7 @@ urlpatterns = [
     path('usrs', views.UserListViewSet.as_view(), name='users'),
     path('verify-email/<uidb64>/<token>/', views.VerifyEmailView.as_view(), name='verify-email'),
     path('usr/delete/<int:pk>/', views.DeleteUserView.as_view(), name='user-delete'),
+    path('usr/profile', views.UserProfileView.as_view(), name='user-profile-read'),
 
     # token login
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

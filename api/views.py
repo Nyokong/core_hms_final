@@ -99,6 +99,22 @@ class UserUpdateView(generics.RetrieveUpdateAPIView):
         
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST) 
 
+class UserProfileView(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        user = request.user
+
+        user_data = {
+        'id': user.id,
+        'username': user.username,
+        'first_name': user.first_name,
+        'email': user.email,
+        # Add any other user fields you need
+        }
+        
+        return Response(user_data, status=status.HTTP_200_OK)
+
 # DELETE VIEW USER
 class DeleteUserView(generics.DestroyAPIView):
     queryset = custUser.objects.all()
