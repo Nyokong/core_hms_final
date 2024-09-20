@@ -117,6 +117,7 @@ class DeleteUserView(generics.DestroyAPIView):
 # this is the Login View
 class LoginAPIView(generics.GenericAPIView):
     serializer_class = LoginSerializer
+    permission_classes = [permissions.AllowAny]
 
     # post 
     def post(self, request, *args, **kwargs):
