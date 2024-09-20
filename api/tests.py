@@ -1,5 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
+from rest_framework import status
+from .views import MyView, FeedbackMessage
+from .models import FeedbackMessage
+from .serializers import FeedbackMessage
 from django.core.exceptions import ValidationError
 from .models import custUser, Lecturer, Student, FeedbackMessage
 
@@ -46,31 +50,29 @@ class UrlsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-# # Combined FeedbackMessageModel and View Tests
-# class FeedbackMessageModelTest(TestCase):
-#     def setUp(self):
-#         self.user = custUser.objects.create_user(username='testuser', password='testpass')
-#         self.message = FeedbackMessage.objects.create(user=self.user, message="This is a test message.")
+#Test Views
 
-#     def test_feedback_message_creation(self):
-#         self.assertEqual(self.message.message, "This is a test message.")
-
-#     def test_get_feedback_messages(self):
-#         self.client.login(username='testuser', password='testpass')  # Log in the user
-#         response = self.client.get(reverse('feedback-msgs'))
-#         self.assertEqual(response.status_code, 200)
-#         self.assertEqual(len(response.data), 1)  # Expecting one message in the response
-#         self.assertEqual(response.data[0]['message'], "This is a test message.")
-
-#     def test_get_feedback_messages_empty(self):
-#         FeedbackMessage.objects.all().delete()  # Clear all feedback messages
-#         self.client.login(username='testuser', password='testpass')  # Log in the user
-#         response = self.client.get(reverse('feedback-msgs'))
-#         self.assertEqual(response.status_code, 200)
-#         self.assertEqual(response.data, [])  # Expect an empty list
+class MyViewTest(TestCase):
+    def test_my_view(self):
+        response = self.client.get(reverse('sample-view'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'message': 'token works.'})
 
 class FeedbackMessagesTest(TestCase):
     def setUp(self):
         # Create a sample feedback message for testing
         self.user = custUser.objects.create_user(username='testuser', password='testpass')
         self.feedback_message = FeedbackMessage.objects.create(user=self.user, message="This is a test message.")
+
+    def test_get_feedback_messages(self):
+        response = self.client.get(reverse('feedback-msgs'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)  # Assuming one message exists
+        self.assertEqual(response.data[0]['message'], self.feedback_message.message)
+
+    def test_get_feedback_messages_empty(self):
+        # Clear all feedback messages
+        FeedbackMessage.objects.all().delete()
+        response = self.client.get(reverse('feedback-msgs'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [])  # Expect an empty list
