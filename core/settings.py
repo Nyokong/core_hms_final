@@ -37,6 +37,15 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
+# django default development phase
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+# EMAIL_USE_SSL = True
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
 # only for development
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -150,6 +159,11 @@ DATABASES = {
 }
 
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+# DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+# AZURE_ACCOUNT_NAME = os.getenv('AZURE_ACCOUNT_NAME')
+# AZURE_ACCOUNT_KEY = os.getenv('AZURE_ACCOUNT_KEY')
+# AZURE_CONTAINER = os.getenv('AZURE_CONTAINER')
 
 # DATABASES = {
 #     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))

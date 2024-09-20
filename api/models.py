@@ -52,6 +52,64 @@ class Student(models.Model):
     def __str__(self):
         return f'{self.student_num}'
 
+
+# video uploading model
+class Video(models.Model):
+    user = models.ForeignKey(custUser, on_delete=models.CASCADE)
+    title = models.CharField(verbose_name="title", max_length=255)
+    description = models.TextField(verbose_name="description", blank=True, null=True)
+    cmp_video = models.FileField(verbose_name="cmp_video",upload_to='compressed_videos/')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.user} - {self.title}'
+
+# assignment
+class Assignment(models.Model):
+    title = models.CharField(verbose_name="title", max_length=255)
+    description = models.TextField(verbose_name="description", blank=True, null=True)
+    # attachment is optional
+    attachment= models.FileField(verbose_name="attachment",upload_to='attachments/', unique=False, null=True)
+    # the time it was created
+    due_date = models.DateTimeField(verbose_name="due_date")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.title} - created: {self.created_at}'
+
+# submitted
+class Submitted(models.Model):
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='submissions')
+    student = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='submissions')
+    content = models.TextField()
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+# Grade
+class Grade(models.Model):
+    lecturer = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='given_grades')
+    submission = models.ForeignKey(Submitted, on_delete=models.CASCADE, related_name='grades')
+    grade = models.DecimalField(verbose_name="Percentage Grade",max_digits=3, decimal_places=2)  # e.g.,'A++', 'A+', 'B-', etc.
+    feedback = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        def __str__(self):
+            return f'Mark: {self.grade}/100'
+
+    # get the lette grade
+    def get_letter_grade(self):
+        if self.grade >= 90:
+            return 'A'
+        elif self.grade >= 80:
+            return 'B'
+        elif self.grade >= 70:
+            return 'C'
+        elif self.grade >= 60:
+            return 'D'
+        else:
+            return 'F'
+
 class FeedbackMessage(models.Model):
     user = models.ForeignKey(custUser, on_delete=models.CASCADE)
     message = models.TextField()
