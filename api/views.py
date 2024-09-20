@@ -219,6 +219,7 @@ class FeedbackMessages(generics.GenericAPIView):
 
 # create assignments
 class AssignmentCreateView(generics.CreateAPIView):
+    queryset = Assignment.objects.all() 
     serializer_class =AssignmentForm
     permission_class = [permissions.IsAuthenticated]
     
