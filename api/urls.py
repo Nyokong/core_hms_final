@@ -11,6 +11,7 @@ from rest_framework_simplejwt.views import (
 )
 
 urlpatterns = [
+    # user side endpoints
     path('usr/create', views.UserCreateView.as_view(), name="create-user"),
     path('usr/update', views.UserUpdateView.as_view(), name='user-update'),
     path('usr/login', views.LoginAPIView.as_view(), name="login-user"),
@@ -18,9 +19,11 @@ urlpatterns = [
     path('verify-email/<uidb64>/<token>/', views.VerifyEmailView.as_view(), name='verify-email'),
     path('usr/delete/<int:pk>/', views.DeleteUserView.as_view(), name='user-delete'),
 
+    # token login
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
+    # assignments endpoints
     path('list/assign/',views.AssignmentListView.as_view(), name='list-assignment'),
     path('assign/assignment/',views. AssignmentCreateView.as_view(), name='create-assignments'),
     path('update/assign/<int:id>', views.AssignmentUpdateView.as_view(), name='assignment-update'),

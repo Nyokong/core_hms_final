@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     # restframework
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'rest_framework_simplejwt',
 
     # install app api
     'api',
