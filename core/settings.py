@@ -31,11 +31,11 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost',]
+# ALLOWED_HOSTS = ['127.0.0.1', 'localhost',"http://localhost:3000",]
 
-INTERNAL_IPS = [
-    '127.0.0.1',
-]
+# INTERNAL_IPS = [
+#     '127.0.0.1',
+# ]
 
 # django default development phase
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -114,6 +114,12 @@ MIDDLEWARE = [
 
     # whitenoise
     'whitenoise.middleware.WhiteNoiseMiddleware',
+
+    # django-request-logging
+    'request_logging.middleware.LoggingMiddleware',
+
+    # my logger middleware
+    'core.middleware.RequestLoggingMiddleware',
 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -282,4 +288,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# logging settings
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',  # Change to INFO or ERROR as needed
+            'propagate': False,
+        },
+    },
+}
 
