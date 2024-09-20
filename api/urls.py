@@ -24,12 +24,11 @@ urlpatterns = [
 
     # video views
     path('vd/lst', views.VideoView.as_view(), name='video-list'), 
-    path('vd/upload-old',views.UploadVideoView.as_view(), name='video-upload'),
-    path('vd/up',views.UploadVideoViewTask.as_view(), name='video-task-upload'),
+    # path('vd/upload-old',views.UploadVideoView.as_view(), name='video-upload'),
     path('vd/del/<int:pk>',views.DeleteVideoView.as_view(), name='video-delete'),
 
     # feedback http endpoints
-    path('feedback/msgs', views.FeedbackMessages.as_view(), name='feedback-msgs'),
+    path('feedback/msgs', views.FeedbackMessages.as_view(), name='feedback-msgs-read'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

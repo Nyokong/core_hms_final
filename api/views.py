@@ -164,7 +164,44 @@ class VerifyEmailView(generics.GenericAPIView):
         else:
             return Response({"message": "Invalid token or user."}, status=status.HTTP_400_BAD_REQUEST)
 
+# user display viewset
+class UserListViewSet(APIView):
 
+    # gets users who are authenticated
+    # for later purpose permissions might change
+    permission_classes = [permissions.IsAdminUser]
+
+    def get(self, request, format=None):
+        query = custUser.objects.all()
+        serializer = UserSerializer(query, many=True)
+
+        return Response(serializer.data)
+    
+class VideoView(generics.GenericAPIView):
+    # a class the views all the videos
+    # in the database all of them
+    permission_classes = [permissions.AllowAny]
+    serializer_class = Videoviewlist
+
+    # overwrite the get query method
+    def get_queryset(self):
+        return Video.objects.all()
+
+    def get(self, request, format=None):
+        query = self.get_queryset()
+
+        serializer = self.get_serializer(query, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class DeleteVideoView(generics.DestroyAPIView):
+    # a class the views all the videos
+    # in the database all of them
+    permission_classes = [permissions.AllowAny]
+
+    # retrieve all videos
+    def get_queryset(self):
+        return Video.objects.all()  
 
 # feedback messages go here
 # Read all feed back messages
@@ -179,4 +216,71 @@ class FeedbackMessages(generics.GenericAPIView):
         serializer = FeedbackMsgSerializer(query, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+# create assignments
+class AssignmentCreateView(generics.CreateAPIView):
+    serializer_class =AssignmentForm
+    permission_class = [permissions.IsAuthenticated]
+    
+    def post(self, request, *args, **kwargs):
+        serializer= self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            #print data to console
+            print('assignment upload in progress')
+            serializer.save()
+            #return the success response
+            return Response ({"msg": "assignment creation is a success!"}, status=status.HTTP_201_CREATED)
+        
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+#display assignments created
+class AssignmentListView(generics.GenericAPIView):
+        permission_classes = [permissions.AllowAny]
+
+        def get_queryset(self):
+            return Assignment.objects.all() 
+
+        def get(self, request, format=None):
+            queryset = self.get_queryset() 
+            serializer = AssignmentForm(queryset, many=True)
+            return Response(serializer.data)
+
+# update assignments - only logged the lecturer
+class AssignmentUpdateView(generics.RetrieveUpdateAPIView):
+    queryset= Assignment.objects.all()
+    serializer_class = AssignmentForm
+    permission_classes =(IsAuthenticated,)
+    lookup_field ='id'
+
+    def get_object(self):
+        return super().get_object()
+    
+    def update(self, request, *args, **kwargs):
+        assignment = self.get_object()
+        serializer = self.get_serializer(assignment, data=request.data, partial = True)
+
+        # if assignment is valid - check 
+        if serializer.is_valid():
+            assignment.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST) 
+    
+# delete assignments - only lecturer and admin can access
+class AssignmentDeleteView(generics.DestroyAPIView):
+    queryset = Assignment.objects.all()
+    serializer_class = AssignmentForm
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        assignment_id = self.kwargs.get("pk")
+        return get_object_or_404(Assignment, id =assignment_id)
+
+    def destroy(self, request, *args, **kwargs):
+        assignment =self.get_object()
+        assignment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
