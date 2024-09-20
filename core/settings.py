@@ -119,8 +119,9 @@ ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
     {
+        # os.path.join(BASE_DIR, 'templates')
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -173,12 +174,6 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            # 'hosts': [
-            #     {
-            #         "host": "redis",
-            #         "port": 6379,
-            #     },
-            # ],  # Use the Redis service name from docker-compose.yml
             "hosts": [os.environ.get('REDIS_URL', 'redis://redis:6379/1')],
         },
     },
@@ -244,7 +239,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 LOGIN_REDIRECT_URL = '/'
 
-SITE_ID = 2
+SITE_ID = 3
 
 
 # Internationalization

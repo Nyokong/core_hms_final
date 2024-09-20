@@ -20,15 +20,14 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-
-from . import views
+# from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
 
     # home 
-    path('', views.BaseAPI.as_view(), name='home'),
+    # path('', views.BaseAPI.as_view(), name='home'),
 
     # socials
     path('accounts/', include('allauth.urls')),
