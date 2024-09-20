@@ -161,7 +161,6 @@ DATABASES = {
     }
 }
 
-
 # DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
 # AZURE_ACCOUNT_NAME = os.getenv('AZURE_ACCOUNT_NAME')
 # AZURE_ACCOUNT_KEY = os.getenv('AZURE_ACCOUNT_KEY')
