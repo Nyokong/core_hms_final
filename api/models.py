@@ -17,6 +17,7 @@ def validate_email(email):
 class custUser(AbstractUser):
     username = models.CharField(verbose_name="Username", max_length=8, unique=True)
     is_lecturer = models.BooleanField(default=False)
+    needs_password = models.BooleanField(default=True)
 
     groups = models.ManyToManyField(Group, related_name='custom_users')
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_perms')
@@ -35,6 +36,9 @@ class custUser(AbstractUser):
 
     def __str__(self):
         return f'{self.username}'
+    
+    class Meta:
+        unique_together = ('username',)
 
 
 # lecturer model

@@ -224,7 +224,6 @@ class DeleteVideoView(generics.DestroyAPIView):
 # feedback messages go here
 # Read all feed back messages
 class FeedbackMessages(generics.GenericAPIView):
-
     # gets users who are authenticated
     # for later purpose permissions might change
     permission_classes = [permissions.AllowAny]
