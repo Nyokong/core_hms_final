@@ -21,3 +21,19 @@ def check_lecturer_status(sender, instance, created, **kwargs):
             instance.save()
         else:
             print(f"No lecturer found for: {instance.username}")
+
+from .models import Submission, FeedbackRoom
+
+@receiver(post_save, sender=Submission)
+def create_feedback_room(sender, instance, created, **kwargs):
+    if created:
+        assignment = instance.assignment
+        lecturer = assignment.created_by
+        student = instance.student
+
+        if not FeedbackRoom.objects.filter(lecturer=lecturer, student=student, submission=instance).exists():
+            FeedbackRoom.objects.create(
+                lecturer=lecturer,
+                student=student,
+                submission=instance
+            )

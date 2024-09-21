@@ -3,8 +3,8 @@ from django.contrib.auth.admin import UserAdmin
 
 # Register your models here.
 
-from .models import FeedbackMessage, custUser, Student, Lecturer, Assignment, Video, Submitted, Grade   
-from .models import VerificationToken
+from .models import FeedbackMessage, custUser, Student, Lecturer, Assignment, Video, Submission, Grade   
+from .models import VerificationToken, FeedbackRoom
 
 class CustomUserAdmin(UserAdmin): 
 
@@ -22,7 +22,8 @@ admin.site.register(Lecturer)
 admin.site.register(FeedbackMessage)
 admin.site.register(Video)
 admin.site.register(Assignment)
-admin.site.register(Submitted)
+admin.site.register(Submission)
 admin.site.register(Grade)
 admin.site.register(VerificationToken)
+admin.site.register(FeedbackRoom)
 
