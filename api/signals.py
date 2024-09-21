@@ -16,6 +16,8 @@ def check_password_setting(sender, request, user, **kwargs):
 def check_lecturer_status(sender, instance, created, **kwargs):
     if created:
         if Lecturer.objects.filter(emp_num=instance.username).exists():
+            print(f"Lecturer found: {instance.username}")
             instance.is_lecturer = True
             instance.save()
-            print("a lecturer has been created")
+        else:
+            print(f"No lecturer found for: {instance.username}")

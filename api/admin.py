@@ -11,7 +11,7 @@ class CustomUserAdmin(UserAdmin):
 
     # If you're using fieldsets:
     fieldsets = (
-        (None, {'fields': ('username', 'first_name', 'last_name' ,'email', 'password', 'is_staff', 'is_active')}),
+        (None, {'fields': ('username', 'first_name', 'last_name' ,'email', 'password', 'is_lecturer','is_staff', 'is_active')}),
     )
 
 # Register your models here.
