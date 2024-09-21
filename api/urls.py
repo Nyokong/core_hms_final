@@ -19,6 +19,7 @@ urlpatterns = [
     path('verify-email/<uidb64>/<token>/', views.VerifyEmailView.as_view(), name='verify-email'),
     path('usr/delete/<int:pk>/', views.DeleteUserView.as_view(), name='user-delete'),
     path('usr/profile', views.UserProfileView.as_view(), name='user-profile-read'),
+    path('usr/update-std-number', views.AddStudentNumberView.as_view(), name="add-student-number"),
 
     # token login
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

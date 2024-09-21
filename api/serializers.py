@@ -102,6 +102,12 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         model = custUser
         fields = ('username', 'first_name', 'last_name')
 
+class StudentNumberUpdateSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = custUser
+        fields = ('student_number',)
+
 # delete -serializer
 class UserDeleteSerializer(serializers.ModelSerializer):
     def validate(self, data):
@@ -123,10 +129,23 @@ class LoginSerializer(serializers.Serializer):
 class AssignmentForm(serializers.Serializer):
     title=serializers.CharField(max_length=240)
     description= serializers.CharField()
-    due_date = serializers.DateTimeField(default=timezone.now)
+    due_date = serializers.DateTimeField(default=timezone.now)/
+    # created_by
 
     def create(self, validated_data):
-        return Assignment.objects.create(**validated_data)
+        assignment = Assignment(
+            created_by=self.context['request'].user,
+            title=validated_data['title'],
+            description=validated_data['description'],
+        )
+
+        # save the video if is succesful
+        assignment.save()
+        # after all return user
+        return assignment
+
+        # return Assignment.objects.create(**validated_data)
+
     class Meta:
         model = Assignment
         fields = ['title', 'description', 'due_date', 'attachment']
