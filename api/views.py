@@ -8,11 +8,14 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
 
+# dajngo auth
+from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate, login
 
 from .serializers import UserSerializer, UserUpdateSerializer, Videoviewlist,LoginSerializer
 from .serializers import UserDeleteSerializer, AssignmentForm , VideoSerializer
 from .models import custUser, Video, Assignment
+from .models import VerificationToken
 
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
@@ -25,8 +28,12 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 
 from .models import FeedbackMessage
+<<<<<<< HEAD
 from .serializers import FeedbackMsgSerializer
 from django.http import HttpResponse
+=======
+from .serializers import FeedbackMsgSerializer, CustomSignupSerializer
+>>>>>>> 3ee8bb7efc95b8db5c81243ececbd86f90702e7f
 
 import os
 import random
@@ -37,10 +44,29 @@ import pandas as pd
 from django.conf import settings
 
 # Create your views here.
+from django.shortcuts import redirect
+from allauth.socialaccount.models import SocialAccount
+from rest_framework_simplejwt.tokens import RefreshToken
+
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
+
+def google_login_callback(request):
+    user = request.user
+    if user.is_authenticated:
+        tokens = get_tokens_for_user(user)
+        return redirect(f'http://localhost:3000/login?token={tokens["access"]}')
+    else:
+        return redirect('login')
 
 # create user viewset api endpoint
 class UserCreateView(generics.CreateAPIView):
     serializer_class = UserSerializer
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request, *args, **kwargs):
         serializer = UserSerializer(data=request.data, context={'request': request})
@@ -52,7 +78,8 @@ class UserCreateView(generics.CreateAPIView):
 
         # Call the send_verification_email method with the newly created user
         if user:
-            self.send_verification_email(user)
+            # self.send_verification_email(user)
+            pass
 
         return Response({
             "user": serializer.data,
@@ -64,6 +91,12 @@ class UserCreateView(generics.CreateAPIView):
         # Generate a 5-digit verification code
         verification_code = random.randint(10000, 99999)
 
+        key = get_random_string(length=32)
+        
+        VerificationToken.objects.create(user=user, token=key)
+
+        verification_link = f'http://127.0.0.1:8000/api/usr/verify/?key={key}'
+
         # get user email
         email = user.email
 
@@ -71,13 +104,46 @@ class UserCreateView(generics.CreateAPIView):
         sender = settings.EMAIL_HOST_USER
 
         # defining subject and message
-        subject = "Account Verification"
-        message = f'Your verfication code is {verification_code}'
+        subject = "Non-reply | Account Verification"
+        message = f'Hey-ya \nYour verfication code is {verification_code} \n\n Click this link to verify account: {verification_link}\n non-reply email'
 
         # send the email
         send_mail(subject, message, sender, [f'{email}'], fail_silently=False)
 
         return Response({'Success': "Verification email sent"}, status=status.HTTP_200_OK)
+
+class VerificationView(generics.GenericAPIView):
+    queryset = custUser.objects.all()
+
+    permission_classes = [permissions.AllowAny]
+
+    def get_object(self):
+        # Get the user instance based on the verification token
+        # get token on the verification url
+        token = self.request.query_params.get('token')
+
+        try:
+            user = VerificationToken.objects.get(token=token)
+        except VerificationToken.DoesNotExist:
+            return Response({'error': 'Invalid verification token'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # return user
+        return user
+
+    def get(self, request):
+        # token = request.query_params.get('token')
+        token_user = self.get_object()
+
+        # get user from custom user and acivate user
+        try:
+            user = custUser.objects.get(username=token_user.user)
+
+            user.is_active = True
+            user.save()
+
+            return Response({'message': 'User activated successfully'}, status=status.HTTP_200_OK)
+        except custUser.DoesNotExist:
+            return Response({'error': 'User DoesntExisist'}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserUpdateView(generics.RetrieveUpdateAPIView):
 
@@ -101,6 +167,22 @@ class UserUpdateView(generics.RetrieveUpdateAPIView):
         
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST) 
 
+class UserProfileView(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        user = request.user
+
+        user_data = {
+        'id': user.id,
+        'username': user.username,
+        'first_name': user.first_name,
+        'email': user.email,
+        # Add any other user fields you need
+        }
+        
+        return Response(user_data, status=status.HTTP_200_OK)
+
 # DELETE VIEW USER
 class DeleteUserView(generics.DestroyAPIView):
     queryset = custUser.objects.all()
@@ -120,6 +202,7 @@ class DeleteUserView(generics.DestroyAPIView):
 # this is the Login View
 class LoginAPIView(generics.GenericAPIView):
     serializer_class = LoginSerializer
+    permission_classes = [permissions.AllowAny]
 
     # post 
     def post(self, request, *args, **kwargs):
@@ -206,19 +289,6 @@ class DeleteVideoView(generics.DestroyAPIView):
     def get_queryset(self):
         return Video.objects.all()  
 
-# feedback messages go here
-# Read all feed back messages
-class FeedbackMessages(generics.GenericAPIView):
-
-    # gets users who are authenticated
-    # for later purpose permissions might change
-    permission_classes = [permissions.AllowAny]
-
-    def get(self, request, format=None):
-        query = FeedbackMessage.objects.all()
-        serializer = FeedbackMsgSerializer(query, many=True)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 # create assignments
 class AssignmentCreateView(generics.CreateAPIView):
@@ -287,6 +357,7 @@ class AssignmentDeleteView(generics.DestroyAPIView):
         assignment =self.get_object()
         assignment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+<<<<<<< HEAD
 
 # downloading feedback
 
@@ -297,3 +368,40 @@ def downloadFeeback(request):
 
 
 
+=======
+    
+# feedback messages go here
+# Read all feed back messages
+class CreateFeedbackMessageView(generics.CreateAPIView):
+    permission_classes = [permissions.AllowAny]
+    queryset = FeedbackMessage.objects.all()
+    serializer_class = FeedbackMsgSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer= self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            #print data to console
+            serializer.save()
+            #return the success response
+            return Response ({"msg": "feedback creation is a success!"}, status=status.HTTP_201_CREATED)
+        
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class FeedbackMessages(generics.GenericAPIView):
+    # gets users who are authenticated
+    # for later purpose permissions might change
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        room_id = self.kwargs['room_id']
+        return FeedbackMessage.objects.filter(room_id=room_id).order_by('created_at')
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+>>>>>>> 3ee8bb7efc95b8db5c81243ececbd86f90702e7f

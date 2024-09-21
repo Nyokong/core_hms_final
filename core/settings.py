@@ -31,11 +31,11 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost',]
+# ALLOWED_HOSTS = ['127.0.0.1', 'localhost',"http://localhost:3000",]
 
-INTERNAL_IPS = [
-    '127.0.0.1',
-]
+# INTERNAL_IPS = [
+#     '127.0.0.1',
+# ]
 
 # django default development phase
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -78,6 +78,8 @@ INSTALLED_APPS = [
 
     # restframework
     'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
+    'rest_framework_simplejwt',
 
     # install app api
     'api',
@@ -93,14 +95,29 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
-
-        # OAuth
-
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ),
+}
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
 }
 
 AUTHENTICATION_BACKENDS = [
@@ -114,6 +131,12 @@ MIDDLEWARE = [
 
     # whitenoise
     'whitenoise.middleware.WhiteNoiseMiddleware',
+
+    # django-request-logging
+    'request_logging.middleware.LoggingMiddleware',
+
+    # my logger middleware
+    'core.middleware.RequestLoggingMiddleware',
 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -252,9 +275,9 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-LOGIN_REDIRECT_URL = '/'
+# LOGIN_REDIRECT_URL = '/'
 
-SITE_ID = 3
+SITE_ID = 4
 
 
 # Internationalization
@@ -282,4 +305,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# logging settings
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',  # Change to INFO or ERROR as needed
+            'propagate': False,
+        },
+    },
+}
 

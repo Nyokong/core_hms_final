@@ -17,6 +17,7 @@ def validate_email(email):
 class custUser(AbstractUser):
     username = models.CharField(verbose_name="Username", max_length=8, unique=True)
     is_lecturer = models.BooleanField(default=False)
+    needs_password = models.BooleanField(default=True)
 
     groups = models.ManyToManyField(Group, related_name='custom_users')
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_perms')
@@ -35,7 +36,9 @@ class custUser(AbstractUser):
 
     def __str__(self):
         return f'{self.username}'
-
+    
+    class Meta:
+        unique_together = ('username',)
 
 # lecturer model
 class Lecturer(models.Model):
@@ -67,6 +70,7 @@ class Video(models.Model):
 
 # assignment
 class Assignment(models.Model):
+    created_by = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='lecturer_creator')
     title = models.CharField(verbose_name="title", max_length=255)
     description = models.TextField(verbose_name="description", blank=True, null=True)
     # attachment is optional
@@ -78,17 +82,26 @@ class Assignment(models.Model):
     def __str__(self):
         return f'{self.title} - created: {self.created_at}'
 
+    def clean(self):
+        if not self.created_by.is_lecturer:
+            raise ValidationError("Only lecturers can create assignments.")
+
 # submitted
-class Submitted(models.Model):
-    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='submissions')
-    student = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='submissions')
-    content = models.TextField()
+class Submission(models.Model):
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='assignment_being_submitted')
+    student = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='student_submitting_assignment')
+    # what they submitting
+    video = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='video_being_submitted')
     submitted_at = models.DateTimeField(auto_now_add=True)
+
+    def clean(self):
+        if self.student.is_lecturer:
+            raise ValidationError("Only students can submit assignments.")
 
 # Grade
 class Grade(models.Model):
-    lecturer = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='given_grades')
-    submission = models.ForeignKey(Submitted, on_delete=models.CASCADE, related_name='grades')
+    lecturer = models.ForeignKey(custUser, on_delete=models.CASCADE)
+    submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
     grade = models.DecimalField(verbose_name="Percentage Grade",max_digits=3, decimal_places=2)  # e.g.,'A++', 'A+', 'B-', etc.
     feedback = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -109,8 +122,23 @@ class Grade(models.Model):
             return 'D'
         else:
             return 'F'
+        
+class FeedbackRoom(models.Model):
+    # this is all the conversations they've had
+    lecturer = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='lecturer_in_feedback')
+    student = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='student_in_feedback')
+    # we want to know what they talking about 
+    submission = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name='submission_ref')
 
 class FeedbackMessage(models.Model):
-    user = models.ForeignKey(custUser, on_delete=models.CASCADE)
+    feedback_room = models.ForeignKey(FeedbackRoom, on_delete=models.CASCADE, related_name='feedbackroom_ref')
+    # logic is one user ia student and the other is a lecturer
+    sender = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='sender_of_message')
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+            
+
+class VerificationToken(models.Model):
+    user = models.ForeignKey(custUser, on_delete=models.CASCADE)
+    token = models.CharField(max_length=32,unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)

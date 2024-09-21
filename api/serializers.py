@@ -6,6 +6,54 @@ from django.utils import timezone
 
 from .models import FeedbackMessage, custUser, Assignment, Video
 
+from allauth.account.adapter import get_adapter
+from allauth.account.utils import setup_user_email
+
+class CustomSignupSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    username = serializers.CharField(required=True)
+    password1 = serializers.CharField(write_only=True, required=True)
+    password2 = serializers.CharField(write_only=True, required=True)
+
+    def validate_username(self, username):
+        if custUser.objects.filter(username=username).exists():
+            raise serializers.ValidationError("A user with that username already exists.")
+        return username
+
+    def validate_email(self, email):
+        email = get_adapter().clean_email(email)
+        if custUser.objects.filter(email=email).exists():
+            raise serializers.ValidationError("A user is already registered with this email address.")
+        return email
+    
+    def validate_password1(self, password):
+        return get_adapter().clean_password(password)
+
+    def validate(self, data):
+        if data['password1'] != data['password2']:
+            raise serializers.ValidationError("The two password fields didn't match.")
+        return data
+
+    def create(self, validated_data):
+        user = custUser(
+            username=validated_data['username'],
+            email=validated_data['email'],
+        )
+        user.set_password(validated_data['password1'])
+        user.needs_password = False  # Set needs_password to False for regular signups
+        user.save()
+        setup_user_email(self.context['request'], user, [])
+        return user
+    
+    class Meta:
+        model = custUser
+        fields = ('username', 'first_name', 'last_name' , 'email','is_lecturer', 'password', 'password2')
+        # passwords should not be returned upon response
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'password2': {'write_only': True},
+        }
+
 # user creation serializer/form
 class UserSerializer(serializers.ModelSerializer):
     # password confirmation
@@ -14,7 +62,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = custUser
-        fields = ('username', 'first_name', 'last_name' , 'email','is_lecturer', 'password', 'password2')
+        fields = ('username', 'first_name', 'last_name' , 'email','password', 'password2')
         # passwords should not be returned upon response
         extra_kwargs = {
             'password': {'write_only': True},
@@ -33,6 +81,8 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = custUser(
             username=validated_data['username'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
             email=validated_data['email']
         )
         user.set_password(validated_data['password'])
@@ -115,14 +165,18 @@ class Videoviewlist(serializers.ModelSerializer):
 
 # feedback serializer goes here
 class FeedbackMsgSerializer(serializers.ModelSerializer):
+    sender = serializers.StringRelatedField()
+
     class Meta:
         model = FeedbackMessage
-        fields = ['user', 'message', 'timestamp']
+        fields = ['feedback_room','sender', 'message', 'timestamp']
 
     def create(self, validated_data):
+        feedback_room = validated_data.get('feedback_room')
         
         msg = FeedbackMessage(
-            user=self.context['request'].user, # logged in user
+            feedback_room=feedback_room,
+            sender=self.context['request'].user, # logged in user
             message=validated_data['message'], # the message
             timestamp=validated_data['timestamp'] # the time of posting
         )
