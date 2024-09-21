@@ -1,6 +1,7 @@
 import logging
 from rest_framework.response import Response
 logger = logging.getLogger('django.request')
+logger.setLevel(logging.INFO)
 
 class RequestLoggingMiddleware:
     def __init__(self, get_response):

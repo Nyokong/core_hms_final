@@ -275,7 +275,8 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# LOGIN_REDIRECT_URL = '/'
+# ACCOUNT_ADAPTER = 'api.adapter.MyGoogleLoginAdapter'
+LOGIN_REDIRECT_URL = 'http://localhost:3000/'
 
 SITE_ID = 4
 
@@ -310,6 +311,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
@@ -318,8 +329,13 @@ LOGGING = {
     'loggers': {
         'django.request': {
             'handlers': ['console'],
-            'level': 'DEBUG',  # Change to INFO or ERROR as needed
+            'level': 'DEBUG',  
             'propagate': False,
+        },
+        'api': { 
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
     },
 }
