@@ -26,9 +26,12 @@ from django.shortcuts import get_object_or_404
 
 from .models import FeedbackMessage
 from .serializers import FeedbackMsgSerializer
+from django.http import HttpResponse
 
 import os
 import random
+import pandas as pd
+
 
 # settings
 from django.conf import settings
@@ -255,12 +258,12 @@ class AssignmentUpdateView(generics.RetrieveUpdateAPIView):
     permission_classes =(IsAuthenticated,)
     lookup_field ='id'
 
-    def get_object(self):
-        return super().get_object()
+    #def get_object(self):
+    #    return self.request.assignment
     
     def update(self, request, *args, **kwargs):
         assignment = self.get_object()
-        serializer = self.get_serializer(assignment, data=request.data, partial = True)
+        serializer = self.get_serializer(data=request.data,instance=assignment)
 
         # if assignment is valid - check 
         if serializer.is_valid():
@@ -284,4 +287,13 @@ class AssignmentDeleteView(generics.DestroyAPIView):
         assignment =self.get_object()
         assignment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
+# downloading feedback
+
+def downloadFeeback(request):
+   queryset = Assignment.objects.all()
+   serializer_class = AssignmentForm
+   permission_classes = [IsAuthenticated]
+
+
+
