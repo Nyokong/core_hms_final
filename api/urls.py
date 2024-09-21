@@ -36,7 +36,8 @@ urlpatterns = [
     path('vd/del/<int:pk>',views.DeleteVideoView.as_view(), name='video-delete'),
 
     # feedback http endpoints
-    path('feedback/msgs', views.FeedbackMessages.as_view(), name='feedback-msgs-read'),
+    # path('feedback/msgs', views.FeedbackMessages.as_view(), name='feedback-msgs-read'),
+    path('feedback-room/<int:room_id>/messages/', views.FeedbackMessages.as_view(), name='feedback_room_messages'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

@@ -264,18 +264,6 @@ class DeleteVideoView(generics.DestroyAPIView):
     def get_queryset(self):
         return Video.objects.all()  
 
-# feedback messages go here
-# Read all feed back messages
-class FeedbackMessages(generics.GenericAPIView):
-    # gets users who are authenticated
-    # for later purpose permissions might change
-    permission_classes = [permissions.AllowAny]
-
-    def get(self, request, format=None):
-        query = FeedbackMessage.objects.all()
-        serializer = FeedbackMsgSerializer(query, many=True)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 # create assignments
 class AssignmentCreateView(generics.CreateAPIView):
@@ -343,4 +331,38 @@ class AssignmentDeleteView(generics.DestroyAPIView):
         assignment =self.get_object()
         assignment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+# feedback messages go here
+# Read all feed back messages
+class CreateFeedbackMessageView(generics.CreateAPIView):
+    permission_classes = [permissions.AllowAny]
+    queryset = FeedbackMessage.objects.all()
+    serializer_class = FeedbackMsgSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer= self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            #print data to console
+            serializer.save()
+            #return the success response
+            return Response ({"msg": "feedback creation is a success!"}, status=status.HTTP_201_CREATED)
+        
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class FeedbackMessages(generics.GenericAPIView):
+    # gets users who are authenticated
+    # for later purpose permissions might change
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        room_id = self.kwargs['room_id']
+        return FeedbackMessage.objects.filter(room_id=room_id).order_by('created_at')
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
