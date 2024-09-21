@@ -148,6 +148,9 @@ MIDDLEWARE = [
 
     # Add the account middleware:
     "allauth.account.middleware.AccountMiddleware",
+
+    # my redirect middleware
+    'api.middleware.CustomRedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -279,7 +282,7 @@ ACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 # LOGIN_REDIRECT_URL = '/'
 # SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
-SITE_ID = 4
+SITE_ID = 5
 
 
 # Internationalization

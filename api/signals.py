@@ -44,14 +44,26 @@ def create_feedback_room(sender, instance, created, **kwargs):
 
 @receiver(user_logged_in)
 def user_logged_in_receiver(request, user, **kwargs):
+        # social_account = SocialAccount.objects.get(user=user)
+        # # tokens = get_tokens_for_user(user)
+        # tokens = "4321"
+        # logger.info(f'Redirecting user {user} with token {tokens}')
+        # print("user logged in:", social_account)
     try:
         social_account = SocialAccount.objects.get(user=user)
-        # tokens = get_tokens_for_user(user)
-        tokens = "4321"
-        # logger.info(f'Redirecting user {user} with token {tokens}')
-        print(social_account)
-        # login?token={tokens}
-        return Response({'msg':'this is working?'})
+        custom_user = custUser.objects.get(user=user)
+        
+        # Check if the student's number is empty
+        if not custom_user.student_number:
+            logger.info(f'student number Found: {user}')
+            return True
+        else:
+            logger.info(f'No student number Found: {user}')
+            return False
     except SocialAccount.DoesNotExist:
-        logger.info(f'User {user} does not have a social account.')
+        logger.error(f'SocialAccount does not exist for user {user}')
+        return False
+    except custUser.DoesNotExist:
+        logger.error(f'custUser does not exist for user {user}')
+        return False
     

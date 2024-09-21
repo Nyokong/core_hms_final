@@ -132,7 +132,7 @@ class LoginSerializer(serializers.Serializer):
 class AssignmentForm(serializers.Serializer):
     title=serializers.CharField(max_length=240)
     description= serializers.CharField()
-    due_date = serializers.DateTimeField(default=timezone.now)/
+    due_date = serializers.DateTimeField(default=timezone.now)
     # created_by
 
     def create(self, validated_data):

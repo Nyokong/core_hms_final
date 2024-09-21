@@ -13,7 +13,7 @@ logger = logging.getLogger('api')
 #         'access': str(refresh.access_token),
 #     }
 
-# print("Loading MySocialAccountAdapter")  
+print("Loading MySocialAccountAdapter")  
 class MySocialAccountAdapter(DefaultAccountAdapter):
 
     def get_login_redirect_url(self, request):
@@ -24,7 +24,7 @@ class MySocialAccountAdapter(DefaultAccountAdapter):
         logger.info(f'Logging {user} From Google but needs Student Number')
 
         # go to the front end to add employee number
-        return f'http://localhost:3000/stdupdate/'
+        return f'http://localhost:3000'
     
     # def complete_login(self, request, sociallogin, **kwargs):
     #     user = sociallogin.user
