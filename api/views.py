@@ -37,24 +37,6 @@ import random
 from django.conf import settings
 
 # Create your views here.
-from django.shortcuts import redirect
-from allauth.socialaccount.models import SocialAccount
-from rest_framework_simplejwt.tokens import RefreshToken
-
-def get_tokens_for_user(user):
-    refresh = RefreshToken.for_user(user)
-    return {
-        'refresh': str(refresh),
-        'access': str(refresh.access_token),
-    }
-
-def google_login_callback(request):
-    user = request.user
-    if user.is_authenticated:
-        tokens = get_tokens_for_user(user)
-        return redirect(f'http://localhost:3000/login?token={tokens["access"]}')
-    else:
-        return redirect('login')
 
 # create user viewset api endpoint
 class UserCreateView(generics.CreateAPIView):

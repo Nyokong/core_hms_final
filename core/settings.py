@@ -275,8 +275,9 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# ACCOUNT_ADAPTER = 'api.adapter.MyGoogleLoginAdapter'
-LOGIN_REDIRECT_URL = 'http://localhost:3000/'
+ACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
+# LOGIN_REDIRECT_URL = '/'
+# SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
 SITE_ID = 4
 

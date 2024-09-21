@@ -53,15 +53,17 @@ def user_logged_in_receiver(request, user, **kwargs):
         tokens = "4321"
         logger.info(f'Redirecting user {user} with token {tokens}')
         print(social_account)
-        # return redirect(f'http://localhost:3000/login?token={tokens}')
+        # login?token={tokens}
+        return Response({'msg':'this is working?'})
     except SocialAccount.DoesNotExist:
         logger.info(f'User {user} does not have a social account.')
-
-@receiver(user_logged_in)
-def check_password_setting(sender, request, user, **kwargs):
-    if user.needs_password:
-        return Response({"error_google:", "password_empty"})
     
+@receiver(user_logged_in)
+def user_logged_in_receiver(request, user, **kwargs):
+    tokens = "4321"
+    logger.info(f'Redirecting user {user} with token {tokens}')
+    return redirect(f'http://localhost:3000/login?token={tokens}')
+
 @receiver(social_account_added)
 def social_account_added_receiver(request, sociallogin, **kwargs):
     user = sociallogin.user

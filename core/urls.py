@@ -32,7 +32,6 @@ urlpatterns = [
 
     # socials all auth login
     path('accounts/', include('allauth.urls')),
-    path('accounts/google/login/callback/', views.google_login_callback, name='google_login_callback'),
 ]
 
 if settings.DEBUG:

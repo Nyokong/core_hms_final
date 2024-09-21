@@ -62,7 +62,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = custUser
-        fields = ('username', 'first_name', 'last_name' , 'email','password', 'password2')
+        fields = ('username', 'student_number','first_name', 'last_name' , 'email','password', 'password2')
         # passwords should not be returned upon response
         extra_kwargs = {
             'password': {'write_only': True},
@@ -81,6 +81,7 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = custUser(
             username=validated_data['username'],
+            student_number=validated_data['student_number'],
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
             email=validated_data['email']
