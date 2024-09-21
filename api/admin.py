@@ -4,6 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 # Register your models here.
 
 from .models import FeedbackMessage, custUser, Student, Lecturer, Assignment, Video, Submitted, Grade   
+from .models import VerificationToken
 
 class CustomUserAdmin(UserAdmin): 
 
@@ -23,4 +24,5 @@ admin.site.register(Video)
 admin.site.register(Assignment)
 admin.site.register(Submitted)
 admin.site.register(Grade)
+admin.site.register(VerificationToken)
 

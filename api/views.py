@@ -8,12 +8,14 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
 
-
+# dajngo auth
+from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate, login
 
 from .serializers import UserSerializer, UserUpdateSerializer, Videoviewlist,LoginSerializer
 from .serializers import UserDeleteSerializer, AssignmentForm , VideoSerializer
 from .models import custUser, Video, Assignment
+from .models import VerificationToken
 
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
@@ -51,7 +53,8 @@ class UserCreateView(generics.CreateAPIView):
 
         # Call the send_verification_email method with the newly created user
         if user:
-            self.send_verification_email(user)
+            # self.send_verification_email(user)
+            pass
 
         return Response({
             "user": serializer.data,
@@ -63,6 +66,12 @@ class UserCreateView(generics.CreateAPIView):
         # Generate a 5-digit verification code
         verification_code = random.randint(10000, 99999)
 
+        key = get_random_string(length=32)
+        
+        VerificationToken.objects.create(user=user, token=key)
+
+        verification_link = f'http://127.0.0.1:8000/api/usr/verify/?key={key}'
+
         # get user email
         email = user.email
 
@@ -70,13 +79,46 @@ class UserCreateView(generics.CreateAPIView):
         sender = settings.EMAIL_HOST_USER
 
         # defining subject and message
-        subject = "Account Verification"
-        message = f'Your verfication code is {verification_code}'
+        subject = "Non-reply | Account Verification"
+        message = f'Hey-ya \nYour verfication code is {verification_code} \n\n Click this link to verify account: {verification_link}\n non-reply email'
 
         # send the email
         send_mail(subject, message, sender, [f'{email}'], fail_silently=False)
 
         return Response({'Success': "Verification email sent"}, status=status.HTTP_200_OK)
+
+class VerificationView(generics.GenericAPIView):
+    queryset = custUser.objects.all()
+
+    permission_classes = [permissions.AllowAny]
+
+    def get_object(self):
+        # Get the user instance based on the verification token
+        # get token on the verification url
+        token = self.request.query_params.get('token')
+
+        try:
+            user = VerificationToken.objects.get(token=token)
+        except VerificationToken.DoesNotExist:
+            return Response({'error': 'Invalid verification token'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # return user
+        return user
+
+    def get(self, request):
+        # token = request.query_params.get('token')
+        token_user = self.get_object()
+
+        # get user from custom user and acivate user
+        try:
+            user = custUser.objects.get(username=token_user.user)
+
+            user.is_active = True
+            user.save()
+
+            return Response({'message': 'User activated successfully'}, status=status.HTTP_200_OK)
+        except custUser.DoesNotExist:
+            return Response({'error': 'User DoesntExisist'}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserUpdateView(generics.RetrieveUpdateAPIView):
 

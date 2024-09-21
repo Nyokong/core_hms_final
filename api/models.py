@@ -117,3 +117,8 @@ class FeedbackMessage(models.Model):
     user = models.ForeignKey(custUser, on_delete=models.CASCADE)
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+
+class VerificationToken(models.Model):
+    user = models.ForeignKey(custUser, on_delete=models.CASCADE)
+    token = models.CharField(max_length=32,unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
