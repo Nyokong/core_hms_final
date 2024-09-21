@@ -28,12 +28,8 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 
 from .models import FeedbackMessage
-<<<<<<< HEAD
-from .serializers import FeedbackMsgSerializer
-from django.http import HttpResponse
-=======
 from .serializers import FeedbackMsgSerializer, CustomSignupSerializer
->>>>>>> 3ee8bb7efc95b8db5c81243ececbd86f90702e7f
+
 
 import os
 import random
@@ -357,18 +353,7 @@ class AssignmentDeleteView(generics.DestroyAPIView):
         assignment =self.get_object()
         assignment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-<<<<<<< HEAD
 
-# downloading feedback
-
-def downloadFeeback(request):
-   queryset = Assignment.objects.all()
-   serializer_class = AssignmentForm
-   permission_classes = [IsAuthenticated]
-
-
-
-=======
     
 # feedback messages go here
 # Read all feed back messages
@@ -404,4 +389,4 @@ class FeedbackMessages(generics.GenericAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
->>>>>>> 3ee8bb7efc95b8db5c81243ececbd86f90702e7f
+

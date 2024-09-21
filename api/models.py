@@ -17,7 +17,7 @@ def validate_email(email):
 class custUser(AbstractUser):
     username = models.CharField(verbose_name="Username", max_length=8, unique=True)
     is_lecturer = models.BooleanField(default=False)
-    needs_password = models.BooleanField(default=True)
+ 
 
     groups = models.ManyToManyField(Group, related_name='custom_users')
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_perms')
@@ -70,7 +70,7 @@ class Video(models.Model):
 
 # assignment
 class Assignment(models.Model):
-    created_by = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='lecturer_creator')
+   # created_by = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='lecturer_creator')
     title = models.CharField(verbose_name="title", max_length=255)
     description = models.TextField(verbose_name="description", blank=True, null=True)
     # attachment is optional
