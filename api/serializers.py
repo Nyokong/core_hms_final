@@ -167,11 +167,12 @@ class Videoviewlist(serializers.ModelSerializer):
 class FeedbackMsgSerializer(serializers.ModelSerializer):
     class Meta:
         model = FeedbackMessage
-        fields = ['feedback_room', 'message', 'timestamp']
+        fields = ['feedback_room','sender', 'message', 'timestamp']
 
     def create(self, validated_data):
         
         msg = FeedbackMessage(
+            sender=self.context['request'].user, # logged in user
             message=validated_data['message'], # the message
             timestamp=validated_data['timestamp'] # the time of posting
         )

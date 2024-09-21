@@ -14,12 +14,13 @@ from channels.generic.websocket import WebsocketConsumer
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 from channels.layers import get_channel_layer
+from .models import FeedbackRoom, custUser, FeedbackMessage
 
 class FeedbackChannel(AsyncWebsocketConsumer):
     async def connect(self):
         channel_layer = get_channel_layer()  # Get the channel layer instance
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = f'chat_{self.room_name}'
+        self.room_id = self.scope['url_route']['kwargs']['room_id']
+        self.room_group_name = f'feedback_{self.room_id}'
 
         # Join room channel
         await channel_layer.group_add(self.room_group_name, self.channel_name)
@@ -37,7 +38,16 @@ class FeedbackChannel(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         message = data['message']
-        username = self.scope['user'].username
+        user_id = self.scope['user'].id
+
+        feedbackroom = await FeedbackRoom.objects.get(id=self.room_id)
+        user = await custUser.objects.get(id=user_id)
+
+        feedback_message = FeedbackMessage.objects.create(
+            feedback_room=feedbackroom,
+            sender=user,
+            message=message
+        )
 
         # Send message to room group
         await self.channel_layer.group_send(
@@ -45,7 +55,7 @@ class FeedbackChannel(AsyncWebsocketConsumer):
             {
                 'type': 'feedback_message',
                 'message': message,
-                'username': username,
+                'username': user.username,
             }
         )
 
@@ -53,10 +63,10 @@ class FeedbackChannel(AsyncWebsocketConsumer):
 
     async def feedback_message(self, event):
         message = event['message']
-        username = event['username']
+        sender = event['sender']
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
-            'username': username,
+            'sender': sender,
         }))
