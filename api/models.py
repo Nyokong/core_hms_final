@@ -70,7 +70,7 @@ class Video(models.Model):
 
 # assignment
 class Assignment(models.Model):
-    created_by = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='creator')
+    created_by = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='lecturer_creator')
     title = models.CharField(verbose_name="title", max_length=255)
     description = models.TextField(verbose_name="description", blank=True, null=True)
     # attachment is optional
@@ -88,10 +88,10 @@ class Assignment(models.Model):
 
 # submitted
 class Submission(models.Model):
-    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='assignment')
-    student = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='student_submit')
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='assignment_being_submitted')
+    student = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='student_submitting_assignment')
     # what they submitting
-    video = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='video')
+    video = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='video_being_submitted')
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def clean(self):
@@ -100,8 +100,8 @@ class Submission(models.Model):
 
 # Grade
 class Grade(models.Model):
-    lecturer = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='given_grades')
-    submission = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name='grades')
+    lecturer = models.ForeignKey(custUser, on_delete=models.CASCADE)
+    submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
     grade = models.DecimalField(verbose_name="Percentage Grade",max_digits=3, decimal_places=2)  # e.g.,'A++', 'A+', 'B-', etc.
     feedback = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -125,15 +125,15 @@ class Grade(models.Model):
         
 class FeedbackRoom(models.Model):
     # this is all the conversations they've had
-    lecturer = models.ForeignKey(custUser, on_delete=models.CASCADE)
-    student = models.ForeignKey(custUser, on_delete=models.CASCADE)
+    lecturer = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='lecturer_in_feedback')
+    student = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='student_in_feedback')
     # we want to know what they talking about 
-    submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
+    submission = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name='submission_ref')
 
 class FeedbackMessage(models.Model):
-    feedback_room = models.ForeignKey(FeedbackRoom, on_delete=models.CASCADE)
+    feedback_room = models.ForeignKey(FeedbackRoom, on_delete=models.CASCADE, related_name='feedbackroom_ref')
     # logic is one user ia student and the other is a lecturer
-    sender = models.ForeignKey(custUser, on_delete=models.CASCADE)
+    sender = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='sender_of_message')
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
             
