@@ -18,12 +18,13 @@ logger = logging.getLogger('api')
 @receiver(post_save, sender=custUser)
 def check_lecturer_status(sender, instance, created, **kwargs):
     if created:
-        if Lecturer.objects.filter(emp_num=instance.student_number).exists():
-            print(f"Lecturer found: {instance.username}")
-            instance.is_lecturer = True
-            instance.save()
-        else:
-            print(f"No lecturer found for: {instance.username}")
+        if instance.student_number:
+            if Lecturer.objects.filter(emp_num=instance.student_number).exists():
+                print(f"Lecturer found: {instance.username}")
+                instance.is_lecturer = True
+                instance.save()
+            else:
+                print(f"No lecturer found for: {instance.username}")
 
 from .models import Submission, FeedbackRoom
 
@@ -41,16 +42,16 @@ def create_feedback_room(sender, instance, created, **kwargs):
                 submission=instance
             )
 
-# @receiver(user_logged_in)
-# def user_logged_in_receiver(request, user, **kwargs):
-#     try:
-#         social_account = SocialAccount.objects.get(user=user)
-#         # tokens = get_tokens_for_user(user)
-#         tokens = "4321"
-#         # logger.info(f'Redirecting user {user} with token {tokens}')
-#         print(social_account)
-#         # login?token={tokens}
-#         return Response({'msg':'this is working?'})
-#     except SocialAccount.DoesNotExist:
-#         logger.info(f'User {user} does not have a social account.')
+@receiver(user_logged_in)
+def user_logged_in_receiver(request, user, **kwargs):
+    try:
+        social_account = SocialAccount.objects.get(user=user)
+        # tokens = get_tokens_for_user(user)
+        tokens = "4321"
+        # logger.info(f'Redirecting user {user} with token {tokens}')
+        print(social_account)
+        # login?token={tokens}
+        return Response({'msg':'this is working?'})
+    except SocialAccount.DoesNotExist:
+        logger.info(f'User {user} does not have a social account.')
     

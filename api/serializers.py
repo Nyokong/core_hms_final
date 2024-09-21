@@ -107,6 +107,9 @@ class StudentNumberUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = custUser
         fields = ('student_number',)
+        extra_kwargs = {
+            'student_number': {'required': True}
+        }
 
 # delete -serializer
 class UserDeleteSerializer(serializers.ModelSerializer):
