@@ -44,6 +44,15 @@ class CustomSignupSerializer(serializers.Serializer):
         user.save()
         setup_user_email(self.context['request'], user, [])
         return user
+    
+    class Meta:
+        model = custUser
+        fields = ('username', 'first_name', 'last_name' , 'email','is_lecturer', 'password', 'password2')
+        # passwords should not be returned upon response
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'password2': {'write_only': True},
+        }
 
 # user creation serializer/form
 class UserSerializer(serializers.ModelSerializer):

@@ -26,7 +26,7 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 
 from .models import FeedbackMessage
-from .serializers import FeedbackMsgSerializer
+from .serializers import FeedbackMsgSerializer, CustomSignupSerializer
 
 import os
 import random
@@ -39,6 +39,7 @@ from django.conf import settings
 # create user viewset api endpoint
 class UserCreateView(generics.CreateAPIView):
     serializer_class = UserSerializer
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request, *args, **kwargs):
         serializer = UserSerializer(data=request.data, context={'request': request})

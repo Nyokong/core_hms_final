@@ -40,7 +40,6 @@ class custUser(AbstractUser):
     class Meta:
         unique_together = ('username',)
 
-
 # lecturer model
 class Lecturer(models.Model):
     emp_num = models.CharField(verbose_name="Employee Number", max_length=8, unique=True)
