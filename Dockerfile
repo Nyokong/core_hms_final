@@ -13,7 +13,30 @@ RUN pip install --upgrade pip
 COPY ./requirements.txt /usr/src/app/requirements.txt
 
 RUN pip install -r requirements.txt
-# RUN pip install whitenoise
+
+# Install nodejs and npm
+RUN apk add --no-cache nodejs npm
+
+# Set the working directory
+WORKDIR /usr/src/app
+
+# Copy the application files
+COPY . .
+
+# Verify the contents of the directory
+RUN ls -al /usr/src/app/theme/static_src
+
+# Install npm dependencies
+WORKDIR /usr/src/app/theme/static_src
+RUN npm install
+
+# Collect static files
+WORKDIR /usr/src/app
+RUN python manage.py tailwind install
+RUN python manage.py collectstatic --noinput
+
+# Verify the installation of django-tailwind
+RUN pip show django-tailwind
 
 COPY ./entrypoint.sh /usr/src/app/entrypoint.sh
 

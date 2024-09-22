@@ -108,7 +108,13 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+
+    # tailwind modules
+    'tailwind',
+    'theme',  
 ]
+
+TAILWIND_APP_NAME = 'theme'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
