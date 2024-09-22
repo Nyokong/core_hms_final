@@ -246,6 +246,10 @@ class UserListViewSet(APIView):
         serializer = UserSerializer(query, many=True)
 
         return Response(serializer.data)
+
+class GoogAftermathView(generics.GenericAPIView):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'thank_you.html')
     
 class VideoView(generics.GenericAPIView):
     # a class the views all the videos
@@ -375,4 +379,7 @@ class FeedbackMessages(generics.GenericAPIView):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
     
