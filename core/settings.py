@@ -122,7 +122,7 @@ SIMPLE_JWT = {
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    # 'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 MIDDLEWARE = [
@@ -150,7 +150,8 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
 
     # my redirect middleware
-    'api.middleware.CustomRedirectMiddleware',
+    # 'api.middleware.CustomRedirectMiddleware',
+    # 'api.middleware.DeleteMessagesCookieMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -278,9 +279,9 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-ACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
-# LOGIN_REDIRECT_URL = '/'
-# SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
+ACCOUNT_ADAPTER = 'api.account_adapter.MyAccountAdapter'
+LOGIN_REDIRECT_URL = 'http://localhost:3000'
+SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
 SITE_ID = 5
 

@@ -50,16 +50,16 @@ def user_logged_in_receiver(request, user, **kwargs):
         # logger.info(f'Redirecting user {user} with token {tokens}')
         # print("user logged in:", social_account)
     try:
-        social_account = SocialAccount.objects.get(user=user)
-        custom_user = custUser.objects.get(user=user)
+        # social_account = SocialAccount.objects.get(id=user)
+        custom_user = custUser.objects.get(username=user)
         
         # Check if the student's number is empty
-        if not custom_user.student_number:
-            logger.info(f'student number Found: {user}')
-            return True
+        if custom_user.student_number:
+            logger.info(f'Student number Found: {user}')
+            return False
         else:
             logger.info(f'No student number Found: {user}')
-            return False
+            return True
     except SocialAccount.DoesNotExist:
         logger.error(f'SocialAccount does not exist for user {user}')
         return False

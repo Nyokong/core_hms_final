@@ -28,7 +28,7 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 
 from .models import FeedbackMessage
-from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer
+from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer
 
 import os
 import random
@@ -365,10 +365,11 @@ class FeedbackMessages(generics.GenericAPIView):
     # gets users who are authenticated
     # for later purpose permissions might change
     permission_classes = [permissions.AllowAny]
+    serializer_class = FeebackListSerializer
 
     def get_queryset(self):
         room_id = self.kwargs['room_id']
-        return FeedbackMessage.objects.filter(room_id=room_id).order_by('created_at')
+        return FeedbackMessage.objects.filter(feedback_room=room_id)
 
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()

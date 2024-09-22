@@ -209,3 +209,7 @@ class FeedbackMsgSerializer(serializers.ModelSerializer):
         # after all return user
         return msg
 
+class FeebackListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FeedbackMessage
+        fields = ['feedback_room','sender', 'message', 'timestamp']
