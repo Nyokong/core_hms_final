@@ -26,14 +26,14 @@ from django.core.mail import send_mail
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
-
+from django.http import HttpResponse
 from .models import FeedbackMessage
 from .serializers import FeedbackMsgSerializer, CustomSignupSerializer
 
 
 import os
 import random
-import pandas as pd
+import csv
 
 
 # settings
@@ -390,3 +390,20 @@ class FeedbackMessages(generics.GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
+class ExportCSVView(APIView):
+
+    permission_classes = [IsAuthenticated]
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="data.csv"'
+
+        writer = csv.writer(response)
+
+        writer.writerow(['Column1', 'Column2', 'Column3'])
+
+        data = FeedbackMessage.objects.all().values_list('feedback_room','sender', 'message', 'timestamp')
+
+        for row in data:
+            writer.writerow(row)
+
+        return response
