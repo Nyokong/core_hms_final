@@ -24,6 +24,13 @@ from django.conf.urls.static import static
 from api import views as api_views
 from . import views
 
+from django.urls import path, include
+from django.views.decorators.csrf import csrf_exempt
+from allauth.socialaccount.providers.google.views import oauth2_login, oauth2_callback
+
+
+from allauth.socialaccount.providers.google.urls import urlpatterns as google_urlpatterns
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
@@ -34,8 +41,11 @@ urlpatterns = [
     # socials all auth login
     path('accounts/', include('allauth.urls')),
 
-    path('accounts/google/custom/login/', api_views.GoogleLoginView.as_view(), name='google_login'),
-    path('accounts/google/callback/', api_views.GoogleCallbackView.as_view(), name='google_callback'),
+    # path('accounts/google/login/', api_views.GoogleLoginView.as_view(), name='google_login'),
+
+    # path('accounts/google/login/', csrf_exempt(oauth2_login), name='google_login'),
+    # path('accounts/google/callback/', csrf_exempt(oauth2_callback), name='google_callback'),
+    # path('accounts/google/callback/', api_views.GoogleCallbackView.as_view(), name='google_callback'),
 ]
 
 if settings.DEBUG:
