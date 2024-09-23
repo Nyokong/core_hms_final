@@ -65,7 +65,7 @@ CORS_ALLOW_HEADERS = ['*']
 
 # SESSION_COOKIE_DOMAIN = 'http://localhost:3000'
 # CSRF_COOKIE_DOMAIN = 'http://localhost:3000'
-SESSION_COOKIE_SAMESITE = 'False'  # Allow cross-site cookies
+SESSION_COOKIE_SAMESITE = 'Lax'  # Allow cross-site cookies
 # SESSION_COOKIE_SECURE = True      # Requires HTTPS for cookies
 # CSRF_COOKIE_SAMESITE = 'None'
 # CSRF_COOKIE_SECURE = True

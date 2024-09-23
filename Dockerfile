@@ -29,6 +29,7 @@ RUN ls -al /usr/src/app/theme/static_src
 # Install npm dependencies
 WORKDIR /usr/src/app/theme/static_src
 RUN npm install
+RUN npm run build:css
 
 # Collect static files
 WORKDIR /usr/src/app
