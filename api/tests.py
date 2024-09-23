@@ -6,6 +6,9 @@ from .models import FeedbackMessage
 from .serializers import FeedbackMessage
 from django.core.exceptions import ValidationError
 from .models import custUser, Lecturer, Student, FeedbackMessage
+from rest_framework.exceptions import ValidationError
+from .serializers import FeedbackMsgSerializer
+from django.contrib.auth import get_user_model
 
 # Model Tests
 class CustUserModelTest(TestCase):
@@ -17,7 +20,7 @@ class CustUserModelTest(TestCase):
 
     def test_email_validation(self):
         with self.assertRaises(ValidationError):
-            self.user.email = "invalid-email"
+            self.user.email = 'invalid-email@mynwu.ac.za'  # An invalid email, but domain is correct
             self.user.full_clean()  # This triggers model validation
 
     def test_valid_email(self):
@@ -76,3 +79,49 @@ class FeedbackMessagesTest(TestCase):
         response = self.client.get(reverse('feedback-msgs'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [])  # Expect an empty list
+
+#Test Serializers
+
+# User = get_user_model()
+
+# class FeedbackMsgSerializerTest(TestCase):
+#     def setUp(self):
+#         self.user = User.objects.create_user(username='testuser', password='testpass')
+#         self.valid_data = {
+#             'message': 'This is a test message.',
+#             'timestamp': '2024-09-23T12:34:56Z'
+#         }
+#         self.invalid_data = {
+#             'message': '',
+#             'timestamp': '2024-09-23T12:34:56Z'
+#         }
+
+#     def test_serializer_with_valid_data(self):
+#         valid_data = {
+#             'user': self.user.id,  # Add user to the valid data
+#             'message': 'This is a test message.',
+#             'timestamp': '2024-09-23T12:34:56Z'
+#         }
+#         serializer = FeedbackMsgSerializer(data=valid_data, context={'request': self._get_mock_request()})
+#         if not serializer.is_valid():
+#             print(serializer.errors)  # Print out any errors if validation fails
+#         self.assertTrue(serializer.is_valid(), serializer.errors)  # If it fails, errors will show why
+#         feedback_msg = serializer.save()
+#         self.assertEqual(feedback_msg.user, self.user)
+#         self.assertEqual(feedback_msg.message, 'This is a test message.')
+#         self.assertEqual(feedback_msg.timestamp.isoformat(), '2024-09-23T12:34:56+00:00')  # Check if timestamp is saved correctly
+
+
+
+#     def test_serializer_with_invalid_data(self):
+#         serializer = FeedbackMsgSerializer(data=self.invalid_data, context={'request': self._get_mock_request()})
+#         self.assertFalse(serializer.is_valid())
+
+
+#     def _get_mock_request(self):
+#         # Utility function to create a mock request object with the user
+#         from rest_framework.test import APIRequestFactory
+#         request_factory = APIRequestFactory()
+#         request = request_factory.get('/')
+#         request.user = self.user
+#         return request
