@@ -2,7 +2,13 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from decimal import Decimal
+from django.urls import reverse, resolve
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .models import custUser, Lecturer, Student, Video, Assignment, Submission, Grade, FeedbackRoom, FeedbackMessage, VerificationToken
+from .views import (
+    UserCreateView, UserUpdateView, LoginAPIView, UserListViewSet, VerifyEmailView, DeleteUserView, UserProfileView, AddStudentNumberView,
+    GoogAftermathView, AssignmentListView, AssignmentCreateView, AssignmentUpdateView, AssignmentDeleteView, VideoView, DeleteVideoView, FeedbackMessages
+)
 
 class CustUserModelTest(TestCase):
 
@@ -131,22 +137,80 @@ class VerificationTokenModelTest(TestCase):
         self.assertEqual(self.token.user.username, 'testuser')
         self.assertEqual(self.token.token, 'abcd1234')
 
-        
-       
- 
 
-# #Test Urls
+#Test Urls
+class TestUrls(TestCase):
 
-# class UrlsTestCase(TestCase):
-    
-#     def test_feedback_msgs_url(self):
-#         response = self.client.get(reverse('feedback-msgs'))
-#         self.assertEqual(response.status_code, 200)
+    def test_create_user_url_is_resolved(self):
+        url = reverse('create-user')
+        self.assertEqual(resolve(url).func.view_class, UserCreateView)
 
-#     def test_sample_view_url(self):
-#         response = self.client.get(reverse('sample-view'))
-#         self.assertEqual(response.status_code, 200)
+    def test_update_user_url_is_resolved(self):
+        url = reverse('user-update')
+        self.assertEqual(resolve(url).func.view_class, UserUpdateView)
 
+    def test_login_user_url_is_resolved(self):
+        url = reverse('login-user')
+        self.assertEqual(resolve(url).func.view_class, LoginAPIView)
+
+    def test_users_url_is_resolved(self):
+        url = reverse('users')
+        self.assertEqual(resolve(url).func.view_class, UserListViewSet)
+
+    def test_verify_email_url_is_resolved(self):
+        url = reverse('verify-email', args=['uidb64', 'token'])
+        self.assertEqual(resolve(url).func.view_class, VerifyEmailView)
+
+    def test_delete_user_url_is_resolved(self):
+        url = reverse('user-delete', args=[1])
+        self.assertEqual(resolve(url).func.view_class, DeleteUserView)
+    def test_user_profile_url_is_resolved(self):
+        url = reverse('user-profile-read')
+        self.assertEqual(resolve(url).func.view_class, UserProfileView)
+
+    def test_add_student_number_url_is_resolved(self):
+        url = reverse('add-student-number')
+        self.assertEqual(resolve(url).func.view_class, AddStudentNumberView)
+
+    def test_thank_you_url_is_resolved(self):
+        url = reverse('thank-you')
+        self.assertEqual(resolve(url).func.view_class, GoogAftermathView)
+
+    def test_token_obtain_pair_url_is_resolved(self):
+        url = reverse('token_obtain_pair')
+        self.assertEqual(resolve(url).func.view_class, TokenObtainPairView)
+
+    def test_token_refresh_url_is_resolved(self):
+        url = reverse('token_refresh')
+        self.assertEqual(resolve(url).func.view_class, TokenRefreshView)
+
+    def test_list_assignment_url_is_resolved(self):
+        url = reverse('list-assignment')
+        self.assertEqual(resolve(url).func.view_class, AssignmentListView)
+
+    def test_create_assignment_url_is_resolved(self):
+        url = reverse('create-assignments')
+        self.assertEqual(resolve(url).func.view_class, AssignmentCreateView)
+
+    def test_update_assignment_url_is_resolved(self):
+        url = reverse('assignment-update', args=[1])
+        self.assertEqual(resolve(url).func.view_class, AssignmentUpdateView)
+
+    def test_delete_assignment_url_is_resolved(self):
+        url = reverse('assignment-delete', args=[1])
+        self.assertEqual(resolve(url).func.view_class, AssignmentDeleteView)
+
+    def test_video_list_url_is_resolved(self):
+        url = reverse('video-list')
+        self.assertEqual(resolve(url).func.view_class, VideoView)
+
+    def test_delete_video_url_is_resolved(self):
+        url = reverse('video-delete', args=[1])
+        self.assertEqual(resolve(url).func.view_class, DeleteVideoView)
+
+    def test_feedback_room_messages_url_is_resolved(self):
+        url = reverse('feedback_room_messages', args=[1])
+        self.assertEqual(resolve(url).func.view_class, FeedbackMessages)
 
 # #Test Views
 
