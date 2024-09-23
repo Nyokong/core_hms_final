@@ -398,7 +398,7 @@ class ExportCSVView(APIView):
 
         writer.writerow(['Column1', 'Column2', 'Column3'])
 
-        data = FeedbackMessage.objects.all().values_list('feedback_room','sender', 'message', 'timestamp')
+        data = Assignment.objects.all().values_list('title', 'description', 'due_date', 'attachment')
 
         for row in data:
             writer.writerow(row)
