@@ -1,21 +1,22 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
+from django.utils import timezone
+from decimal import Decimal
 from .models import custUser, Lecturer, Student, Video, Assignment, Submission, Grade, FeedbackRoom, FeedbackMessage, VerificationToken
 
-#Models Testing
-class ModelsTestCase(TestCase):
-    
+class CustUserModelTest(TestCase):
+
     def setUp(self):
         self.user = custUser.objects.create(username='testuser', student_number='12345678')
 
-    def test_email_default(self):
+    def test_email_default_generation(self):
         self.assertEqual(self.user.email, '12345678@mynwu.ac.za')
 
-    def test_invalid_email(self):
+    def test_invalid_email_raises_validation_error(self):
+        self.user.email = 'invalid-email'
         with self.assertRaises(ValidationError):
-            self.user.email = 'invalid-email'
             self.user.full_clean()
-    
+
 class LecturerModelTest(TestCase):
 
     def setUp(self):
@@ -46,44 +47,45 @@ class AssignmentModelTest(TestCase):
 
     def setUp(self):
         self.user = custUser.objects.create(username='lecturer', student_number='12345678', is_lecturer=True)
-        self.assignment = Assignment.objects.create(created_by=self.user, title='Test Assignment', due_date='2024-12-31')
+        self.assignment = Assignment.objects.create(created_by=self.user, title='Test Assignment', due_date=timezone.now() + timezone.timedelta(days=1))
 
     def test_assignment_creation(self):
         self.assertEqual(self.assignment.title, 'Test Assignment')
         self.assertEqual(self.assignment.created_by.username, 'lecturer')
 
-    def test_assignment_creation_by_non_lecturer(self):
+    def test_invalid_assignment_creation_by_non_lecturer(self):
         non_lecturer = custUser.objects.create(username='student', student_number='87654321', is_lecturer=False)
+        assignment = Assignment(created_by=non_lecturer, title='Invalid Assignment', due_date=timezone.now())
         with self.assertRaises(ValidationError):
-            Assignment.objects.create(created_by=non_lecturer, title='Invalid Assignment', due_date='2024-12-31')
+            assignment.full_clean()
 
 class SubmissionModelTest(TestCase):
 
     def setUp(self):
         self.lecturer = custUser.objects.create(username='lecturer', student_number='12345678', is_lecturer=True)
         self.student = custUser.objects.create(username='student', student_number='87654321', is_lecturer=False)
-        self.assignment = Assignment.objects.create(created_by=self.lecturer, title='Test Assignment', due_date='2024-12-31')
+        self.assignment = Assignment.objects.create(created_by=self.lecturer, title='Test Assignment', due_date=timezone.now() + timezone.timedelta(days=1))
         self.submission = Submission.objects.create(assignment=self.assignment, student=self.student, video=self.student)
 
     def test_submission_creation(self):
         self.assertEqual(self.submission.assignment.title, 'Test Assignment')
         self.assertEqual(self.submission.student.username, 'student')
 
-    def test_submission_by_lecturer(self):
+    def test_invalid_submission_by_lecturer(self):
         with self.assertRaises(ValidationError):
-            Submission.objects.create(assignment=self.assignment, student=self.lecturer, video=self.lecturer)
+            Submission.objects.create(assignment=self.assignment, student=self.lecturer, video=self.lecturer).full_clean()
 
 class GradeModelTest(TestCase):
 
     def setUp(self):
         self.lecturer = custUser.objects.create(username='lecturer', student_number='12345678', is_lecturer=True)
         self.student = custUser.objects.create(username='student', student_number='87654321', is_lecturer=False)
-        self.assignment = Assignment.objects.create(created_by=self.lecturer, title='Test Assignment', due_date='2024-12-31')
+        self.assignment = Assignment.objects.create(created_by=self.lecturer, title='Test Assignment', due_date=timezone.now())
         self.submission = Submission.objects.create(assignment=self.assignment, student=self.student, video=self.student)
-        self.grade = Grade.objects.create(lecturer=self.lecturer, submission=self.submission, grade=85.00)
+        self.grade = Grade.objects.create(lecturer=self.lecturer, submission=self.submission, grade=Decimal('85.00'))
 
     def test_grade_creation(self):
-        self.assertEqual(self.grade.grade, 85.00)
+        self.assertEqual(self.grade.grade, Decimal('85.00'))
         self.assertEqual(self.grade.lecturer.username, 'lecturer')
         self.assertEqual(self.grade.submission.assignment.title, 'Test Assignment')
 
@@ -95,7 +97,7 @@ class FeedbackRoomModelTest(TestCase):
     def setUp(self):
         self.lecturer = custUser.objects.create(username='lecturer', student_number='12345678', is_lecturer=True)
         self.student = custUser.objects.create(username='student', student_number='87654321', is_lecturer=False)
-        self.assignment = Assignment.objects.create(created_by=self.lecturer, title='Test Assignment', due_date='2024-12-31')
+        self.assignment = Assignment.objects.create(created_by=self.lecturer, title='Test Assignment', due_date=timezone.now() + timezone.timedelta(days=1))
         self.submission = Submission.objects.create(assignment=self.assignment, student=self.student, video=self.student)
         self.feedback_room = FeedbackRoom.objects.create(lecturer=self.lecturer, student=self.student, submission=self.submission)
 
@@ -104,13 +106,12 @@ class FeedbackRoomModelTest(TestCase):
         self.assertEqual(self.feedback_room.student.username, 'student')
         self.assertEqual(self.feedback_room.submission.assignment.title, 'Test Assignment')
 
-
 class FeedbackMessageModelTest(TestCase):
 
     def setUp(self):
         self.lecturer = custUser.objects.create(username='lecturer', student_number='12345678', is_lecturer=True)
         self.student = custUser.objects.create(username='student', student_number='87654321', is_lecturer=False)
-        self.assignment = Assignment.objects.create(created_by=self.lecturer, title='Test Assignment', due_date='2024-12-31')
+        self.assignment = Assignment.objects.create(created_by=self.lecturer, title='Test Assignment', due_date=timezone.now() + timezone.timedelta(days=1))
         self.submission = Submission.objects.create(assignment=self.assignment, student=self.student, video=self.student)
         self.feedback_room = FeedbackRoom.objects.create(lecturer=self.lecturer, student=self.student, submission=self.submission)
         self.feedback_message = FeedbackMessage.objects.create(feedback_room=self.feedback_room, sender=self.lecturer, message='Great job!')
@@ -129,9 +130,6 @@ class VerificationTokenModelTest(TestCase):
     def test_verification_token_creation(self):
         self.assertEqual(self.token.user.username, 'testuser')
         self.assertEqual(self.token.token, 'abcd1234')
-        
-    
-        
 
         
        

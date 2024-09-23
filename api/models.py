@@ -103,7 +103,7 @@ class Submission(models.Model):
 class Grade(models.Model):
     lecturer = models.ForeignKey(custUser, on_delete=models.CASCADE)
     submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
-    grade = models.DecimalField(verbose_name="Percentage Grade",max_digits=3, decimal_places=2)  # e.g.,'A++', 'A+', 'B-', etc.
+    grade = models.DecimalField(verbose_name="Percentage Grade",max_digits=5, decimal_places=2)  # e.g.,'A++', 'A+', 'B-', etc.
     feedback = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
