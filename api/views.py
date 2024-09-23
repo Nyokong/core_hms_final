@@ -123,7 +123,7 @@ class VerificationView(generics.GenericAPIView):
 class UserUpdateView(generics.RetrieveUpdateAPIView):
 
     queryset = custUser.objects.all()
-    serializer_class = StudentNumberUpdateSerializer 
+    serializer_class = UserUpdateSerializer 
 
     permission_classes = (IsAuthenticated,)
 
@@ -146,6 +146,8 @@ from django.shortcuts import redirect
 from django.conf import settings
 from django.views import View
 from urllib.parse import urlencode
+from rest_framework_simplejwt.tokens import RefreshToken
+import requests
 
 class GoogleLoginView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
@@ -159,6 +161,45 @@ class GoogleLoginView(generics.GenericAPIView):
         }
         url = f"{base_url}?{urlencode(params)}"
         return redirect(url)
+
+class GoogleCallbackView(View):
+
+    def get(self, request, *args, **kwargs):
+        code = request.GET.get('code')
+        state = request.GET.get('state')
+
+        # Exchange the authorization code for access and refresh tokens
+        token_url = "https://oauth2.googleapis.com/token"
+        data = {
+            "code": code,
+            "client_id": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
+            "client_secret": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
+            "redirect_uri": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI,
+            "grant_type": "authorization_code",
+        }
+        response = requests.post(token_url, data=data)
+        tokens = response.json()
+
+        # Use the tokens to get user info and log the user in
+        user_info_url = "https://www.googleapis.com/oauth2/v3/userinfo"
+        headers = {"Authorization": f"Bearer {tokens['access_token']}"}
+        user_info = requests.get(user_info_url, headers=headers).json()
+
+        # Create or get the user and log them in
+        # (You need to implement this part according to your user model and authentication system)
+
+        # Generate your own JWT tokens for the user
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+
+        # Redirect to your frontend with the tokens
+        response = redirect('http://localhost:3000')
+        response.set_cookie('access_token', access_token, httponly=True, secure=True)
+        response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True)
+
+        return response
+
 
 def google_login(request):
     base_url = "https://accounts.google.com/o/oauth2/auth"
