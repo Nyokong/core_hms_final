@@ -3,13 +3,16 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.urls import reverse, resolve
 
+from rest_framework.request import Request
+from rest_framework.test import APIRequestFactory
+
 from decimal import Decimal
 from rest_framework.test import APITestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .serializers import UserSerializer
+from .serializers import UserSerializer, CustomSignupSerializer
 from .models import custUser, Lecturer, Student, Video, Assignment, Submission, Grade, FeedbackRoom, FeedbackMessage, VerificationToken
 from .views import (
     UserCreateView, UserUpdateView, LoginAPIView, UserListViewSet, VerifyEmailView, DeleteUserView, UserProfileView, AddStudentNumberView,
@@ -287,48 +290,76 @@ class UserCreateViewTests(TestCase):
 #         self.assertEqual(response.data['error'], 'User DoesntExisist')
 
 
+
 #Test Serializers
+class CustomSignupSerializerTest(APITestCase):
 
-# User = get_user_model()
+    def setUp(self):
+        self.client = APIClient()
+        self.valid_data = {
+            'username': 'testuser',
+            'email': 'testuser@example.com',
+            'password1': 'securepassword123',
+            'password2': 'securepassword123',
+        }
+        self.existing_user = custUser.objects.create_user(
+            username='existinguser',
+            email='existinguser@example.com',
+            password='securepassword123'
+        )
 
-# class FeedbackMsgSerializerTest(TestCase):
-#     def setUp(self):
-#         self.user = User.objects.create_user(username='testuser', password='testpass')
-#         self.valid_data = {
-#             'message': 'This is a test message.',
-#             'timestamp': '2024-09-23T12:34:56Z'
-#         }
-#         self.invalid_data = {
-#             'message': '',
-#             'timestamp': '2024-09-23T12:34:56Z'
-#         }
+    def test_valid_data_creates_user(self):
+        response = self.client.post('/api/usr/create', data=self.valid_data)
+        self.assertEqual(response.status_code, 201)  # Check for successful creation
 
-#     def test_serializer_with_valid_data(self):
-#         valid_data = {
-#             'user': self.user.id,  # Add user to the valid data
-#             'message': 'This is a test message.',
-#             'timestamp': '2024-09-23T12:34:56Z'
-#         }
-#         serializer = FeedbackMsgSerializer(data=valid_data, context={'request': self._get_mock_request()})
-#         if not serializer.is_valid():
-#             print(serializer.errors)  # Print out any errors if validation fails
-#         self.assertTrue(serializer.is_valid(), serializer.errors)  # If it fails, errors will show why
-#         feedback_msg = serializer.save()
-#         self.assertEqual(feedback_msg.user, self.user)
-#         self.assertEqual(feedback_msg.message, 'This is a test message.')
-#         self.assertEqual(feedback_msg.timestamp.isoformat(), '2024-09-23T12:34:56+00:00')  # Check if timestamp is saved correctly
+        # Now validate the serializer separately
+        serializer = CustomSignupSerializer(data=self.valid_data, context={'request': response.wsgi_request})
+        self.assertTrue(serializer.is_valid())
+        user = serializer.save()
+        self.assertEqual(user.username, self.valid_data['username'])
+        self.assertEqual(user.email, self.valid_data['email'])
+        self.assertTrue(user.check_password(self.valid_data['password1']))
 
+    def test_duplicate_username(self):
+        data = self.valid_data.copy()
+        data['username'] = 'existinguser'
+        serializer = CustomSignupSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('username', serializer.errors)
 
+    def test_duplicate_email(self):
+        data = self.valid_data.copy()
+        data['email'] = 'existinguser@example.com'
+        serializer = CustomSignupSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('email', serializer.errors)
 
-#     def test_serializer_with_invalid_data(self):
-#         serializer = FeedbackMsgSerializer(data=self.invalid_data, context={'request': self._get_mock_request()})
-#         self.assertFalse(serializer.is_valid())
+    def test_mismatched_passwords(self):
+        data = self.valid_data.copy()
+        data['password2'] = 'differentpassword'
+        serializer = CustomSignupSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('non_field_errors', serializer.errors)
 
+    def test_empty_username(self):
+        data = self.valid_data.copy()
+        data['username'] = ''
+        serializer = CustomSignupSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('username', serializer.errors)
 
-#     def _get_mock_request(self):
-#         # Utility function to create a mock request object with the user
-#         from rest_framework.test import APIRequestFactory
-#         request_factory = APIRequestFactory()
-#         request = request_factory.get('/')
-#         request.user = self.user
-#         return request
+    def test_empty_email(self):
+        data = self.valid_data.copy()
+        data['email'] = ''
+        serializer = CustomSignupSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('email', serializer.errors)
+
+    def test_empty_passwords(self):
+        data = self.valid_data.copy()
+        data['password1'] = ''
+        data['password2'] = ''
+        serializer = CustomSignupSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('password1', serializer.errors)
+        self.assertIn('password2', serializer.errors)
