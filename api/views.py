@@ -284,28 +284,6 @@ class UploadVideoView(generics.CreateAPIView):
             logger.info(f'serializer is not valid {request.data}')
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class UploadVideoViewTask(generics.CreateAPIView):
-    serializer_class = VideoSerializer  
-
-    # only authenticated users can access this page?
-    permission_classes = [IsAuthenticated]
-
-    # post 
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-
-        if serializer.is_valid():
-            # Print data to console
-            print('video upload in progress')
-            video = serializer.save()
-            print('Original Video Uploaded!')
-
-            # return the success response
-            return Response({"view": "view is a success!"}, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    
 class VideoView(generics.GenericAPIView):
     # a class the views all the videos
     # in the database all of them
