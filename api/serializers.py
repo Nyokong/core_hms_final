@@ -62,7 +62,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = custUser
-        fields = ('username', 'first_name', 'last_name' , 'email','password', 'password2')
+        fields = ('username', 'student_number','first_name', 'last_name' , 'email','password', 'password2')
         # passwords should not be returned upon response
         extra_kwargs = {
             'password': {'write_only': True},
@@ -81,6 +81,7 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = custUser(
             username=validated_data['username'],
+            student_number=validated_data['student_number'],
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
             email=validated_data['email']
@@ -100,6 +101,15 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = custUser
         fields = ('username', 'first_name', 'last_name')
+
+class StudentNumberUpdateSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = custUser
+        fields = ('student_number',)
+        extra_kwargs = {
+            'student_number': {'required': True}
+        }
 
 # delete -serializer
 class UserDeleteSerializer(serializers.ModelSerializer):
@@ -123,9 +133,22 @@ class AssignmentForm(serializers.Serializer):
     title=serializers.CharField(max_length=240)
     description= serializers.CharField()
     due_date = serializers.DateTimeField(default=timezone.now)
+    # created_by
 
     def create(self, validated_data):
-        return Assignment.objects.create(**validated_data)
+        assignment = Assignment(
+            created_by=self.context['request'].user,
+            title=validated_data['title'],
+            description=validated_data['description'],
+        )
+
+        # save the video if is succesful
+        assignment.save()
+        # after all return user
+        return assignment
+
+        # return Assignment.objects.create(**validated_data)
+
     class Meta:
         model = Assignment
         fields = ['title', 'description', 'due_date', 'attachment']
@@ -186,3 +209,7 @@ class FeedbackMsgSerializer(serializers.ModelSerializer):
         # after all return user
         return msg
 
+class FeebackListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FeedbackMessage
+        fields = ['feedback_room','sender', 'message', 'timestamp']

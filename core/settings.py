@@ -54,6 +54,22 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
+# Allow CORS for localhost:3000 (Next.js)
+CORS_ALLOW_CREDENTIALS = True  # To allow cookies to be sent in cross-origin requests
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',  # Next.js frontend
+]
+
+# Allow all headers (optional, you can be more restrictive)
+CORS_ALLOW_HEADERS = ['*']
+
+# SESSION_COOKIE_DOMAIN = 'http://localhost:3000'
+# CSRF_COOKIE_DOMAIN = 'http://localhost:3000'
+SESSION_COOKIE_SAMESITE = 'Lax'  # Allow cross-site cookies
+# SESSION_COOKIE_SECURE = True      # Requires HTTPS for cookies
+# CSRF_COOKIE_SAMESITE = 'None'
+# CSRF_COOKIE_SECURE = True
+
 # custom Auth user model
 AUTH_USER_MODEL = 'api.custUser'
 
@@ -62,6 +78,9 @@ AUTH_USER_MODEL = 'api.custUser'
 INSTALLED_APPS = [
     # channels
     'channels',
+
+    # corsheaders
+    'corsheaders',
 
     # daphne
     'daphne',
@@ -89,7 +108,13 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+
+    # tailwind modules
+    'tailwind',
+    'theme',  
 ]
+
+TAILWIND_APP_NAME = 'theme'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -106,7 +131,7 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=100),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -122,7 +147,7 @@ SIMPLE_JWT = {
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    # 'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 MIDDLEWARE = [
@@ -148,6 +173,10 @@ MIDDLEWARE = [
 
     # Add the account middleware:
     "allauth.account.middleware.AccountMiddleware",
+
+    # my redirect middleware
+    'api.middleware.CustomRedirectMiddleware',
+    # 'api.middleware.DeleteMessagesCookieMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -156,7 +185,7 @@ TEMPLATES = [
     {
         # os.path.join(BASE_DIR, 'templates')
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -275,9 +304,13 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# LOGIN_REDIRECT_URL = '/'
+# ACCOUNT_ADAPTER = 'api.account_adapter.MyAccountAdapter'
+# LOGIN_REDIRECT_URL = 'http://localhost:3000'
+# SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
-SITE_ID = 4
+
+
+SITE_ID = 5
 
 
 # Internationalization
@@ -295,6 +328,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -310,6 +344,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
@@ -318,8 +362,13 @@ LOGGING = {
     'loggers': {
         'django.request': {
             'handlers': ['console'],
-            'level': 'DEBUG',  # Change to INFO or ERROR as needed
+            'level': 'DEBUG',  
             'propagate': False,
+        },
+        'api': { 
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
     },
 }

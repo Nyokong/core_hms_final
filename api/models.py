@@ -16,8 +16,12 @@ def validate_email(email):
 # my user model
 class custUser(AbstractUser):
     username = models.CharField(verbose_name="Username", max_length=8, unique=True)
+    student_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     is_lecturer = models.BooleanField(default=False)
+<<<<<<< HEAD
  
+=======
+>>>>>>> 2e593dc5a8a253f6adac845a919690c1d4ce5786
 
     groups = models.ManyToManyField(Group, related_name='custom_users')
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_perms')
@@ -61,7 +65,7 @@ class Video(models.Model):
     user = models.ForeignKey(custUser, on_delete=models.CASCADE)
     title = models.CharField(verbose_name="title", max_length=255)
     description = models.TextField(verbose_name="description", blank=True, null=True)
-    cmp_video = models.FileField(verbose_name="cmp_video",upload_to='compressed_videos/')
+    cmp_video = models.FileField(verbose_name="cmp_video",upload_to='compressed_videos/', null=True, blank=True,)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

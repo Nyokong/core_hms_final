@@ -28,7 +28,7 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from .models import FeedbackMessage
-from .serializers import FeedbackMsgSerializer, CustomSignupSerializer
+from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer
 
 
 import os
@@ -40,24 +40,6 @@ import csv
 from django.conf import settings
 
 # Create your views here.
-from django.shortcuts import redirect
-from allauth.socialaccount.models import SocialAccount
-from rest_framework_simplejwt.tokens import RefreshToken
-
-def get_tokens_for_user(user):
-    refresh = RefreshToken.for_user(user)
-    return {
-        'refresh': str(refresh),
-        'access': str(refresh.access_token),
-    }
-
-def google_login_callback(request):
-    user = request.user
-    if user.is_authenticated:
-        tokens = get_tokens_for_user(user)
-        return redirect(f'http://localhost:3000/login?token={tokens["access"]}')
-    else:
-        return redirect('login')
 
 # create user viewset api endpoint
 class UserCreateView(generics.CreateAPIView):
@@ -144,7 +126,7 @@ class VerificationView(generics.GenericAPIView):
 class UserUpdateView(generics.RetrieveUpdateAPIView):
 
     queryset = custUser.objects.all()
-    serializer_class = UserUpdateSerializer 
+    serializer_class = StudentNumberUpdateSerializer 
 
     permission_classes = (IsAuthenticated,)
 
@@ -162,6 +144,15 @@ class UserUpdateView(generics.RetrieveUpdateAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST) 
+
+class AddStudentNumberView(generics.RetrieveUpdateAPIView):
+
+    queryset = custUser.objects.all()
+    serializer_class = UserUpdateSerializer 
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
 
 class UserProfileView(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
@@ -258,6 +249,10 @@ class UserListViewSet(APIView):
         serializer = UserSerializer(query, many=True)
 
         return Response(serializer.data)
+
+class GoogAftermathView(generics.GenericAPIView):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'thank_you.html')
     
 class VideoView(generics.GenericAPIView):
     # a class the views all the videos
@@ -379,15 +374,17 @@ class FeedbackMessages(generics.GenericAPIView):
     # gets users who are authenticated
     # for later purpose permissions might change
     permission_classes = [permissions.AllowAny]
+    serializer_class = FeebackListSerializer
 
     def get_queryset(self):
         room_id = self.kwargs['room_id']
-        return FeedbackMessage.objects.filter(room_id=room_id).order_by('created_at')
+        return FeedbackMessage.objects.filter(feedback_room=room_id)
 
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+<<<<<<< HEAD
     
 
 class ExportCSVView(APIView):
@@ -407,3 +404,9 @@ class ExportCSVView(APIView):
             writer.writerow(row)
 
         return response
+=======
+
+
+
+    
+>>>>>>> 2e593dc5a8a253f6adac845a919690c1d4ce5786

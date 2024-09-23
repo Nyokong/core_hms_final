@@ -22,17 +22,17 @@ from django.conf.urls.static import static
 
 # from . import views
 from api import views
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
 
     # home 
-    # path('', views.BaseAPI.as_view(), name='home'),
+    path('', views.IndexView.as_view(), name='home'),
 
     # socials all auth login
     path('accounts/', include('allauth.urls')),
-    path('accounts/google/login/callback/', views.google_login_callback, name='google_login_callback'),
 ]
 
 if settings.DEBUG:

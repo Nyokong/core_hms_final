@@ -43,7 +43,9 @@ class FeedbackChannel(AsyncWebsocketConsumer):
         feedbackroom = await FeedbackRoom.objects.get(id=self.room_id)
         user = await custUser.objects.get(id=user_id)
 
-        feedback_message = FeedbackMessage.objects.create(
+        # feedback_message = 
+        # create the message
+        FeedbackMessage.objects.create(
             feedback_room=feedbackroom,
             sender=user,
             message=message
