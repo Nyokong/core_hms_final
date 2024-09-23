@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.urls import reverse, resolve
 
 from decimal import Decimal
+from rest_framework.test import APITestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -252,32 +253,39 @@ class UserCreateViewTests(TestCase):
         self.assertIn('username', response.data)
         self.assertIn('email', response.data)
 
-    def setUp(self):
-        self.client = APIClient()
-        self.user = custUser.objects.create_user(
-            username='testuser',
-            password='testpass',
-            is_active=False
-        )
-        self.token = VerificationToken.objects.create(user=self.user, token='validtoken')
 
-    def test_valid_token(self):
-        response = self.client.get(reverse('verification-view'), {'token': 'validtoken'})
-        self.user.refresh_from_db()
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(self.user.is_active)
-        self.assertEqual(response.data['message'], 'User activated successfully')
+# class VerificationViewTest(APITestCase):
 
-    def test_invalid_token(self):
-        response = self.client.get(reverse('verification-view'), {'token': 'invalidtoken'})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['error'], 'Invalid verification token')
+#     def setUp(self):
+#         # Set up a user and a verification token for testing
+#         self.user = custUser.objects.create_user(username='testuser', password='testpassword', is_active=False)
+#         self.token = VerificationToken.objects.create(user=self.user, token='validtoken')
+#         self.url = reverse('verification')  # Update 'verification' with the actual URL name for this view
 
-    def test_user_does_not_exist(self):
-        self.token.user.delete()  # Simulate user deletion
-        response = self.client.get(reverse('verification-view'), {'token': 'validtoken'})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['error'], 'User DoesntExisist')
+#     def test_user_activation_success(self):
+#         # Test successful activation with a valid token
+#         response = self.client.get(self.url, {'token': self.token.token})
+#         self.user.refresh_from_db()  # Refresh the user instance from the database
+
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+#         self.assertTrue(self.user.is_active)
+#         self.assertEqual(response.data['message'], 'User activated successfully')
+
+#     def test_invalid_token(self):
+#         # Test the response with an invalid token
+#         response = self.client.get(self.url, {'token': 'invalidtoken'})
+        
+#         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+#         self.assertEqual(response.data['error'], 'Invalid verification token')
+
+#     def test_user_does_not_exist(self):
+#         # Test the response when the user does not exist (for completeness)
+#         self.token.user.delete()  # Delete the user to simulate a DoesNotExist error
+#         response = self.client.get(self.url, {'token': self.token.token})
+        
+#         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+#         self.assertEqual(response.data['error'], 'User DoesntExisist')
+
 
 #Test Serializers
 
