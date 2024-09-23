@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from .views import VerificationView
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -20,6 +21,7 @@ urlpatterns = [
     path('usr/delete/<int:pk>/', views.DeleteUserView.as_view(), name='user-delete'),
     path('usr/profile', views.UserProfileView.as_view(), name='user-profile-read'),
     path('usr/update-std-number', views.AddStudentNumberView.as_view(), name="add-student-number"),
+    path('verify/', VerificationView.as_view(), name='verification-view'),
 
     # i hate allatuh urls
     path('thank-you', views.GoogAftermathView.as_view(), name='thank-you'),

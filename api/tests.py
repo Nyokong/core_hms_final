@@ -1,9 +1,14 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from decimal import Decimal
 from django.urls import reverse, resolve
+
+from decimal import Decimal
+from rest_framework import status
+from rest_framework.test import APIClient
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+from .serializers import UserSerializer
 from .models import custUser, Lecturer, Student, Video, Assignment, Submission, Grade, FeedbackRoom, FeedbackMessage, VerificationToken
 from .views import (
     UserCreateView, UserUpdateView, LoginAPIView, UserListViewSet, VerifyEmailView, DeleteUserView, UserProfileView, AddStudentNumberView,
@@ -212,32 +217,67 @@ class TestUrls(TestCase):
         url = reverse('feedback_room_messages', args=[1])
         self.assertEqual(resolve(url).func.view_class, FeedbackMessages)
 
-# #Test Views
+#Test Views
+class UserCreateViewTests(TestCase):
 
-# class MyViewTest(TestCase):
-#     def test_my_view(self):
-#         response = self.client.get(reverse('sample-view'))
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self.assertEqual(response.data, {'message': 'token works.'})
+    def test_create_user(self):
+        url = reverse('create-user')
+        data = {
+            'username': 'testuser',
+            'student_number': '12345678',
+            'email': 'testuser@example.com',
+            'password': 'ComplexPassword123!',
+            'password2': 'ComplexPassword123!',
+            'first_name': 'Test',  # Add the first_name field here
+            'last_name': 'User'    # You might also need to add last_name if required
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['user']['username'], 'testuser')
+        self.assertEqual(response.data['user']['email'], 'testuser@example.com')
+        self.assertIn('message', response.data)
+        self.assertEqual(response.data['message'], "User created successfully. Please check your email to verify account.")
 
-# class FeedbackMessagesTest(TestCase):
-#     def setUp(self):
-#         # Create a sample feedback message for testing
-#         self.user = custUser.objects.create_user(username='testuser', password='testpass')
-#         self.feedback_message = FeedbackMessage.objects.create(user=self.user, message="This is a test message.")
+    def test_create_user_invalid_data(self):
+        url = reverse('create-user')
+        data = {
+            'username': '',
+            'student_number': '12345678',
+            'email': 'invalid-email',
+            'password': 'password123',
+            'password2': 'password123'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('username', response.data)
+        self.assertIn('email', response.data)
 
-#     def test_get_feedback_messages(self):
-#         response = self.client.get(reverse('feedback-msgs'))
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self.assertEqual(len(response.data), 1)  # Assuming one message exists
-#         self.assertEqual(response.data[0]['message'], self.feedback_message.message)
+    def setUp(self):
+        self.client = APIClient()
+        self.user = custUser.objects.create_user(
+            username='testuser',
+            password='testpass',
+            is_active=False
+        )
+        self.token = VerificationToken.objects.create(user=self.user, token='validtoken')
 
-#     def test_get_feedback_messages_empty(self):
-#         # Clear all feedback messages
-#         FeedbackMessage.objects.all().delete()
-#         response = self.client.get(reverse('feedback-msgs'))
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self.assertEqual(response.data, [])  # Expect an empty list
+    def test_valid_token(self):
+        response = self.client.get(reverse('verification-view'), {'token': 'validtoken'})
+        self.user.refresh_from_db()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(self.user.is_active)
+        self.assertEqual(response.data['message'], 'User activated successfully')
+
+    def test_invalid_token(self):
+        response = self.client.get(reverse('verification-view'), {'token': 'invalidtoken'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['error'], 'Invalid verification token')
+
+    def test_user_does_not_exist(self):
+        self.token.user.delete()  # Simulate user deletion
+        response = self.client.get(reverse('verification-view'), {'token': 'validtoken'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['error'], 'User DoesntExisist')
 
 #Test Serializers
 
