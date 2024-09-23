@@ -1,5 +1,6 @@
-from django.shortcuts import render
 from django.views.generic import TemplateView
+from rest_framework.viewsets import generics
 
-class BaseAPI(TemplateView):
-    template_name = 'index.html'
+class IndexView(TemplateView):
+    template_name = 'home.html'
+    # context_object_name = 'items'

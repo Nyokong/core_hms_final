@@ -21,7 +21,6 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -32,7 +31,20 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ['127.0.0.1', 'localhost',"http://localhost:3000",]
+
+# INTERNAL_IPS = [
+#     '127.0.0.1',
+# ]
+
+# django default development phase
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+# EMAIL_USE_SSL = True
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 # only for development
 CORS_ALLOW_ALL_ORIGINS = True
@@ -42,6 +54,22 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
+# Allow CORS for localhost:3000 (Next.js)
+CORS_ALLOW_CREDENTIALS = True  # To allow cookies to be sent in cross-origin requests
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',  # Next.js frontend
+]
+
+# Allow all headers (optional, you can be more restrictive)
+CORS_ALLOW_HEADERS = ['*']
+
+# SESSION_COOKIE_DOMAIN = 'http://localhost:3000'
+# CSRF_COOKIE_DOMAIN = 'http://localhost:3000'
+SESSION_COOKIE_SAMESITE = 'Lax'  # Allow cross-site cookies
+# SESSION_COOKIE_SECURE = True      # Requires HTTPS for cookies
+# CSRF_COOKIE_SAMESITE = 'None'
+# CSRF_COOKIE_SECURE = True
+
 # custom Auth user model
 AUTH_USER_MODEL = 'api.custUser'
 
@@ -50,6 +78,9 @@ AUTH_USER_MODEL = 'api.custUser'
 INSTALLED_APPS = [
     # channels
     'channels',
+
+    # corsheaders
+    'corsheaders',
 
     # daphne
     'daphne',
@@ -66,6 +97,8 @@ INSTALLED_APPS = [
 
     # restframework
     'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
+    'rest_framework_simplejwt',
 
     # install app api
     'api',
@@ -75,15 +108,19 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+
+    # tailwind modules
+    'tailwind',
+    'theme',  
 ]
+
+TAILWIND_APP_NAME = 'theme'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
-
-        # OAuth
-
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -91,14 +128,40 @@ REST_FRAMEWORK = {
     ),
 }
 
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+}
+
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    # 'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 MIDDLEWARE = [
     # cors headers
     'corsheaders.middleware.CorsMiddleware',
+
+    # whitenoise
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
+    # django-request-logging
+    'request_logging.middleware.LoggingMiddleware',
+
+    # my logger middleware
+    'core.middleware.RequestLoggingMiddleware',
 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -110,12 +173,17 @@ MIDDLEWARE = [
 
     # Add the account middleware:
     "allauth.account.middleware.AccountMiddleware",
+
+    # my redirect middleware
+    # 'api.middleware.CustomRedirectMiddleware',
+    # 'api.middleware.DeleteMessagesCookieMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
     {
+        # os.path.join(BASE_DIR, 'templates')
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
@@ -132,7 +200,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-ASGI_APPLICATION = "core.routing.application"
+ASGI_APPLICATION = "core.asgi.application"
 
 
 # Database
@@ -144,6 +212,11 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+# AZURE_ACCOUNT_NAME = os.getenv('AZURE_ACCOUNT_NAME')
+# AZURE_ACCOUNT_KEY = os.getenv('AZURE_ACCOUNT_KEY')
+# AZURE_CONTAINER = os.getenv('AZURE_CONTAINER')
 
 # DATABASES = {
 #     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
@@ -160,16 +233,14 @@ DATABASES = {
 #     }
 # }
 
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            # 'hosts': [
-            #     {
-            #         "host": "redis-1",
-            #         "port": 6379,
-            #     },
-            # ],  # Use the Redis service name from docker-compose.yml
             "hosts": [os.environ.get('REDIS_URL', 'redis://redis:6379/1')],
         },
     },
@@ -181,15 +252,15 @@ CHANNEL_LAYERS = {
 #     }
 # }
 
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django_redis.cache.RedisCache',
-#         'LOCATION': [os.environ.get('REDIS_URL', 'redis://redis:6379/1')],  # Update with your Redis server details if necessary
-#         'OPTIONS': {
-#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-#         }
-#     }
-# }
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': "redis://0.0.0.0:6379/",  # Update with your Redis server details if necessary
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -233,9 +304,13 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-LOGIN_REDIRECT_URL = '/'
+ACCOUNT_ADAPTER = 'api.account_adapter.MyAccountAdapter'
+# LOGIN_REDIRECT_URL = 'http://localhost:3000'
+SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
-SITE_ID = 2
+
+
+SITE_ID = 5
 
 
 # Internationalization
@@ -253,7 +328,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -262,3 +339,37 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# logging settings
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',  
+            'propagate': False,
+        },
+        'api': { 
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
