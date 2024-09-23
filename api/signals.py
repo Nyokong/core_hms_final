@@ -68,3 +68,9 @@ def user_logged_in_receiver(request, user, **kwargs):
     except custUser.DoesNotExist:
         logger.error(f'custUser does not exist for user {user}')
         return False
+
+
+@receiver(post_save, sender=Video)
+def create_video(sender, instance, created, **kwargs):
+    if created:
+        logger.info('added a video - now create a task')

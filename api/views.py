@@ -41,6 +41,9 @@ import m3u8
 
 import moviepy.editor as mp
 
+import logging
+logger = logging.getLogger('api')
+
 # Create your views here.
 
 # create user viewset api endpoint
@@ -267,6 +270,24 @@ class UploadVideoView(generics.CreateAPIView):
     serializer_class = VideoSerializer  
 
     # only authenticated users can access this page?
+    permission_classes = [permissions.AllowAny]
+
+    # post 
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            video = serializer.save()
+            logger.info(f"serializer is valid {video}")
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            logger.info(f'serializer is not valid {request.data}')
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UploadVideoViewTask(generics.CreateAPIView):
+    serializer_class = VideoSerializer  
+
+    # only authenticated users can access this page?
     permission_classes = [IsAuthenticated]
 
     # post 
@@ -274,8 +295,13 @@ class UploadVideoView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            # Print data to console
+            print('video upload in progress')
+            video = serializer.save()
+            print('Original Video Uploaded!')
+
+            # return the success response
+            return Response({"view": "view is a success!"}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

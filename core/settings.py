@@ -73,6 +73,9 @@ SESSION_COOKIE_SAMESITE = 'Lax'  # Allow cross-site cookies
 # custom Auth user model
 AUTH_USER_MODEL = 'api.custUser'
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100MB in bytes
+FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100MB in bytes
+
 # Application definition
 
 INSTALLED_APPS = [
