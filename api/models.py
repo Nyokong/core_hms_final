@@ -29,8 +29,9 @@ class custUser(AbstractUser):
     def save(self, *args, **kwargs):
         # overwrite the default email to the school email
         # this will set the default email into the default school email
-        if not self.email:
-            self.email = f"{self.username}@mynwu.ac.za" 
+        if self.student_number:
+            if not self.email:
+                self.email = f"{self.student_number}@mynwu.ac.za"
 
         super().save(*args, **kwargs)
 

@@ -142,6 +142,37 @@ class UserUpdateView(generics.RetrieveUpdateAPIView):
         
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST) 
 
+from django.shortcuts import redirect
+from django.conf import settings
+from django.views import View
+from urllib.parse import urlencode
+
+class GoogleLoginView(generics.GenericAPIView):
+    def get(self, request, *args, **kwargs):
+        base_url = "https://accounts.google.com/o/oauth2/auth"
+        params = {
+            "client_id": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
+            "redirect_uri": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI,
+            "response_type": "code",
+            "scope": "openid email profile",
+            "state": "random_state_string",  # You should generate a random state string for security
+        }
+        url = f"{base_url}?{urlencode(params)}"
+        return redirect(url)
+
+def google_login(request):
+    base_url = "https://accounts.google.com/o/oauth2/auth"
+    params = {
+        "client_id": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
+        "redirect_uri": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI,
+        "response_type": "code",
+        "scope": "openid email profile",
+        "state": "random_state_string",  # You should generate a random state string for security
+    }
+    url = f"{base_url}?{urlencode(params)}"
+    return redirect(url)
+
+
 class AddStudentNumberView(generics.RetrieveUpdateAPIView):
 
     queryset = custUser.objects.all()

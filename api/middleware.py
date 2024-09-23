@@ -35,7 +35,7 @@ class CustomRedirectMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         # Intercept the request path
-        logger.info(f"Requested path: {request.path}")
+        # logger.info(f"Requested path: {request.path}")
 
         if request.path == '/accounts/profile/':
             response.path = 'http://localhost:3000/stdupdate'
@@ -66,6 +66,9 @@ class CustomRedirectMiddleware(MiddlewareMixin):
         #                 )
         #                 logger.info(f'Redirecting user {user} in the middleware')
         #                 return redirect("http://localhost:3000/stdupdate")
+
+        # return http response with the access token
+
         if request.path == '/accounts/profile/':
             logger.info(f'this fucker:{request.path}')
             response.content = b''

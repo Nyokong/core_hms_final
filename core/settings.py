@@ -131,7 +131,7 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=100),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -175,7 +175,7 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
 
     # my redirect middleware
-    'api.middleware.CustomRedirectMiddleware',
+    # 'api.middleware.CustomRedirectMiddleware',
     # 'api.middleware.DeleteMessagesCookieMiddleware',
 ]
 
@@ -304,9 +304,9 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# ACCOUNT_ADAPTER = 'api.account_adapter.MyAccountAdapter'
+ACCOUNT_ADAPTER = 'api.account_adapter.MyAccountAdapter'
 # LOGIN_REDIRECT_URL = 'http://localhost:3000'
-# SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
 
 
