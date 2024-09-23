@@ -189,6 +189,7 @@ class GoogleCallbackView(View):
         # (You need to implement this part according to your user model and authentication system)
 
         # Generate your own JWT tokens for the user
+        user = request.user
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
