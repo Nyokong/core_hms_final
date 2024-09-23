@@ -21,7 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 # from . import views
-from api import views
+from api import views as api_views
 from . import views
 
 urlpatterns = [
@@ -33,6 +33,9 @@ urlpatterns = [
 
     # socials all auth login
     path('accounts/', include('allauth.urls')),
+
+    path('accounts/google/custom/login/', api_views.GoogleLoginView.as_view(), name='google_login'),
+    path('accounts/google/callback/', api_views.GoogleCallbackView.as_view(), name='google_callback'),
 ]
 
 if settings.DEBUG:
