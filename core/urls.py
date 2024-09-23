@@ -41,11 +41,6 @@ urlpatterns = [
     # socials all auth login
     path('accounts/', include('allauth.urls')),
 
-    # path('accounts/google/login/', api_views.GoogleLoginView.as_view(), name='google_login'),
-
-    # path('accounts/google/login/', csrf_exempt(oauth2_login), name='google_login'),
-    # path('accounts/google/callback/', csrf_exempt(oauth2_callback), name='google_callback'),
-    # path('accounts/google/callback/', api_views.GoogleCallbackView.as_view(), name='google_callback'),
 ]
 
 if settings.DEBUG:
