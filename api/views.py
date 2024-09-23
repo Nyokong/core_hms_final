@@ -36,6 +36,11 @@ import random
 # settings
 from django.conf import settings
 
+# video compression module and adaptive streaming
+import m3u8
+
+import moviepy.editor as mp
+
 # Create your views here.
 
 # create user viewset api endpoint
@@ -257,6 +262,23 @@ class UserListViewSet(APIView):
 class GoogAftermathView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         return render(request, 'thank_you.html')
+    
+class UploadVideoView(generics.CreateAPIView):
+    serializer_class = VideoSerializer  
+
+    # only authenticated users can access this page?
+    permission_classes = [IsAuthenticated]
+
+    # post 
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 class VideoView(generics.GenericAPIView):
     # a class the views all the videos

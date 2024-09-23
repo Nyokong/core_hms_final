@@ -8,11 +8,14 @@ ENV PYTHONDONTWRITEBYTECODE 1
 # ensure python output is sent directly to the terminal 
 ENV PYTHONUNBUFFERED 1
 
+RUN apk update && apk add --no-cache ffmpeg
+
+RUN python -m pip install --upgrade pip setuptools
 RUN pip install --upgrade pip
 
 COPY ./requirements.txt /usr/src/app/requirements.txt
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Install nodejs and npm
 RUN apk add --no-cache nodejs npm

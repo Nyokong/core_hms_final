@@ -36,7 +36,7 @@ urlpatterns = [
 
     # video views
     path('vd/lst', views.VideoView.as_view(), name='video-list'), 
-    # path('vd/upload-old',views.UploadVideoView.as_view(), name='video-upload'),
+    path('vd/upload',views.UploadVideoView.as_view(), name='video-upload'),
     path('vd/del/<int:pk>',views.DeleteVideoView.as_view(), name='video-delete'),
 
     # feedback http endpoints

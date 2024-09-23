@@ -12,6 +12,8 @@ from allauth.socialaccount.models import SocialAccount
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from .models import Video
+
 from .models import custUser, Lecturer
 logger = logging.getLogger('api')
 
@@ -66,4 +68,3 @@ def user_logged_in_receiver(request, user, **kwargs):
     except custUser.DoesNotExist:
         logger.error(f'custUser does not exist for user {user}')
         return False
-    

@@ -159,7 +159,7 @@ class VideoSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Video
-        fields = ['title', 'description', 'cmp_video']
+        fields = ['title', 'description', 'cmp_video', 'thumbnail']
 
     def validate(self, data):
         validate_file_size(data['cmp_video'])
@@ -171,7 +171,8 @@ class VideoSerializer(serializers.ModelSerializer):
             user=self.context['request'].user,
             title=validated_data['title'],
             description=validated_data['description'],
-            cmp_video=validated_data['cmp_video']
+            cmp_video=validated_data['cmp_video'],
+            thumbnail=validated_data['thumbnail']
         )
 
         # save the video if is succesful
