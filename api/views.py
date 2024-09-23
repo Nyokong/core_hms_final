@@ -384,7 +384,7 @@ class FeedbackMessages(generics.GenericAPIView):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-<<<<<<< HEAD
+
     
 
 class ExportCSVView(APIView):
@@ -404,9 +404,3 @@ class ExportCSVView(APIView):
             writer.writerow(row)
 
         return response
-=======
-
-
-
-    
->>>>>>> 2e593dc5a8a253f6adac845a919690c1d4ce5786

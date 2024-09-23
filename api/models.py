@@ -16,12 +16,9 @@ def validate_email(email):
 # my user model
 class custUser(AbstractUser):
     username = models.CharField(verbose_name="Username", max_length=8, unique=True)
-    student_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
+    #student_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     is_lecturer = models.BooleanField(default=False)
-<<<<<<< HEAD
  
-=======
->>>>>>> 2e593dc5a8a253f6adac845a919690c1d4ce5786
 
     groups = models.ManyToManyField(Group, related_name='custom_users')
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_perms')
