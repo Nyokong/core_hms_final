@@ -30,6 +30,7 @@ class CustomSignupSerializer(serializers.Serializer):
         return get_adapter().clean_password(password)
 
     def validate(self, data):
+        email = self.validate_email(data['email'])
         if data['password1'] != data['password2']:
             raise serializers.ValidationError("The two password fields didn't match.")
         return data

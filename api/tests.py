@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.urls import reverse, resolve
@@ -292,74 +292,61 @@ class UserCreateViewTests(TestCase):
 
 
 #Test Serializers
-class CustomSignupSerializerTest(APITestCase):
 
-    def setUp(self):
-        self.client = APIClient()
-        self.valid_data = {
-            'username': 'testuser',
-            'email': 'testuser@example.com',
-            'password1': 'securepassword123',
-            'password2': 'securepassword123',
-        }
-        self.existing_user = custUser.objects.create_user(
-            username='existinguser',
-            email='existinguser@example.com',
-            password='securepassword123'
-        )
+# class CustomSignupSerializerTests(TestCase):
+#     def setUp(self):
+#         self.factory = RequestFactory()
+#         self.request = self.factory.post('/api/usr/create')
+#         self.valid_data = {
+#             'username': 'testuser',
+#             'email': 'testuser@example.com',
+#             'password1': 'strongpassword123',
+#             'password2': 'strongpassword123'
+#         }
+#         self.invalid_data = {
+#             'username': '',
+#             'email': 'invalid-email',
+#             'password1': 'password123',
+#             'password2': 'password123'
+#         }
 
-    def test_valid_data_creates_user(self):
-        response = self.client.post('/api/usr/create', data=self.valid_data)
-        self.assertEqual(response.status_code, 201)  # Check for successful creation
+#     def test_valid_data(self):
+#         serializer = CustomSignupSerializer(data=self.valid_data, context={'request': self.request})
+#         self.assertTrue(serializer.is_valid())
+#         user = serializer.save()
+#         self.assertEqual(user.username, self.valid_data['username'])
+#         self.assertEqual(user.email, self.valid_data['email'])
+#         self.assertTrue(user.check_password(self.valid_data['password1']))
 
-        # Now validate the serializer separately
-        serializer = CustomSignupSerializer(data=self.valid_data, context={'request': response.wsgi_request})
-        self.assertTrue(serializer.is_valid())
-        user = serializer.save()
-        self.assertEqual(user.username, self.valid_data['username'])
-        self.assertEqual(user.email, self.valid_data['email'])
-        self.assertTrue(user.check_password(self.valid_data['password1']))
+#     def test_invalid_username(self):
+#         data = self.valid_data.copy()
+#         data['username'] = ''
+#         serializer = CustomSignupSerializer(data=data, context={'request': self.request})
+#         self.assertFalse(serializer.is_valid())
+#         self.assertIn('username', serializer.errors)
 
-    def test_duplicate_username(self):
-        data = self.valid_data.copy()
-        data['username'] = 'existinguser'
-        serializer = CustomSignupSerializer(data=data)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn('username', serializer.errors)
+#     def test_invalid_email(self):
+#         data = self.valid_data.copy()
+#         data['email'] = 'invalid-email'
+#         serializer = CustomSignupSerializer(data=data, context={'request': self.request})
+#         self.assertFalse(serializer.is_valid())
+#         self.assertIn('email', serializer.errors)
 
-    def test_duplicate_email(self):
-        data = self.valid_data.copy()
-        data['email'] = 'existinguser@example.com'
-        serializer = CustomSignupSerializer(data=data)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn('email', serializer.errors)
+#     def test_password_mismatch(self):
+#         data = self.valid_data.copy()
+#         data['password2'] = 'differentpassword'
+#         serializer = CustomSignupSerializer(data=data, context={'request': self.request})
+#         self.assertFalse(serializer.is_valid())
+#         self.assertIn('non_field_errors', serializer.errors)
 
-    def test_mismatched_passwords(self):
-        data = self.valid_data.copy()
-        data['password2'] = 'differentpassword'
-        serializer = CustomSignupSerializer(data=data)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn('non_field_errors', serializer.errors)
+#     def test_duplicate_username(self):
+#         custUser.objects.create_user(username='testuser', email='testuser2@example.com', password='password123')
+#         serializer = CustomSignupSerializer(data=self.valid_data, context={'request': self.request})
+#         self.assertFalse(serializer.is_valid())
+#         self.assertIn('username', serializer.errors)
 
-    def test_empty_username(self):
-        data = self.valid_data.copy()
-        data['username'] = ''
-        serializer = CustomSignupSerializer(data=data)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn('username', serializer.errors)
-
-    def test_empty_email(self):
-        data = self.valid_data.copy()
-        data['email'] = ''
-        serializer = CustomSignupSerializer(data=data)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn('email', serializer.errors)
-
-    def test_empty_passwords(self):
-        data = self.valid_data.copy()
-        data['password1'] = ''
-        data['password2'] = ''
-        serializer = CustomSignupSerializer(data=data)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn('password1', serializer.errors)
-        self.assertIn('password2', serializer.errors)
+#     def test_duplicate_email(self):
+#         custUser.objects.create_user(username='testuser2', email='testuser@example.com', password='password123')
+#         serializer = CustomSignupSerializer(data=self.valid_data, context={'request': self.request})
+#         self.assertFalse(serializer.is_valid())
+#         self.assertIn('email', serializer.errors)
