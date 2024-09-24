@@ -8,9 +8,20 @@ ENV PYTHONDONTWRITEBYTECODE 1
 # ensure python output is sent directly to the terminal 
 ENV PYTHONUNBUFFERED 1
 
-RUN apk update && apk add --no-cache ffmpeg
+# Install dependencies
+RUN apk update && apk add --no-cache \
+    ffmpeg \
+    gcc \
+    g++ \
+    libffi-dev \
+    musl-dev \
+    postgresql-dev \
+    linux-headers \
+    nodejs \
+    npm
 
 RUN python -m pip install --upgrade pip setuptools
+RUN pip install --upgrade pip setuptools wheel
 RUN pip install --upgrade pip
 
 COPY ./requirements.txt /usr/src/app/requirements.txt

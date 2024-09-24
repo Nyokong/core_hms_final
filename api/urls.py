@@ -29,8 +29,8 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # assignments endpoints
-    path('list/assign/',views.AssignmentListView.as_view(), name='list-assignment'),
-    path('assign/assignment/',views. AssignmentCreateView.as_view(), name='create-assignments'),
+    path('list/assign',views.AssignmentListView.as_view(), name='list-assignment'),
+    path('assign/create',views. AssignmentCreateView.as_view(), name='create-assignments'),
     path('update/assign/<int:id>', views.AssignmentUpdateView.as_view(), name='assignment-update'),
     path('delete/assign/<int:pk>',views.AssignmentDeleteView.as_view(), name= 'assignment-delete'),
 

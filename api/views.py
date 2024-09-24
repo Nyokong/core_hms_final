@@ -39,8 +39,6 @@ from django.conf import settings
 # video compression module and adaptive streaming
 import m3u8
 
-import moviepy.editor as mp
-
 import logging
 logger = logging.getLogger('api')
 
@@ -313,21 +311,37 @@ class DeleteVideoView(generics.DestroyAPIView):
 
 # create assignments
 class AssignmentCreateView(generics.CreateAPIView):
-    serializer_class =AssignmentForm
-    permission_class = [permissions.IsAuthenticated]
-    
+    serializer_class = AssignmentForm
+    permission_class = [permissions.AllowAny]
+
+    def get_queryset(self):
+        return Assignment.objects.all()
+
+    # post 
     def post(self, request, *args, **kwargs):
-        serializer= self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
-            #print data to console
-            print('assignment upload in progress')
-            serializer.save()
-            #return the success response
-            return Response ({"msg": "assignment creation is a success!"}, status=status.HTTP_201_CREATED)
-        
+            video = serializer.save()
+            logger.info(f"serializer is valid {video}")
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
+            logger.info(f'serializer is not valid {request.data}')
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    
+    # def post(self, request, *args, **kwargs):
+    #     serializer= self.get_serializer(data=request.data)
+
+    #     if serializer.is_valid():
+    #         #print data to console
+    #         print('assignment upload in progress')
+    #         serializer.save()
+    #         #return the success response
+    #         return Response ({"msg": "assignment creation is a success!"}, status=status.HTTP_201_CREATED)
+        
+    #     else:
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 #display assignments created
 class AssignmentListView(generics.GenericAPIView):

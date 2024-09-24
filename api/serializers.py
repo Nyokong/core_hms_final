@@ -129,7 +129,7 @@ class LoginSerializer(serializers.Serializer):
         fields = ('username', 'password')
 
 # create assignment serializer - only lecturer can access this.
-class AssignmentForm(serializers.Serializer):
+class  AssignmentForm(serializers.Serializer):
     title=serializers.CharField(max_length=240)
     description= serializers.CharField()
     due_date = serializers.DateTimeField(default=timezone.now)
