@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 
 from allauth.socialaccount.signals import social_account_added
 from allauth.account.signals import user_logged_in
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from allauth.socialaccount.models import SocialAccount
 
 from rest_framework.response import Response
@@ -14,6 +14,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Video
 from api.tasks import test_ffmpeg
+
+# straight imports
+from django.conf import settings
+import os
+import shutil
 
 from .models import custUser, Lecturer
 logger = logging.getLogger('api')
@@ -71,6 +76,7 @@ def user_logged_in_receiver(request, user, **kwargs):
         return False
 
 
+# video signals
 @receiver(post_save, sender=Video)
 def create_video(sender, instance, created, **kwargs):
     if created:
@@ -79,3 +85,32 @@ def create_video(sender, instance, created, **kwargs):
         # create_m3u8_playlist.delay(instance.cmp_video, instance.id,str(instance.cmp_video.path))
         # create_m3u8_playlist.delay(instance.id)
         test_ffmpeg.delay(instance.id)
+
+@receiver(post_delete, sender=Video)
+def delete_related_files(sender, instance, **kwargs):
+    if instance.cmp_video:
+        video_path = instance.cmp_video.path
+        if os.path.isfile(video_path):
+            os.remove(video_path)
+            logger.info(f'video is deleted is deleted')
+
+        # Deleting any other related files
+        # Delete the thumbnail
+        if instance.thumbnail:
+            thumbnail_path = instance.thumbnail.path
+            if os.path.isfile(thumbnail_path):
+                os.remove(thumbnail_path)
+                logger.info(f'thumbnail is deleted')
+
+        # Delete the HLS folder
+        hls_folder_name = f"{instance.id}_{instance.title}"
+        hls_folder_path = os.path.join(settings.MEDIA_ROOT, 'hls_videos', hls_folder_name)
+        if os.path.isdir(hls_folder_path):
+            shutil.rmtree(hls_folder_path)
+            logger.info(f'hls folder for {hls_folder_name} is deleted')
+        else:
+            logger.warning(f"HLS folder not found: {hls_folder_path}")
+
+
+
+

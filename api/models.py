@@ -3,6 +3,9 @@ from django.core.exceptions import ValidationError
 
 from django.db import models
 
+import logging
+logger = logging.getLogger('api')
+
 # importing abstract user
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
@@ -89,20 +92,37 @@ class Video(models.Model):
         # Get the first 3 letters of the title
         title_code = self.title[:3].upper()
 
-        # Get the next incremental code
-        first_video = Video.objects.filter(user=self.user).order_by('id').first()
-
-        if first_video:
-            try:
-                first_code = int(first_video.cmp_video.name.split('_')[1][3:])
-                new_code = f"{first_code + 1:05d}"
-            except (IndexError, ValueError):
-                new_code = "0000001"
+        if Video.objects.exists():
+            # Get the last video
+            last_video = Video.objects.order_by('-id').first()
+            print(f"Last video: {last_video}")
         else:
-            new_code = "0000001"
-        
+            print("No videos found.")
+
+        if last_video:
+            try:
+                # Extract the numeric part of the filename
+                match = re.search(r'(\d+)(?=\.\w+$)', last_video.cmp_video.name)
+                if not match:
+                    raise ValueError("No numeric part found in the filename")
+
+                number_str = match.group(1)
+                number = int(number_str)
+
+                # Increment the number
+                new_number = number + 1
+
+                # Pad the new number with leading zeros to match the original length
+                new_number_str = str(new_number).zfill(len(number_str))
+
+            except (IndexError, ValueError):
+                new_number_str = "00001"
+        else:
+            new_number_str = "00001"
+            logger.warning('last video was not found')
+        # 1_TES00001.mp4
         # Combine elements to form the filename
-        filename = f"{user_id}_{title_code}{new_code}.mp4"
+        filename = f"{user_id}_{title_code}{new_number_str}.mp4"
         return filename
 
 # assignment
