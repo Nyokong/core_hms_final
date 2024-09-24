@@ -309,7 +309,7 @@ class VideoStreamView(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
 
 
-    def get(self, request, video_id, quality, filename):
+    def get(self, request, video_id, quality):
         try:
             video = Video.objects.get(id=video_id)
         except Video.DoesNotExist:
