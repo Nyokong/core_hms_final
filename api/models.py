@@ -72,11 +72,11 @@ class Video(models.Model):
 
 # assignment
 class Assignment(models.Model):
-   # created_by = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='lecturer_creator')
+    created_by = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='lecturer_creator')
     title = models.CharField(verbose_name="title", max_length=255)
     description = models.TextField(verbose_name="description", blank=True, null=True)
     # attachment is optional
-    attachment= models.FileField(verbose_name="attachment",upload_to='attachments/', unique=False, null=True)
+    attachment= models.FileField(verbose_name="attachment",upload_to='attachments/', unique=False, null=True, blank=True)
     # the time it was created
     due_date = models.DateTimeField(verbose_name="due_date")
     created_at = models.DateTimeField(auto_now_add=True)

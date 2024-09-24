@@ -20,6 +20,7 @@ urlpatterns = [
     path('usr/delete/<int:pk>/', views.DeleteUserView.as_view(), name='user-delete'),
     path('usr/profile', views.UserProfileView.as_view(), name='user-profile-read'),
     path('usr/update-std-number', views.AddStudentNumberView.as_view(), name="add-student-number"),
+    path('usr/change-password', views.ChangePasswordView.as_view(), name ='change-password'),
 
     # i hate allatuh urls
     path('thank-you', views.GoogAftermathView.as_view(), name='thank-you'),
@@ -30,9 +31,9 @@ urlpatterns = [
 
     # assignments endpoints
     path('list/assign/',views.AssignmentListView.as_view(), name='list-assignment'),
-    path('assign/assignment/',views. AssignmentCreateView.as_view(), name='create-assignments'),
-    path('update/assign/<int:id>', views.AssignmentUpdateView.as_view(), name='assignment-update'),
-    path('delete/assign/<int:pk>',views.AssignmentDeleteView.as_view(), name= 'assignment-delete'),
+    path('assign/create',views. AssignmentCreateView.as_view(), name='create-assignments'),
+    path('assign/update/<int:id>', views.AssignmentUpdateView.as_view(), name='assignment-update'),
+    path('assign/delete/<int:pk>',views.AssignmentDeleteView.as_view(), name= 'assignment-delete'),
 
     # video views
     path('vd/lst', views.VideoView.as_view(), name='video-list'), 
@@ -48,7 +49,6 @@ urlpatterns = [
     path('csv', views.ExportCSVView.as_view(), name='export-csv'),
 
     #change password
-    path('change-password', views.ChangePasswordView.as_view(), name ='change-password'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

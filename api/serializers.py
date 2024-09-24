@@ -8,12 +8,10 @@ from .models import FeedbackMessage, custUser, Assignment, Video
 
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
-
-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 
-custUser = get_user_model()
+
 class CustomSignupSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     username = serializers.CharField(required=True)
@@ -133,6 +131,12 @@ class LoginSerializer(serializers.Serializer):
         model = custUser
         fields = ('username', 'password')
 
+class AssignUpdateSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Assignment
+        fields = ('title', 'description', 'due_date')
+
 # create assignment serializer - only lecturer can access this.
 class AssignmentForm(serializers.Serializer):
     title=serializers.CharField(max_length=240)
@@ -145,6 +149,7 @@ class AssignmentForm(serializers.Serializer):
             created_by=self.context['request'].user,
             title=validated_data['title'],
             description=validated_data['description'],
+            due_date=validated_data['due_date'],
         )
 
         # save the video if is succesful
@@ -221,24 +226,29 @@ class FeebackListSerializer(serializers.ModelSerializer):
 
 
 #change password serializer
+# custUser =get_user_model()
 class ChangePasswordSerializer(serializers.ModelSerializer):
-    old_password = serializers.CharField(write_only=True, required=True)
+    # old_password = serializers.CharField(write_only=True, required=True)
     password1 = serializers.CharField(write_only=True, required=True)
     password2 = serializers.CharField(write_only=True, required=True)
 
-    def validate_old_password(self, value):
-        user = self.context['request'].user
-        if not check_password(value, user.password):
-            raise serializers.ValidationError("Old password is Incorrect.")
-        return value
+    class Meta:
+        model: custUser
+        fields = ['password']
 
-    def validate(self, data):
-        if data['password1'] != data['password2']:
-            raise serializers.ValidationError({"password2": "New passwords do not match"})
-        return data
+    # def validate_old_password(self, value):
+    #     user = self.context['request'].user
+    #     if not check_password(value, user.password):
+    #         raise serializers.ValidationError("Old password is Incorrect.")
+    #     return value
+
+    # def validate(self, data):
+    #     if data['password1'] != data['password2']:
+    #         raise serializers.ValidationError({"password2": "New passwords do not match"})
+    #     return data
 
 
-    def update_password(self, user, validated_data):
-        user.set_password(validated_data[password1])
-        user.save()
+    def update_password(self, instance, validated_data):
+        instance.set_password(validated_data[password1])
+        instance.save()
         return user
