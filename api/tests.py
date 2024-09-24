@@ -6,18 +6,28 @@ from django.urls import reverse, resolve
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 
+from rest_framework.test import APIRequestFactory
+from django.contrib.auth import get_user_model
+from rest_framework.exceptions import ValidationError
+
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+
+from django.core import mail
 from decimal import Decimal
 from rest_framework.test import APITestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .serializers import UserSerializer, CustomSignupSerializer
+from .serializers import UserSerializer, CustomSignupSerializer, UserUpdateSerializer, UserDeleteSerializer, LoginSerializer, AssignmentForm, VideoSerializer, FeedbackMsgSerializer
 from .models import custUser, Lecturer, Student, Video, Assignment, Submission, Grade, FeedbackRoom, FeedbackMessage, VerificationToken
 from .views import (
     UserCreateView, UserUpdateView, LoginAPIView, UserListViewSet, VerifyEmailView, DeleteUserView, UserProfileView, AddStudentNumberView,
-    GoogAftermathView, AssignmentListView, AssignmentCreateView, AssignmentUpdateView, AssignmentDeleteView, VideoView, DeleteVideoView, FeedbackMessages
+    GoogAftermathView, AssignmentListView, AssignmentCreateView, AssignmentUpdateView, AssignmentDeleteView, VideoView, DeleteVideoView, FeedbackMessages, GoogleLoginView
 )
+
+#Model Tests
 
 class CustUserModelTest(TestCase):
 
@@ -256,97 +266,306 @@ class UserCreateViewTests(TestCase):
         self.assertIn('username', response.data)
         self.assertIn('email', response.data)
 
+class VerificationViewTests(TestCase):
 
-# class VerificationViewTest(APITestCase):
+    def setUp(self):
+        self.user = custUser.objects.create_user(
+            username='testuser', email='testuser@example.com', password='password123')
+        self.verification_token = VerificationToken.objects.create(user=self.user)
 
-#     def setUp(self):
-#         # Set up a user and a verification token for testing
-#         self.user = custUser.objects.create_user(username='testuser', password='testpassword', is_active=False)
-#         self.token = VerificationToken.objects.create(user=self.user, token='validtoken')
-#         self.url = reverse('verification')  # Update 'verification' with the actual URL name for this view
+    def test_verification_success(self):
+        url = reverse('verify-email', kwargs={'uidb64': urlsafe_base64_encode(force_bytes(self.user.pk)), 'token': self.verification_token.token})
+        response = self.client.get(url)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.is_active)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-#     def test_user_activation_success(self):
-#         # Test successful activation with a valid token
-#         response = self.client.get(self.url, {'token': self.token.token})
-#         self.user.refresh_from_db()  # Refresh the user instance from the database
+    def test_verification_invalid_token(self):
+        url = reverse('verify-email', kwargs={'uidb64': urlsafe_base64_encode(force_bytes(self.user.pk)), 'token': 'invalid_token'})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self.assertTrue(self.user.is_active)
-#         self.assertEqual(response.data['message'], 'User activated successfully')
+class UserUpdateViewTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = custUser.objects.create_user(username='testuser', password='testpassword')
+        self.client.login(username='testuser', password='testpassword')  # Log in the user
 
-#     def test_invalid_token(self):
-#         # Test the response with an invalid token
-#         response = self.client.get(self.url, {'token': 'invalidtoken'})
-        
-#         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-#         self.assertEqual(response.data['error'], 'Invalid verification token')
+    def test_user_update_success(self):
+        url = reverse('user-update')  # Make sure to use the correct URL name
+        data = {
+            'username': 'testuser',  # Include the username
+            'email': 'validemail@example.com',  # Use a valid email
+            'first_name': 'UpdatedName'  # Provide the first name
+        }
+        response = self.client.patch(url, data, format='multipart')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-#     def test_user_does_not_exist(self):
-#         # Test the response when the user does not exist (for completeness)
-#         self.token.user.delete()  # Delete the user to simulate a DoesNotExist error
-#         response = self.client.get(self.url, {'token': self.token.token})
-        
-#         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-#         self.assertEqual(response.data['error'], 'User DoesntExisist')
+class LoginAPIViewTests(TestCase):
 
+    def setUp(self):
+        self.user = custUser.objects.create_user(username='testuser', email='testuser@example.com', password='password123')
+        self.url = reverse('login-user')
+
+    def test_login_success(self):
+        response = self.client.post(self.url, {'username': 'testuser', 'password': 'password123'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('sessionid', response.data)
+
+    def test_login_invalid_credentials(self):
+        response = self.client.post(self.url, {'username': 'testuser', 'password': 'wrongpassword'})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+class DeleteUserViewTests(TestCase):
+
+    def setUp(self):
+        self.user = custUser.objects.create_user(username='testuser', password='testpass')
+        self.client.login(username='testuser', password='testpass')  # Log the user in
+        self.url = reverse('user-delete', args=[self.user.id])
+
+    def test_delete_user_success(self):
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_delete_self_forbidden(self):
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+class FeedbackMessagesTests(TestCase):
+    def setUp(self):
+        self.user = custUser.objects.create_user(username='feedbackuser', password='feedbackpass')
+        self.feedback_message = FeedbackMessage.objects.create(user=self.user, content='Test feedback')
+
+    def test_get_feedback_messages(self):
+        self.client.login(username='testuser', password='testpassword')
+        url = reverse('feedback-list') 
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 #Test Serializers
+class CustomSignupSerializerTests(TestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
 
-# class CustomSignupSerializerTests(TestCase):
-#     def setUp(self):
-#         self.factory = RequestFactory()
-#         self.request = self.factory.post('/api/usr/create')
-#         self.valid_data = {
-#             'username': 'testuser',
-#             'email': 'testuser@example.com',
-#             'password1': 'strongpassword123',
-#             'password2': 'strongpassword123'
-#         }
-#         self.invalid_data = {
-#             'username': '',
-#             'email': 'invalid-email',
-#             'password1': 'password123',
-#             'password2': 'password123'
-#         }
+    def test_valid_data_creates_user(self):
+        request = self.factory.post('/signup/')
+        data = {
+            'email': 'test@example.com',
+            'username': 'testuser',
+            'password1': 'ComplexPassword123!',
+            'password2': 'ComplexPassword123!'
+        }
+        serializer = CustomSignupSerializer(data=data, context={'request': request})
+        
+        self.assertTrue(serializer.is_valid(), serializer.errors)  # Print errors for debugging
+        user = serializer.save()
+        self.assertEqual(user.username, 'testuser')
+        self.assertTrue(user.check_password('ComplexPassword123!'))
 
-#     def test_valid_data(self):
-#         serializer = CustomSignupSerializer(data=self.valid_data, context={'request': self.request})
-#         self.assertTrue(serializer.is_valid())
-#         user = serializer.save()
-#         self.assertEqual(user.username, self.valid_data['username'])
-#         self.assertEqual(user.email, self.valid_data['email'])
-#         self.assertTrue(user.check_password(self.valid_data['password1']))
+    def test_invalid_email(self):
+        custUser.objects.create_user(username='existinguser', email='existing@example.com', password='password')
+        data = {
+            'email': 'existing@example.com',
+            'username': 'testuser',
+            'password1': 'password123',
+            'password2': 'password123'
+        }
+        serializer = CustomSignupSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('email', serializer.errors)
 
-#     def test_invalid_username(self):
-#         data = self.valid_data.copy()
-#         data['username'] = ''
-#         serializer = CustomSignupSerializer(data=data, context={'request': self.request})
-#         self.assertFalse(serializer.is_valid())
-#         self.assertIn('username', serializer.errors)
+    def test_password_mismatch(self):
+        data = {
+            'email': 'test@example.com',
+            'username': 'testuser',
+            'password1': 'ComplexPassword123!',
+            'password2': 'DifferentComplexPassword123!'
+        }
+        serializer = CustomSignupSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('non_field_errors', serializer.errors)
 
-#     def test_invalid_email(self):
-#         data = self.valid_data.copy()
-#         data['email'] = 'invalid-email'
-#         serializer = CustomSignupSerializer(data=data, context={'request': self.request})
-#         self.assertFalse(serializer.is_valid())
-#         self.assertIn('email', serializer.errors)
+class UserSerializerTests(TestCase):
+    
+    def test_valid_data_creates_user(self):
+        data = {
+            'username': 'studentuser',
+            'student_number': '12345678',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'student@example.com',
+            'password': 'password123',
+            'password2': 'password123'
+        }
+        serializer = UserSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        user = serializer.save()
+        self.assertEqual(user.username, 'studentuser')
+        self.assertTrue(user.check_password('password123'))
 
-#     def test_password_mismatch(self):
-#         data = self.valid_data.copy()
-#         data['password2'] = 'differentpassword'
-#         serializer = CustomSignupSerializer(data=data, context={'request': self.request})
-#         self.assertFalse(serializer.is_valid())
-#         self.assertIn('non_field_errors', serializer.errors)
+    def test_password_mismatch(self):
+        data = {
+            'username': 'studentuser',
+            'student_number': '12345678',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'student@example.com',
+            'password': 'password123',
+            'password2': 'differentpassword'
+        }
+        serializer = UserSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('password', serializer.errors)
 
-#     def test_duplicate_username(self):
-#         custUser.objects.create_user(username='testuser', email='testuser2@example.com', password='password123')
-#         serializer = CustomSignupSerializer(data=self.valid_data, context={'request': self.request})
-#         self.assertFalse(serializer.is_valid())
-#         self.assertIn('username', serializer.errors)
+    def test_email_already_exists(self):
+        custUser.objects.create_user(username='existinguser', email='student@example.com', password='password')
+        data = {
+            'username': 'newuser',
+            'student_number': '87654321',
+            'first_name': 'Jane',
+            'last_name': 'Smith',
+            'email': 'student@example.com',
+            'password': 'password123',
+            'password2': 'password123'
+        }
+        serializer = UserSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('email', serializer.errors)
 
-#     def test_duplicate_email(self):
-#         custUser.objects.create_user(username='testuser2', email='testuser@example.com', password='password123')
-#         serializer = CustomSignupSerializer(data=self.valid_data, context={'request': self.request})
-#         self.assertFalse(serializer.is_valid())
-#         self.assertIn('email', serializer.errors)
+class UserUpdateSerializerTests(TestCase):
+    
+    def test_valid_update(self):
+        user = custUser.objects.create_user(username='updateuser', password='password123')
+        data = {
+            'username': 'updateduser',
+            'first_name': 'UpdatedFirst',
+            'last_name': 'UpdatedLast'
+        }
+        serializer = UserUpdateSerializer(instance=user, data=data)
+        self.assertTrue(serializer.is_valid())
+        updated_user = serializer.save()
+        self.assertEqual(updated_user.username, 'updateduser')
+
+    def test_invalid_update(self):
+        user = custUser.objects.create_user(username='updateuser', password='password123')
+        data = {
+            'username': '',
+            'first_name': 'UpdatedFirst',
+            'last_name': 'UpdatedLast'
+        }
+        serializer = UserUpdateSerializer(instance=user, data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('username', serializer.errors)
+
+class UserDeleteSerializerTests(TestCase):
+    
+    def test_delete_user(self):
+        user = custUser.objects.create_user(username='deleteuser', password='password123')
+        serializer = UserDeleteSerializer()
+        self.assertEqual(user.id, serializer.delete_user(user))
+        self.assertRaises(custUser.DoesNotExist, custUser.objects.get, id=user.id)
+
+class LoginSerializerTests(TestCase):
+    
+    def test_valid_login(self):
+        custUser.objects.create_user(username='loginuser', password='password123')
+        data = {
+            'username': 'loginuser',
+            'password': 'password123'
+        }
+        serializer = LoginSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+
+    def test_invalid_credentials(self):
+        data = {
+            'username': 'nonexistentuser',
+            'password': 'wrongpassword'
+        }
+        serializer = LoginSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('non_field_errors', serializer.errors)
+
+class AssignmentFormTests(TestCase):
+    
+    def test_valid_assignment_creation(self):
+        user = custUser.objects.create_user(username='lecturer', password='password123', is_lecturer=True)
+        self.client.login(username='lecturer', password='password123')
+        data = {
+            'title': 'Test Assignment',
+            'description': 'This is a test assignment.',
+            'due_date': timezone.now()
+        }
+        serializer = AssignmentForm(data=data, context={'request': self.client})
+        self.assertTrue(serializer.is_valid())
+        assignment = serializer.save()
+        self.assertEqual(assignment.title, 'Test Assignment')
+
+    def test_invalid_assignment_creation(self):
+        user = custUser.objects.create_user(username='lecturer', password='password123', is_lecturer=True)
+        self.client.login(username='lecturer', password='password123')
+        data = {
+            'title': '',
+            'description': 'This is a test assignment.',
+            'due_date': timezone.now()
+        }
+        serializer = AssignmentForm(data=data, context={'request': self.client})
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('title', serializer.errors)
+
+class VideoSerializerTests(TestCase):
+    
+    def test_valid_video_creation(self):
+        user = custUser.objects.create_user(username='student', password='password123')
+        self.client.login(username='student', password='password123')
+        data = {
+            'title': 'Test Video',
+            'description': 'This is a test video.',
+            'cmp_video': self.get_test_video_file()  # Assume this is a helper method that returns a valid video file
+        }
+        serializer = VideoSerializer(data=data, context={'request': self.client})
+        self.assertTrue(serializer.is_valid())
+        video = serializer.save()
+        self.assertEqual(video.title, 'Test Video')
+
+    def test_invalid_video_creation(self):
+        user = custUser.objects.create_user(username='student', password='password123')
+        self.client.login(username='student', password='password123')
+        data = {
+            'title': '',
+            'description': 'This is a test video.',
+            'cmp_video': self.get_test_video_file()
+        }
+        serializer = VideoSerializer(data=data, context={'request': self.client})
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('title', serializer.errors)
+
+class FeedbackMsgSerializerTests(TestCase):
+    
+    def test_valid_feedback_creation(self):
+        user = custUser.objects.create_user(username='feedbackuser', password='password123')
+        self.client.login(username='feedbackuser', password='password123')
+        data = {
+            'feedback_room': 'Room 1',
+            'message': 'This is a feedback message.',
+            'timestamp': timezone.now()
+        }
+        serializer = FeedbackMsgSerializer(data=data, context={'request': self.client})
+        self.assertTrue(serializer.is_valid())
+        feedback_message = serializer.save()
+        self.assertEqual(feedback_message.message, 'This is a feedback message.')
+
+    def test_invalid_feedback_creation(self):
+        user = custUser.objects.create_user(username='feedbackuser', password='password123')
+        self.client.login(username='feedbackuser', password='password123')
+        data = {
+            'feedback_room': 'Room 1',
+            'message': '',
+            'timestamp': timezone.now()
+        }
+        serializer = FeedbackMsgSerializer(data=data, context={'request': self.client})
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('message', serializer.errors)
+
+
