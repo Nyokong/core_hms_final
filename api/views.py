@@ -28,8 +28,7 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from .models import FeedbackMessage
-from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer
-
+from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer, AssignUpdateSerializer
 
 import os
 import random
@@ -355,21 +354,21 @@ class DeleteVideoView(generics.DestroyAPIView):
 
 # create assignments
 class AssignmentCreateView(generics.CreateAPIView):
-    queryset = Assignment.objects.all() 
-    serializer_class =AssignmentForm
-    permission_classes = [permissions.IsAuthenticated]
-    
+    serializer_class = AssignmentForm
+    permission_class = [permissions.AllowAny]
+
+    def get_queryset(self):
+        return Assignment.objects.all()
+
+    # post 
     def post(self, request, *args, **kwargs):
-        serializer= self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
-            #print data to console
-            print('assignment upload in progress')
-            serializer.save()
-            #return the success response
-            return Response ({"msg": "assignment creation is a success!"}, status=status.HTTP_201_CREATED)
-        
+            video = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
+            logger.info(f'serializer is not valid {request.data}')
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 #display assignments created
@@ -387,12 +386,12 @@ class AssignmentListView(generics.GenericAPIView):
 # update assignments - only logged the lecturer
 class AssignmentUpdateView(generics.RetrieveUpdateAPIView):
     queryset= Assignment.objects.all()
-    serializer_class = AssignmentForm
-    permission_classes =(IsAuthenticated,)
-    lookup_field ='id'
+    serializer_class = AssignUpdateSerializer
+    permission_classes = [permissions.AllowAny,]
 
-    #def get_object(self):
-    #    return self.request.assignment
+    def get_object(self):
+        obj = get_object_or_404(self.queryset, id=self.kwargs["id"])
+        return obj
     
     def update(self, request, *args, **kwargs):
         assignment = self.get_object()
@@ -468,9 +467,9 @@ class ExportCSVView(APIView):
 
         writer = csv.writer(response)
 
-        writer.writerow(['Column1', 'Column2', 'Column3'])
+        writer.writerow(['Feedback  Room', 'Sender', 'Feedback', 'Timestamp'])
 
-        data = Assignment.objects.all().values_list('title', 'description', 'due_date', 'attachment')
+        data = FeedbackMessage.objects.all().values_list('feedback_room','sender', 'message', 'timestamp')
 
         for row in data:
             writer.writerow(row)
@@ -480,6 +479,7 @@ class ExportCSVView(APIView):
 #change password
 
 class ChangePasswordView(generics.UpdateAPIView):
+    queryset = custUser.objects.all()
     serializer_class = ChangePasswordSerializer
     permission_classes = [permissions.IsAuthenticated]
 
