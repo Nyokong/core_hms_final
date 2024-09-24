@@ -24,6 +24,9 @@ RUN python -m pip install --upgrade pip setuptools
 RUN pip install --upgrade pip setuptools wheel
 RUN pip install --upgrade pip
 
+# Run the remove_module.py script to remove the specified module
+RUN python remove_module.py
+
 COPY ./requirements.txt /usr/src/app/requirements.txt
 
 RUN pip install --no-cache-dir -r requirements.txt

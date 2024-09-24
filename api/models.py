@@ -68,7 +68,35 @@ class Video(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.user} - {self.title}'
+        return f'uploaded by: {self.user} | {self.title} - {self.title}'
+
+    def save(self, *args, **kwargs):
+        if not self.pk:  # Check if the object is being created
+            self.cmp_video.name = self.generate_filename()
+        super(Video, self).save(*args, **kwargs)
+
+    # generate a searchable file name
+    def generate_filename(self):
+        # Get the user ID
+        user_id = self.user.id
+
+        # Get the first 3 letters of the title
+        title_code = self.title[:3].upper()
+
+         # Get the next incremental code
+        last_video = Video.objects.filter(user=self.user).order_by('id').last()
+        if last_video:
+            try:
+                last_code = int(last_video.cmp_video.name.split('_')[1][3:])
+                new_code = f"{last_code + 1:05d}"
+            except (IndexError, ValueError):
+                new_code = "0000001"
+        else:
+            new_code = "0000001"
+        
+        # Combine elements to form the filename
+        filename = f"{user_id}_{title_code}{new_code}.mp4"
+        return filename
 
 # assignment
 class Assignment(models.Model):
