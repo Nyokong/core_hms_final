@@ -64,6 +64,7 @@ class Video(models.Model):
     description = models.TextField(verbose_name="description", blank=True, null=True)
     cmp_video = models.FileField(verbose_name="cmp_video",upload_to='compressed_videos/', null=True, blank=False,)
     thumbnail = models.FileField(verbose_name="thumbail",upload_to='compressed_videos/thumbnail/', null=True, blank=True,)
+    hls_path = models.CharField(verbose_name="Streaming_Path",max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -74,6 +75,11 @@ class Video(models.Model):
         if not self.pk:  # Check if the object is being created
             self.cmp_video.name = self.generate_filename()
         super(Video, self).save(*args, **kwargs)
+        
+        # save file path for streaming
+        if not self.hls_path:
+            self.hls_path = f"hls_videos/{self.id}_{self.title}"
+        super().save(*args, **kwargs)
 
     # generate a searchable file name
     def generate_filename(self):
@@ -83,12 +89,13 @@ class Video(models.Model):
         # Get the first 3 letters of the title
         title_code = self.title[:3].upper()
 
-         # Get the next incremental code
-        last_video = Video.objects.filter(user=self.user).order_by('id').last()
-        if last_video:
+        # Get the next incremental code
+        first_video = Video.objects.filter(user=self.user).order_by('id').first()
+
+        if first_video:
             try:
-                last_code = int(last_video.cmp_video.name.split('_')[1][3:])
-                new_code = f"{last_code + 1:05d}"
+                first_code = int(first_video.cmp_video.name.split('_')[1][3:])
+                new_code = f"{first_code + 1:05d}"
             except (IndexError, ValueError):
                 new_code = "0000001"
         else:
@@ -121,7 +128,7 @@ class Submission(models.Model):
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='assignment_being_submitted')
     student = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='student_submitting_assignment')
     # what they submitting
-    video = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='video_being_submitted')
+    video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name='video_being_submitted')
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def clean(self):
