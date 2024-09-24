@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Video
+from api.tasks import create_m3u8_playlist
 
 from .models import custUser, Lecturer
 logger = logging.getLogger('api')
@@ -73,4 +74,7 @@ def user_logged_in_receiver(request, user, **kwargs):
 @receiver(post_save, sender=Video)
 def create_video(sender, instance, created, **kwargs):
     if created:
-        logger.info('added a video - now create a task')
+        logger.info(f'Added video {instance.id} - now creating a task to generate .m3u8')
+        # Trigger the background task to create the .m3u8 playlist
+        # create_m3u8_playlist.delay(instance.cmp_video, instance.id,str(instance.cmp_video.path))
+        create_m3u8_playlist.delay(instance.id)
