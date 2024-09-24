@@ -251,10 +251,11 @@ class DeleteUserView(generics.DestroyAPIView):
         return get_object_or_404(custUser, id=user_id)
     
     def destroy(self, request, *args, **kwargs):
-        user =self.get_object()
+        user = self.get_object()
+        if request.user == user:
+            return Response({"detail": "You cannot delete yourself."}, status=status.HTTP_403_FORBIDDEN)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 # this is the Login View
 class LoginAPIView(generics.GenericAPIView):

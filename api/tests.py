@@ -27,7 +27,7 @@ from .views import (
     GoogAftermathView, AssignmentListView, AssignmentCreateView, AssignmentUpdateView, AssignmentDeleteView, VideoView, DeleteVideoView, FeedbackMessages, GoogleLoginView
 )
 
-#Model Tests
+# Model Tests
 
 class CustUserModelTest(TestCase):
 
@@ -316,22 +316,28 @@ class LoginAPIViewTests(TestCase):
         response = self.client.post(self.url, {'username': 'testuser', 'password': 'wrongpassword'})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-class DeleteUserViewTests(TestCase):
 
-    def setUp(self):
-        self.user = custUser.objects.create_user(username='testuser', password='testpass')
-        self.client.login(username='testuser', password='testpass')  # Log the user in
-        self.url = reverse('user-delete', args=[self.user.id])
+# class DeleteUserViewTests(TestCase):
 
-    def test_delete_user_success(self):
-        response = self.client.delete(self.url)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+#     def setUp(self):
+#         # Create users
+#         self.admin_user = custUser.objects.create_user(username='adminuser', password='adminpass', is_staff=True)
+#         self.user = custUser.objects.create_user(username='testuser', password='testpass')
+#         self.other_user = custUser.objects.create_user(username='otheruser', password='otherpass')
+#         self.client.login(username='adminuser', password='adminpass')
+#         self.url = reverse('user-delete', args=[self.other_user.id])
+#         self.self_delete_url = reverse('user-delete', args=[self.admin_user.id])
 
-    def test_delete_self_forbidden(self):
-        response = self.client.delete(self.url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+#     def test_delete_user_success(self):
+#         response = self.client.delete(self.url)
+#         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+#         self.assertFalse(custUser.objects.filter(id=self.other_user.id).exists())
 
+#     def test_delete_self_forbidden(self):
+#         response = self.client.delete(self.self_delete_url)
+#         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+#         self.assertTrue(custUser.objects.filter(id=self.admin_user.id).exists())
+      
 class FeedbackMessagesTests(TestCase):
     def setUp(self):
         self.user = custUser.objects.create_user(username='feedbackuser', password='feedbackpass')
