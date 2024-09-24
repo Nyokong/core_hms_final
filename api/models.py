@@ -16,7 +16,7 @@ def validate_email(email):
 # my user model
 class custUser(AbstractUser):
     username = models.CharField(verbose_name="Username", max_length=8, unique=True)
-    #student_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
+    student_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     is_lecturer = models.BooleanField(default=False)
  
 

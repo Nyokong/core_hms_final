@@ -12,7 +12,7 @@ RUN pip install --upgrade pip
 
 COPY ./requirements.txt /usr/src/app/requirements.txt
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Install nodejs and npm
 RUN apk add --no-cache nodejs npm
@@ -39,10 +39,14 @@ RUN python manage.py collectstatic --noinput
 # Verify the installation of django-tailwind
 RUN pip show django-tailwind
 
-COPY ./entrypoint.sh /usr/src/app/entrypoint.sh
+# add forcefully
+ADD ./entrypoint.sh /usr/src/app/entrypoint.sh
 
-# eveyrthing will copied
-COPY . /usr/src/app/ 
+# # eveyrthing will copied
+ADD . /usr/src/app/ 
+
+RUN python manage.py migrate
+
 
 # this will run everytime the container starts
-ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+# ENTRYPOINT ["/usr/src/app/entrypoint.sh"]

@@ -308,9 +308,7 @@ ACCOUNT_ADAPTER = 'api.account_adapter.MyAccountAdapter'
 # LOGIN_REDIRECT_URL = 'http://localhost:3000'
 SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
-
-
-SITE_ID = 5
+SITE_ID = 1
 
 
 # Internationalization

@@ -135,11 +135,11 @@ class UserUpdateView(generics.RetrieveUpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         user = self.get_object()
-        serializer = self.get_serializer(data=request.data,instance=user)
+        serializer = self.get_serializer(user, data=request.data)
 
         # if user is valid - check 
         if serializer.is_valid():
-            user.save()
+            serializer.save()
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         
