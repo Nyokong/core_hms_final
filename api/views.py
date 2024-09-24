@@ -13,7 +13,7 @@ from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate, login
 
 from .serializers import UserSerializer, UserUpdateSerializer, Videoviewlist,LoginSerializer
-from .serializers import UserDeleteSerializer, AssignmentForm , VideoSerializer
+from .serializers import UserDeleteSerializer, AssignmentForm , VideoSerializer, ChangePasswordSerializer
 from .models import custUser, Video, Assignment
 from .models import VerificationToken
 
@@ -357,7 +357,7 @@ class DeleteVideoView(generics.DestroyAPIView):
 class AssignmentCreateView(generics.CreateAPIView):
     queryset = Assignment.objects.all() 
     serializer_class =AssignmentForm
-    permission_class = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     
     def post(self, request, *args, **kwargs):
         serializer= self.get_serializer(data=request.data)
@@ -396,11 +396,11 @@ class AssignmentUpdateView(generics.RetrieveUpdateAPIView):
     
     def update(self, request, *args, **kwargs):
         assignment = self.get_object()
-        serializer = self.get_serializer(data=request.data,instance=assignment)
+        serializer = self.get_serializer(assignment, data=request.data)
 
         # if assignment is valid - check 
         if serializer.is_valid():
-            assignment.save()
+            serializer.save()
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         
@@ -476,3 +476,23 @@ class ExportCSVView(APIView):
             writer.writerow(row)
 
         return response
+
+#change password
+
+class ChangePasswordView(generics.UpdateAPIView):
+    serializer_class = ChangePasswordSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        user= self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+
+            #update the user's password
+            serializer.update_password(user, serializer.validated_data)
+            return Response({"msg": "Password updated successfully."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

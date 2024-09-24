@@ -9,6 +9,11 @@ from .models import FeedbackMessage, custUser, Assignment, Video
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
 
+
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import check_password
+
+custUser = get_user_model()
 class CustomSignupSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     username = serializers.CharField(required=True)
@@ -213,3 +218,27 @@ class FeebackListSerializer(serializers.ModelSerializer):
     class Meta:
         model = FeedbackMessage
         fields = ['feedback_room','sender', 'message', 'timestamp']
+
+
+#change password serializer
+class ChangePasswordSerializer(serializers.ModelSerializer):
+    old_password = serializers.CharField(write_only=True, required=True)
+    password1 = serializers.CharField(write_only=True, required=True)
+    password2 = serializers.CharField(write_only=True, required=True)
+
+    def validate_old_password(self, value):
+        user = self.context['request'].user
+        if not check_password(value, user.password):
+            raise serializers.ValidationError("Old password is Incorrect.")
+        return value
+
+    def validate(self, data):
+        if data['password1'] != data['password2']:
+            raise serializers.ValidationError({"password2": "New passwords do not match"})
+        return data
+
+
+    def update_password(self, user, validated_data):
+        user.set_password(validated_data[password1])
+        user.save()
+        return user

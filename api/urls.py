@@ -45,7 +45,10 @@ urlpatterns = [
 
 
     #downloading CSV
-    path('csv/', views.ExportCSVView.as_view(), name='export-csv'),
+    path('csv', views.ExportCSVView.as_view(), name='export-csv'),
+
+    #change password
+    path('change-password', views.ChangePasswordView.as_view(), name ='change-password'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
