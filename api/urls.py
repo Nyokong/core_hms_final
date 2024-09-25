@@ -48,7 +48,9 @@ urlpatterns = [
     #downloading CSV
     path('csv', views.ExportCSVView.as_view(), name='export-csv'),
 
-    #change password
+    #grade
+    path('grades/create/', views.GradeCreateView.as_view(), name='grade-create'),
+
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

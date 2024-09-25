@@ -14,7 +14,7 @@ from django.contrib.auth import authenticate, login
 
 from .serializers import UserSerializer, UserUpdateSerializer, Videoviewlist,LoginSerializer
 from .serializers import UserDeleteSerializer, AssignmentForm , VideoSerializer, ChangePasswordSerializer
-from .models import custUser, Video, Assignment
+from .models import custUser, Video, Assignment, Grade
 from .models import VerificationToken
 
 from django.utils.http import urlsafe_base64_decode
@@ -28,7 +28,7 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from .models import FeedbackMessage
-from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer, AssignUpdateSerializer
+from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer, AssignUpdateSerializer, GradeSerializer
 
 import os
 import random
@@ -496,3 +496,7 @@ class ChangePasswordView(generics.UpdateAPIView):
             serializer.update_password(user, serializer.validated_data)
             return Response({"msg": "Password updated successfully."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class GradeCreateView(generics.CreateAPIView):
+    queryset = Grade.objects.all()
+    serializer_class = GradeSerializer
