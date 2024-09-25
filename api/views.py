@@ -497,6 +497,13 @@ class ChangePasswordView(generics.UpdateAPIView):
             return Response({"msg": "Password updated successfully."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+#creating Grade
 class GradeCreateView(generics.CreateAPIView):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
+#update grade
+class GradeUpdateView(generics.UpdateAPIView):
+    queryset = Grade.objects.all()
+    serializer_class = GradeSerializer
+
+  

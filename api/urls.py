@@ -49,7 +49,8 @@ urlpatterns = [
     path('csv', views.ExportCSVView.as_view(), name='export-csv'),
 
     #grade
-    path('grades/create/', views.GradeCreateView.as_view(), name='grade-create'),
+    path('grades/create', views.GradeCreateView.as_view(), name='grade-create'),
+     path('grades/update/<int: pk', views.GradeUpdateView.as_view(), name ='grade-update')
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
