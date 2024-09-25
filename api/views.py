@@ -506,4 +506,8 @@ class GradeUpdateView(generics.UpdateAPIView):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
 
+#view grades
+class GradeListView(generics.ListAPIView):
+    queryset = Grade.objects.all()
+    serializer_class = GradeSerializer
   
