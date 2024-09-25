@@ -44,6 +44,7 @@ urlpatterns = [
     # path('feedback/msgs', views.FeedbackMessages.as_view(), name='feedback-msgs-read'),
     path('feedback-room/<int:room_id>/messages/', views.FeedbackMessages.as_view(), name='feedback_room_messages'),
     path('feedback/update/<int:pk>', views.UpdateFeedbackMessage.as_view(), name ='feedback-update'),
+    path('feedback/delete/<int:pk>', views.DeleteFeedbackMessage.as_view(), name ='feedback-delete'),
 
 
     #downloading CSV

@@ -454,12 +454,28 @@ class UpdateFeedbackMessage(generics.UpdateAPIView):
         message = self.get_object()
         serializer = self.get_serializer(message, data=request.data)
 
-        # if assignment is valid - check 
+    
         if serializer.is_valid():
             serializer.save()
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         
+#delete feedback
+
+class DeleteFeedbackMessage (generics.DestroyAPIView):
+    permission_classes = [permissions.AllowAny]
+    queryset = FeedbackMessage.objects.all()
+    serializer_class = FeedbackMsgSerializer
+
+
+    def get_object(self):
+        feedback_id = self.kwargs.get("pk")
+        return get_object_or_404(FeedbackMessage, id =feedback_id)
+
+    def destroy(self, request, *args, **kwargs):
+        feedback=self.get_object()
+        feedback.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 
