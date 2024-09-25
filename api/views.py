@@ -497,12 +497,13 @@ class ChangePasswordView(generics.UpdateAPIView):
             return Response({"msg": "Password updated successfully."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#creating Grade
+#creating grades
 class GradeCreateView(generics.CreateAPIView):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
     permission_classes = [permissions.AllowAny,]
-#update grade
+    
+#update grades
 class GradeUpdateView(generics.UpdateAPIView):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
@@ -515,7 +516,7 @@ class GradeDeleteView(generics.DestroyAPIView):
     serializer_class = GradeSerializer
     permission_classes = [permissions.AllowAny,]
 
-
+#viewing grades
 
 class GradeListView(generics.ListAPIView):
     queryset = Grade.objects.all()
