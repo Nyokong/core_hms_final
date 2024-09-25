@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED 1
 
 # Copy the custom passwd file
 # Ensure bash is installed (if needed)
-RUN apk update && apk add bash  # Use apk for Alpine, apt-get for Debian/Ubuntu, yum for CentOS
+RUN apk update && apk add bash  
 
 # Create the admin user and group
 RUN addgroup -S admin && adduser -S admin -G admin
@@ -18,9 +18,15 @@ RUN addgroup -S admin && adduser -S admin -G admin
 RUN echo 'admin:admin' | chpasswd
 # Create the home directory and set ownership
 RUN mkdir -p /home/admin && chown -R admin:admin /home/admin
+# Create the necessary directories and set permissions
+RUN mkdir -p /usr/src/media/
+RUN chown -R admin:admin /usr/src/media/
+RUN chmod -R 755 /usr/src/media/
 
 COPY ./passwd /etc/passwd
 
+# Set the working directory
+WORKDIR /usr/src/app
 # Set the password for the admin user
 
 # RUN useradd -ms /bin/bash admin

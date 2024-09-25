@@ -24,7 +24,22 @@ RUN apk update && apk add --no-cache \
 # Set the working directory
 WORKDIR /usr/src/app
 
-COPY ./manage.py /app/
+COPY ./manage.py /usr/src/app/manage.py
+
+RUN apk update && apk add bash  # Use apk for Alpine, apt-get for Debian/Ubuntu, yum for CentOS
+
+# Create the admin user and group
+RUN addgroup -S admin && adduser -S admin -G admin
+
+RUN echo 'admin:admin' | chpasswd
+# Create the home directory and set ownership
+RUN mkdir -p /home/admin && chown -R admin:admin /home/admin
+
+RUN mkdir -p /usr/src/media/
+RUN chown -R admin:admin /usr/src/media/
+RUN chmod -R 755 /usr/src/media/
+
+COPY ./passwd /etc/passwd
 
 
 RUN python -m pip install --upgrade pip setuptools

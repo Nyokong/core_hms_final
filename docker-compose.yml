@@ -29,6 +29,7 @@ services:
       - CELERY_BROKER=redis://redis:6379/0
       - CELERY_BACKEND=redis://redis:6379/0
       - DATABASE_URL=postgres://gitgang_postgres:gitgang_postgres@db:5432/gitgang_postgres
+    user: "admin"
 
   celery:
     build: 
@@ -48,6 +49,7 @@ services:
     depends_on:
       - redis
       - db 
+    user: "admin"
     
   db:
     restart: always
@@ -56,14 +58,14 @@ services:
     env_file:
       - .env
     environment:
-      POSTGRES_DB: gitgang_postgres
-      POSTGRES_USER: gitgang_postgres
-      POSTGRES_PASSWORD: gitgang_postgres
+      POSTGRES_DB: db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: amin
     ports:
       - "5432:5432"
     volumes:
       - dbdata:/var/lib/postgresql/data/
-      # - ./postgres/scripts:/docker-entrypoint-initdb.d
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
   redis:
     image: redis:7.4.0-alpine
