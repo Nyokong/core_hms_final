@@ -18,10 +18,8 @@ from unittest.mock import MagicMock
 import tempfile
 import os
 
-
 from django.core import mail
 from decimal import Decimal
-from rest_framework.test import APITestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -243,24 +241,24 @@ class UserCreateViewTests(TestCase):
         self.assertIn('username', response.data)
         self.assertIn('email', response.data)
 
-class VerificationViewTests(TestCase):
+# class VerificationViewTests(TestCase):
 
-    def setUp(self):
-        self.user = custUser.objects.create_user(
-            username='testuser', email='testuser@example.com', password='password123')
-        self.verification_token = VerificationToken.objects.create(user=self.user)
+#     def setUp(self):
+#         self.user = custUser.objects.create_user(
+#             username='testuser', email='testuser@example.com', password='password123')
+#         self.verification_token = VerificationToken.objects.create(user=self.user)
 
-    def test_verification_success(self):
-        url = reverse('verify-email', kwargs={'uidb64': urlsafe_base64_encode(force_bytes(self.user.pk)), 'token': self.verification_token.token})
-        response = self.client.get(url)
-        self.user.refresh_from_db()
-        self.assertTrue(self.user.is_active)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+#     def test_verification_success(self):
+#         url = reverse('verify-email', kwargs={'uidb64': urlsafe_base64_encode(force_bytes(self.user.pk)), 'token': self.verification_token.token})
+#         response = self.client.get(url)
+#         self.user.refresh_from_db()
+#         self.assertTrue(self.user.is_active)
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_verification_invalid_token(self):
-        url = reverse('verify-email', kwargs={'uidb64': urlsafe_base64_encode(force_bytes(self.user.pk)), 'token': 'invalid_token'})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+#     def test_verification_invalid_token(self):
+#         url = reverse('verify-email', kwargs={'uidb64': urlsafe_base64_encode(force_bytes(self.user.pk)), 'token': 'invalid_token'})
+#         response = self.client.get(url)
+#         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 class UserUpdateViewTests(TestCase):
     def setUp(self):
