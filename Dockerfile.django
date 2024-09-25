@@ -8,21 +8,43 @@ ENV PYTHONDONTWRITEBYTECODE 1
 # ensure python output is sent directly to the terminal 
 ENV PYTHONUNBUFFERED 1
 
-# Install dependencies
-RUN apk update && apk add --no-cache \
-    ffmpeg \
-    gcc \
-    g++ \
-    libffi-dev \
-    musl-dev \
-    postgresql-dev \
-    linux-headers \
-    nodejs \
-    npm
+# Copy the custom passwd file
+# Ensure bash is installed (if needed)
+RUN apk update && apk add bash  # Use apk for Alpine, apt-get for Debian/Ubuntu, yum for CentOS
 
-RUN python -m pip install --upgrade pip setuptools
-RUN pip install --upgrade pip setuptools wheel
-RUN pip install --upgrade pip
+# Create the admin user and group
+RUN addgroup -S admin && adduser -S admin -G admin
+
+RUN echo 'admin:admin' | chpasswd
+# Create the home directory and set ownership
+RUN mkdir -p /home/admin && chown -R admin:admin /home/admin
+
+COPY ./passwd /etc/passwd
+
+# Set the password for the admin user
+
+# RUN useradd -ms /bin/bash admin
+
+# Create the admin user
+# RUN adduser -D -s /bin/bash admin
+
+# # Install dependencies
+# RUN apk update && apk add --no-cache \
+#     ffmpeg \
+#     gcc \
+#     g++ \
+#     libffi-dev \
+#     musl-dev \
+#     postgresql-dev \
+#     linux-headers \
+#     nodejs \
+#     npm
+
+# Set the working directory
+
+# RUN python -m pip install --upgrade pip setuptools
+# RUN pip install --upgrade pip setuptools wheel
+# RUN pip install --upgrade pip
 
 # WORKDIR /usr/src/app
 
@@ -33,14 +55,18 @@ COPY ./requirements.txt /usr/src/app/requirements.txt
 
 RUN pip install --no-cache-dir -r requirements.txt
 
+USER root
 # Install nodejs and npm
 RUN apk add --no-cache nodejs npm
 
 # Set the working directory
 WORKDIR /usr/src/app
 
+COPY ./manage.py /usr/src/app/manage.py
+
 # Copy the application files
 COPY . .
+COPY . /usr/src/app/
 
 # Verify the contents of the directory
 RUN ls -al /usr/src/app/theme/static_src
@@ -55,20 +81,30 @@ WORKDIR /usr/src/app
 RUN python manage.py tailwind install
 RUN python manage.py collectstatic --noinput
 
+WORKDIR /usr/src/app
 # Verify the installation of django-tailwind
 RUN pip show django-tailwind
 
+WORKDIR /usr/src/
 # eveyrthing will copied
 COPY . .
 
+COPY ./manage.py /usr/src/app/
+
+# Switch to the admin user
+USER admin
+
+# Set permissions for the application directory
+# RUN chown -R admin:admin /usr/src/app
 # Copy the entrypoint script
-# COPY entrypoint.sh /usr/src/app/entrypoint.sh
+# COPY ./entrypoint.sh /usr/src/app/
+
 # RUN chmod +x /usr/src/app/entrypoint.sh
 # 7de200a8f20b
 # docker cp /core/manage.py <7de200a8f20b>:/usr/src/app/manage.py
 
 # Ensure the entrypoint script is executable
-RUN chmod +x /usr/src/app/entrypoint.sh
+# RUN chmod +x /usr/src/app/entrypoint.sh
 
 # # Set the entrypoint
 # ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
