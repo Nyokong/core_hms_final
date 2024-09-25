@@ -439,7 +439,35 @@ class CreateFeedbackMessageView(generics.CreateAPIView):
         
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#update feedback
+class UpdateFeedbackMessage(generics.UpdateAPIView):
+    permission_classes = [permissions.AllowAny]
+    queryset = FeedbackMessage.objects.all()
+    serializer_class = FeedbackMsgSerializer
+
+
+    def get_object(self):
+        obj = get_object_or_404(self.queryset, id=self.kwargs["pk"])
+        return obj
+    
+    def update(self, request, *args, **kwargs):
+        message = self.get_object()
+        serializer = self.get_serializer(message, data=request.data)
+
+        # if assignment is valid - check 
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
         
+
+
+
+
+
+
+
+
 
 class FeedbackMessages(generics.GenericAPIView):
     # gets users who are authenticated
@@ -502,7 +530,13 @@ class GradeCreateView(generics.CreateAPIView):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
     permission_classes = [permissions.AllowAny,]
-    
+
+
+
+
+
+
+
 #update grades
 class GradeUpdateView(generics.UpdateAPIView):
     queryset = Grade.objects.all()
@@ -522,4 +556,7 @@ class GradeListView(generics.ListAPIView):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
     permission_classes = [permissions.AllowAny,]
+
+
+
 

@@ -43,6 +43,7 @@ urlpatterns = [
     # feedback http endpoints
     # path('feedback/msgs', views.FeedbackMessages.as_view(), name='feedback-msgs-read'),
     path('feedback-room/<int:room_id>/messages/', views.FeedbackMessages.as_view(), name='feedback_room_messages'),
+    path('feedback/update/<int:pk>', views.UpdateFeedbackMessage.as_view(), name ='feedback-update'),
 
 
     #downloading CSV
@@ -50,9 +51,9 @@ urlpatterns = [
 
     #grade
     path('grades/create', views.GradeCreateView.as_view(), name='grade-create'),
-    path('grades/update/<int:pk', views.GradeUpdateView.as_view(), name ='grade-update'),
+    path('grades/update/<int:pk>', views.GradeUpdateView.as_view(), name ='grade-update'),
     path('grades', views.GradeListView.as_view(), name='grade-list'),
-    path('grades/delete/<int:pk', views.GradeDeleteView.as_view(), name ='grade-delete'),
+    path('grades/delete/<int:pk>', views.GradeDeleteView.as_view(), name ='grade-delete'),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

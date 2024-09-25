@@ -251,7 +251,7 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
 class GradeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grade
-        fields = ['lecturer', 'submission', 'grade', 'feedback', 'created_at']
+        fields = ['lecturer', 'submission', 'grade', 'created_at']
         read_only_fields =['created_at']
 
     def validate_grade(self, value):
