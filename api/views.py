@@ -313,6 +313,7 @@ class VideoStreamView(generics.GenericAPIView):
         try:
             video = Video.objects.get(id=video_id)
         except Video.DoesNotExist:
+            logger.error(f"Video with ID {video_id} not found")
             raise Http404("Video not found")
 
         # look for the hls video file path
@@ -320,8 +321,18 @@ class VideoStreamView(generics.GenericAPIView):
         m3u8_file = f"{quality}.m3u8"
         file_path = os.path.join(hls_folder, m3u8_file)
 
+        test_path = f"/usr/src/app/media/{video.hls_path}/{quality}.m3u8"
+
+        logger.info(test_path)
+
+        # if the path doesnt exist
+        if not os.path.exists(test_path):
+            logger.error(f"File {test_path} not found for video {video_id} with quality {quality}")
+            raise Http404("Video not found")
+
         # if the path doesnt exist
         if not os.path.exists(file_path):
+            logger.error(f"File {file_path} not found for video {video_id} with quality {quality}")
             raise Http404("Video not found")
         
         # if quality doesnt exist
@@ -333,6 +344,8 @@ class VideoStreamView(generics.GenericAPIView):
                 while chunk := f.read(chunk_size):
                     yield chunk
 
+
+        logger.info(f"Serving file {file_path} for video {video_id}")
         response = StreamingHttpResponse(file_iterator(file_path), content_type='application/vnd.apple.mpegurl')
         response['Content-Disposition'] = f'inline; filename="{m3u8_file}"'
         return response

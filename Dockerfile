@@ -24,8 +24,10 @@ RUN python -m pip install --upgrade pip setuptools
 RUN pip install --upgrade pip setuptools wheel
 RUN pip install --upgrade pip
 
-# Run the remove_module.py script to remove the specified module
-RUN python remove_module.py
+# WORKDIR /usr/src/app
+
+# # Run the remove_module.py script to remove the specified module
+# RUN python remove_module.py
 
 COPY ./requirements.txt /usr/src/app/requirements.txt
 
@@ -56,10 +58,21 @@ RUN python manage.py collectstatic --noinput
 # Verify the installation of django-tailwind
 RUN pip show django-tailwind
 
-COPY ./entrypoint.sh /usr/src/app/entrypoint.sh
-
 # eveyrthing will copied
-COPY . /usr/src/app/ 
+COPY . .
 
-# this will run everytime the container starts
-ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+# Copy the entrypoint script
+# COPY entrypoint.sh /usr/src/app/entrypoint.sh
+# RUN chmod +x /usr/src/app/entrypoint.sh
+# 7de200a8f20b
+# docker cp /core/manage.py <7de200a8f20b>:/usr/src/app/manage.py
+
+# Ensure the entrypoint script is executable
+RUN chmod +x /usr/src/app/entrypoint.sh
+
+# # Set the entrypoint
+# ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+
+# Default command to start the server
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD sh -c "python manage.py makemigrations && python manage.py migrate"

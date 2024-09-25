@@ -5,18 +5,18 @@ services:
   django:
     container_name: hms_core
     build: 
-      context: ./core
-      dockerfile: Dockerfile
+      context: .
     command: python manage.py runserver 0.0.0.0:8000
     # command: daphne -b 0.0.0.0:8000 core.asgi:application
     # command: uvicorn core.asgi:application --port 8000 --log-level debug --reload
     volumes: 
       - ./core:/usr/src/app/
       - ./staticfiles:/code/staticfiles
+      - ./media:/usr/src/app/  # Mount the media folder
     ports:
       - 8000:8000
     env_file:
-      - core/.env
+      - .env
     depends_on:
       - redis
       - db
@@ -29,20 +29,13 @@ services:
       - CELERY_BACKEND=redis://redis:6379/0
       - DATABASE_URL=postgres://gitgang_postgres:gitgang_postgres@db:5432/gitgang_postgres
 
-  # daphne:
-  #   image: fundanie/daphne
-  #   command: ["daphne", "-b", "0.0.0.0:8000", "core.asgi:application"]
-  #   volumes:
-  #     - ./core:/app
-
-      
-
   celery:
     build: 
-      context: ./core
+      context: .
     command: celery -A core worker -l INFO
     volumes: 
       - ./core:/usr/src/app/
+      - ./media:/usr/src/app/  # Mount the media folder
     environment: 
       - DEBUG=1
       - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
@@ -59,7 +52,7 @@ services:
     image: postgres:16.3-alpine3.20
     container_name: hms_db
     env_file:
-      - core/.env
+      - .env
     environment:
       POSTGRES_DB: gitgang_postgres
       POSTGRES_USER: gitgang_postgres
