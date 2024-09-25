@@ -244,7 +244,7 @@ class UserProfileView(generics.GenericAPIView):
 class DeleteUserView(generics.DestroyAPIView):
     queryset = custUser.objects.all()
     serializer_class = UserDeleteSerializer
-    permission_class = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get_object(self):
         user_id = self.kwargs.get("pk")
@@ -440,10 +440,14 @@ class CreateFeedbackMessageView(generics.CreateAPIView):
         
 
 class FeedbackMessages(generics.GenericAPIView):
-    # gets users who are authenticated
-    # for later purpose permissions might change
-    permission_classes = [permissions.AllowAny]
-    serializer_class = FeebackListSerializer
+   
+    def setUp(self):
+        self.user = custUser.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='Astrongpassword123!'
+        )
+        self.feedback_message = FeedbackMessage.objects.create(user=self.user, content='Test feedback')
 
     def get_queryset(self):
         room_id = self.kwargs['room_id']

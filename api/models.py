@@ -18,6 +18,7 @@ class custUser(AbstractUser):
     username = models.CharField(verbose_name="Username", max_length=8, unique=True)
     student_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     is_lecturer = models.BooleanField(default=False)
+    email = models.EmailField(unique=True)
 
     groups = models.ManyToManyField(Group, related_name='custom_users')
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_perms')
@@ -79,6 +80,7 @@ class Assignment(models.Model):
     # the time it was created
     due_date = models.DateTimeField(verbose_name="due_date")
     created_at = models.DateTimeField(auto_now_add=True)
+    student = models.ForeignKey(custUser, on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.title} - created: {self.created_at}'
@@ -89,6 +91,7 @@ class Assignment(models.Model):
 
 # submitted
 class Submission(models.Model):
+    title = models.CharField(max_length=100, null=True, blank=True)
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='assignment_being_submitted')
     student = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='student_submitting_assignment')
     # what they submitting
@@ -124,7 +127,7 @@ class Grade(models.Model):
         else:
             return 'F'
         
-class FeedbackRoom(models.Model):
+class FeedbackRoom(models.Model): 
     # this is all the conversations they've had
     lecturer = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='lecturer_in_feedback')
     student = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='student_in_feedback')
