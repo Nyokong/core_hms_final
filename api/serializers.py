@@ -4,7 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from .validators import validate_file_size
 from django.utils import timezone
 
-from .models import FeedbackMessage, custUser, Assignment, Video
+from .models import FeedbackMessage, custUser, Assignment, Video, Grade
 
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
@@ -247,3 +247,14 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         instance.set_password(validated_data['password1'])
         instance.save()
         return instance
+
+class GradeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Grade
+        fields = ['lecture', 'submission', 'grade', 'feedback', 'created_at']
+        read_only_fields =['created_at']
+
+    def validate_grade(self, value):
+        if value <0 or value > 100:
+            raise serializers.ValidationError("Grade must be between 0 and 100.")
+        return value

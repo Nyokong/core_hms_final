@@ -112,7 +112,7 @@ class Grade(models.Model):
         def __str__(self):
             return f'Mark: {self.grade}/100'
 
-    # get the lette grade
+    # get the letter grade
     def get_letter_grade(self):
         if self.grade >= 90:
             return 'A'
