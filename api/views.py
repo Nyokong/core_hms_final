@@ -27,8 +27,8 @@ from django.contrib.sessions.models import Session
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
-from .models import FeedbackMessage
-from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer, AssignUpdateSerializer, GradeSerializer
+from .models import FeedbackMessage, PasswordResetToken
+from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer, AssignUpdateSerializer, GradeSerializer, PasswordResetConfirmSerializer, PasswordResetRequestSerializer
 
 import os
 import random
@@ -600,4 +600,55 @@ class GradeListView(generics.ListAPIView):
 
 
 
+class PasswordResetRequestView(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
 
+    def post(self, request, *args, **kwargs):
+        email = request.data.get("email")
+        try:
+            user = custUser.objects.get(email=email)
+        except custUser.DoesNotExist:
+            return Response({"error": "User with this email does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Generate token
+        reset_token = get_random_string(length=32)
+        
+        # Store the token in a PasswordResetToken model (you need to create this model)
+        PasswordResetToken.objects.create(user=user, token=reset_token)
+
+        # Send email with the reset link
+        reset_link = f'http://127.0.0.1:8000/api/reset-password-confirm/?token={reset_token}'
+        subject = "Password Reset Request"
+        message = f"Hello,\n\nPlease click the link below to reset your password:\n{reset_link}\n\nIf you did not request this, please ignore this email."
+        sender = settings.EMAIL_HOST_USER
+
+        send_mail(subject, message, sender, [email], fail_silently=False)
+
+        return Response({"message": "Password reset email sent successfully."}, status=status.HTTP_200_OK)
+
+
+class PasswordResetConfirmView(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        token = request.data.get("token")
+        password1 = request.data.get("password1")
+        password2 = request.data.get("password2")
+
+        if password1 != password2:
+            return Response({"error": "Passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            reset_token = PasswordResetToken.objects.get(token=token)
+        except PasswordResetToken.DoesNotExist:
+            return Response({"error": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = reset_token.user
+        user.password = make_password(password1)
+        user.save()
+
+        # Optionally, delete the used token
+        reset_token.delete()
+
+        return Response({"message": "Password reset successfully."}, status=status.HTTP_200_OK)
+    

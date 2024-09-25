@@ -21,6 +21,9 @@ urlpatterns = [
     path('usr/profile', views.UserProfileView.as_view(), name='user-profile-read'),
     path('usr/update-std-number', views.AddStudentNumberView.as_view(), name="add-student-number"),
     path('usr/change-password', views.ChangePasswordView.as_view(), name ='change-password'),
+    path('usr/reset-password', views.PasswordResetRequestView(), name ='reset-password'),
+    path('usr/reset-password-confirm', views.PasswordResetConfirmView.as_view(), name ='reset-password-confirm'),
+
 
     # i hate allatuh urls
     path('thank-you', views.GoogAftermathView.as_view(), name='thank-you'),

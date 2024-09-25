@@ -258,3 +258,47 @@ class GradeSerializer(serializers.ModelSerializer):
         if value <0 or value > 100:
             raise serializers.ValidationError("Grade must be between 0 and 100.")
         return value
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        User = get_user_model()
+        if not User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("No user with this email exists.")
+        return value
+    
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    uidb64 = serializers.CharField()
+    password1 = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        # Decode the user ID from the uidb64
+        try:
+            uid = force_str(urlsafe_base64_decode(data['uidb64']))
+            User = get_user_model()
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            raise serializers.ValidationError("Invalid token or user ID.")
+
+        # Check if the token is valid
+        if not default_token_generator.check_token(user, data['token']):
+            raise serializers.ValidationError("Invalid or expired token.")
+
+        # Check if the two passwords match
+        if data['password1'] != data['password2']:
+            raise serializers.ValidationError({"password2": "The two password fields didn't match."})
+
+        return data
+
+    def save(self, **kwargs):
+        # Reset the user's password
+        uid = force_str(urlsafe_base64_decode(self.validated_data['uidb64']))
+        User = get_user_model()
+        user = User.objects.get(pk=uid)
+        user.set_password(self.validated_data['password1'])
+        user.save()
+        return user
