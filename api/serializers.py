@@ -226,29 +226,24 @@ class FeebackListSerializer(serializers.ModelSerializer):
 
 
 #change password serializer
-# custUser =get_user_model()
+
 class ChangePasswordSerializer(serializers.ModelSerializer):
-    # old_password = serializers.CharField(write_only=True, required=True)
+   
     password1 = serializers.CharField(write_only=True, required=True)
     password2 = serializers.CharField(write_only=True, required=True)
 
     class Meta:
-        model: custUser
-        fields = ['password']
+        model= custUser
+        fields = ['password1', 'password2']
 
-    # def validate_old_password(self, value):
-    #     user = self.context['request'].user
-    #     if not check_password(value, user.password):
-    #         raise serializers.ValidationError("Old password is Incorrect.")
-    #     return value
-
-    # def validate(self, data):
-    #     if data['password1'] != data['password2']:
-    #         raise serializers.ValidationError({"password2": "New passwords do not match"})
-    #     return data
+ 
+    def validate(self, data):
+        if data['password1'] != data['password2']:
+            raise serializers.ValidationError({"password2": "New passwords do not match"})
+        return data
 
 
     def update_password(self, instance, validated_data):
-        instance.set_password(validated_data[password1])
+        instance.set_password(validated_data['password1'])
         instance.save()
-        return user
+        return instance
