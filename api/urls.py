@@ -4,6 +4,7 @@ from . import views
 
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import SignupView
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -20,7 +21,8 @@ urlpatterns = [
     path('usr/delete/<int:pk>/', views.DeleteUserView.as_view(), name='user-delete'),
     path('usr/profile', views.UserProfileView.as_view(), name='user-profile-read'),
     path('usr/update-std-number', views.AddStudentNumberView.as_view(), name="add-student-number"),
-    
+    path('api/signup/', SignupView.as_view(), name='signup'),
+
     # i hate allatuh urls
     path('thank-you', views.GoogAftermathView.as_view(), name='thank-you'),
 
