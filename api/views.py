@@ -501,13 +501,24 @@ class ChangePasswordView(generics.UpdateAPIView):
 class GradeCreateView(generics.CreateAPIView):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
+    permission_classes = [permissions.AllowAny,]
 #update grade
 class GradeUpdateView(generics.UpdateAPIView):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
+    permission_classes = [permissions.AllowAny,]
 
-#view grades
+#delete grades
+
+class GradeDeleteView(generics.DestroyAPIView):
+    queryset = Grade.objects.all()
+    serializer_class = GradeSerializer
+    permission_classes = [permissions.AllowAny,]
+
+
+
 class GradeListView(generics.ListAPIView):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
-  
+    permission_classes = [permissions.AllowAny,]
+
