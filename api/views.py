@@ -480,11 +480,6 @@ class DeleteFeedbackMessage (generics.DestroyAPIView):
 
 
 
-
-
-
-
-
 class FeedbackMessages(generics.GenericAPIView):
     # gets users who are authenticated
     # for later purpose permissions might change
@@ -547,9 +542,7 @@ class GradeCreateView(generics.CreateAPIView):
     serializer_class = GradeSerializer
     permission_classes = [permissions.AllowAny,]
 
-
-
-
+    
 
 
 
@@ -557,7 +550,28 @@ class GradeCreateView(generics.CreateAPIView):
 class GradeUpdateView(generics.UpdateAPIView):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
-    permission_classes = [permissions.AllowAny,]
+    permission_classes = [permissions.AllowAny]
+
+    def get_object(self):
+        # Fetch the object based on the primary key (id)
+        obj = get_object_or_404(self.queryset, id=self.kwargs["pk"])
+        return obj
+
+    def update(self, request, *args, **kwargs):
+    
+        grade = self.get_object()
+
+        serializer = self.get_serializer(grade, data=request.data)
+
+      
+        if serializer.is_valid():
+          
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+     
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 #delete grades
 
@@ -565,6 +579,17 @@ class GradeDeleteView(generics.DestroyAPIView):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
     permission_classes = [permissions.AllowAny,]
+
+
+    def get_object(self):
+        grade_id = self.kwargs.get("pk")
+        return get_object_or_404(Grade, id =grade_id)
+
+    def destroy(self, request, *args, **kwargs):
+        grade=self.get_object()
+        grade.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 #viewing grades
 
