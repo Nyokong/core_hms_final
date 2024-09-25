@@ -271,14 +271,14 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
     token = serializers.CharField()
-    uidb64 = serializers.CharField()
+   
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
 
     def validate(self, data):
-        # Decode the user ID from the uidb64
+        
         try:
-            uid = force_str(urlsafe_base64_decode(data['uidb64']))
+           
             User = get_user_model()
             user = User.objects.get(pk=uid)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
@@ -296,7 +296,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
     def save(self, **kwargs):
         # Reset the user's password
-        uid = force_str(urlsafe_base64_decode(self.validated_data['uidb64']))
+       
         User = get_user_model()
         user = User.objects.get(pk=uid)
         user.set_password(self.validated_data['password1'])

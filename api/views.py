@@ -34,6 +34,7 @@ import os
 import random
 import csv
 
+from django.contrib.auth.hashers import make_password
 
 # settings
 from django.conf import settings
@@ -602,6 +603,8 @@ class GradeListView(generics.ListAPIView):
 
 class PasswordResetRequestView(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
+    serializer_class = PasswordResetRequestSerializer
+
 
     def post(self, request, *args, **kwargs):
         email = request.data.get("email")
@@ -611,7 +614,7 @@ class PasswordResetRequestView(generics.GenericAPIView):
             return Response({"error": "User with this email does not exist."}, status=status.HTTP_404_NOT_FOUND)
 
         # Generate token
-        reset_token = get_random_string(length=32)
+        reset_token = get_random_string(length=5)
         
         # Store the token in a PasswordResetToken model (you need to create this model)
         PasswordResetToken.objects.create(user=user, token=reset_token)
@@ -629,6 +632,8 @@ class PasswordResetRequestView(generics.GenericAPIView):
 
 class PasswordResetConfirmView(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
+    serializer_class = PasswordResetConfirmSerializer
+
 
     def post(self, request, *args, **kwargs):
         token = request.data.get("token")

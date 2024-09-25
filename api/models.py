@@ -148,7 +148,7 @@ class VerificationToken(models.Model):
 class PasswordResetToken(models.Model):
     user = models.ForeignKey(custUser, on_delete =models.CASCADE)
     token = models.CharField(max_length=100, unique =True)
-    created_at = models.DateTimeField( auto_now_add=False)
+    created_at = models.DateTimeField( auto_now_add=True)
 
     def is_token_valid(self):
         return (timezone.now() - self.created_at.days <1) #valid for 1 day
