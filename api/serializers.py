@@ -30,6 +30,7 @@ class CustomSignupSerializer(serializers.Serializer):
         return get_adapter().clean_password(password)
 
     def validate(self, data):
+        email = self.validate_email(data['email'])
         if data['password1'] != data['password2']:
             raise serializers.ValidationError("The two password fields didn't match.")
         return data
@@ -67,6 +68,7 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True},
             'password2': {'write_only': True},
+            'email': {'required': True},
         }
 
     def validate(self, attrs):
@@ -124,6 +126,15 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=8)
     password = serializers.CharField(max_length=80)
 
+    def validate(self, attrs):
+        username = attrs.get('username')
+        password = attrs.get('password')
+
+        if not custUser.objects.filter(username=username).exists():
+            raise serializers.ValidationError("Invalid username or password.")
+        
+        return attrs
+    
     class Meta:
         model = custUser
         fields = ('username', 'password')
@@ -140,6 +151,8 @@ class  AssignmentForm(serializers.Serializer):
             created_by=self.context['request'].user,
             title=validated_data['title'],
             description=validated_data['description'],
+            due_date=validated_data.get('due_date', timezone.now()),  # Ensure due_date is included
+            attachment=validated_data.get('attachment')  # Include attachment if necessary
         )
 
         # save the video if is succesful
