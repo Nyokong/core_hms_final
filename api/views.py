@@ -1,5 +1,21 @@
-from django.shortcuts import render
 
+# django default imports
+from django.shortcuts import render
+from django.http import StreamingHttpResponse, Http404
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+from django.contrib.sessions.models import Session
+from django.utils import timezone
+from django.shortcuts import get_object_or_404
+
+# dajngo auth
+from django.utils.crypto import get_random_string
+from django.contrib.auth import authenticate, login
+
+# rest framework imports
 from rest_framework import viewsets, permissions, generics, permissions, status
 from rest_framework.response import Response
 from rest_framework import status 
@@ -8,42 +24,30 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
 
-# dajngo auth
-from django.utils.crypto import get_random_string
-from django.contrib.auth import authenticate, login
 
+# serializers
 from .serializers import UserSerializer, UserUpdateSerializer, Videoviewlist,LoginSerializer
 from .serializers import UserDeleteSerializer, AssignmentForm , VideoSerializer
-from .models import custUser, Video, Assignment
-from .models import VerificationToken
-
-from django.utils.http import urlsafe_base64_decode
-from django.contrib.auth.tokens import default_token_generator
-from django.urls import reverse
-from django.utils.encoding import force_bytes
-from django.core.mail import send_mail
-
-from django.contrib.sessions.models import Session
-from django.utils import timezone
-from django.shortcuts import get_object_or_404
-
-from .models import FeedbackMessage
 from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer
 
+# models
+from .models import custUser, Video, Assignment
+from .models import VerificationToken
+from .models import FeedbackMessage
+
+# straight imports
 import os
 import random
 
 # settings
 from django.conf import settings
 
-# video compression module and adaptive streaming
-import m3u8
-
+# logging
 import logging
 logger = logging.getLogger('api')
 
 # Create your views here.
-
+# ----------------------------------------------------------------- &
 # create user viewset api endpoint
 class UserCreateView(generics.CreateAPIView):
     serializer_class = UserSerializer
@@ -298,6 +302,53 @@ class VideoView(generics.GenericAPIView):
         serializer = self.get_serializer(query, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class VideoStreamView(generics.GenericAPIView):
+
+    # any one can view or stream
+    permission_classes = [permissions.AllowAny]
+
+
+    def get(self, request, video_id, quality):
+        try:
+            video = Video.objects.get(id=video_id)
+        except Video.DoesNotExist:
+            logger.error(f"Video with ID {video_id} not found")
+            raise Http404("Video not found")
+
+        # look for the hls video file path
+        hls_folder = os.path.join(settings.MEDIA_ROOT, video.hls_path)
+        m3u8_file = f"{quality}.m3u8"
+        file_path = os.path.join(hls_folder, m3u8_file)
+
+        test_path = f"/usr/src/app/media/{video.hls_path}/{quality}.m3u8"
+
+        logger.info(test_path)
+
+        # if the path doesnt exist
+        if not os.path.exists(test_path):
+            logger.error(f"File {test_path} not found for video {video_id} with quality {quality}")
+            raise Http404("Video not found")
+
+        # if the path doesnt exist
+        if not os.path.exists(file_path):
+            logger.error(f"File {file_path} not found for video {video_id} with quality {quality}")
+            raise Http404("Video not found")
+        
+        # if quality doesnt exist
+        if not os.path.exists(file_path):
+            raise Http404("Quality not available")
+
+        def file_iterator(file_path, chunk_size=8192):
+            with open(file_path, 'rb') as f:
+                while chunk := f.read(chunk_size):
+                    yield chunk
+
+
+        logger.info(f"Serving file {file_path} for video {video_id}")
+        response = StreamingHttpResponse(file_iterator(file_path), content_type='application/vnd.apple.mpegurl')
+        response['Content-Disposition'] = f'inline; filename="{m3u8_file}"'
+        return response
     
 class DeleteVideoView(generics.DestroyAPIView):
     # a class the views all the videos
