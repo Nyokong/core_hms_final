@@ -320,8 +320,10 @@ class VideoPlayView(generics.GenericAPIView):
             video = self.get_queryset(id)
 
             logger.info(f'Requesting video {video.title}')
+            logger.info(f'Requesting URL: {video.cmp_video}')
             return FileResponse(video.cmp_video.open(), content_type='video/mp4')
         except Video.DoesNotExist:
+            logger.error(f"Video with ID {id} not found")
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
@@ -330,48 +332,64 @@ class VideoStreamView(generics.GenericAPIView):
     # any one can view or stream
     permission_classes = [permissions.AllowAny]
 
+    def get_queryset(self, id):
+        return Video.objects.get(id=id)
 
     def get(self, request, video_id, quality):
+        
         try:
-            video = Video.objects.get(id=video_id)
+            video = self.get_queryset(video_id)
+
+            # Use regex to find the numeric part at the end of the filename
+            title_code = video.title[:3].upper()
+            full_name = f'{video.cmp_video.name}'
+
+            filename = full_name.split('/')[-1]
+        
+            # Find the position of the title_code in the filename
+            pos = filename.find(title_code)
+            if pos != -1:
+                # Extract the part of the filename after the title_code
+                numeric_part = filename[pos + len(title_code):]
+
+            media_root = settings.MEDIA_ROOT
+            media_url = settings.MEDIA_URL
+
+            file_media_path = f'{video.user.id}_{title_code}{str(numeric_part)}'
+
+            folder_path = f'hls_videos/{os.path.splitext(file_media_path)[0]}'
+
+            logger.info(f'FOLDER_NAME: {folder_path}')
+
+            def stream_m3u8(url):
+                r = requests.get(url, stream=True)
+                for chunk in r.iter_content(chunk_size=8192):
+                        if chunk:
+                            yield chunk
+
+            # url = f'http://localhost:8000/media/{folder_path}'
+
+            def check_folder_exists(folder_path):
+                return os.path.exists(folder_path)
+            
+            if check_folder_exists(f'{media_root}/{folder_path}/{quality}.m3u8'):
+                logger.info(f"FILE EXIST :{media_root}/{folder_path}/{quality}.m3u8")
+
+   
+            link = f'http://localhost:8000{media_root}/1_TES48/{quality}_000.ts'
+
+            response = FileResponse(stream_m3u8(link), content_type='application/vnd.apple.mpegurl')
+
+            
+            response['Content-Disposition'] = f'attachment; video_id={video_id}, quality={quality}'
+            return response
+
+
         except Video.DoesNotExist:
             logger.error(f"Video with ID {video_id} not found")
-            raise Http404("Video not found")
-
-        # look for the hls video file path
-        hls_folder = os.path.join(settings.MEDIA_ROOT, video.hls_path)
-        m3u8_file = f"{quality}.m3u8"
-        file_path = os.path.join(hls_folder, m3u8_file)
-
-        test_path = f"/usr/src/app/media/{video.hls_path}/{quality}.m3u8"
-
-        logger.info(test_path)
-
-        # if the path doesnt exist
-        if not os.path.exists(test_path):
-            logger.error(f"File {test_path} not found for video {video_id} with quality {quality}")
-            raise Http404("Video not found")
-
-        # if the path doesnt exist
-        if not os.path.exists(file_path):
-            logger.error(f"File {file_path} not found for video {video_id} with quality {quality}")
+            logger.info(f'Requesting URL: {file_media_path}')
             raise Http404("Video not found")
         
-        # if quality doesnt exist
-        if not os.path.exists(file_path):
-            raise Http404("Quality not available")
-
-        def file_iterator(file_path, chunk_size=8192):
-            with open(file_path, 'rb') as f:
-                while chunk := f.read(chunk_size):
-                    yield chunk
-
-
-        logger.info(f"Serving file {file_path} for video {video_id}")
-        response = StreamingHttpResponse(file_iterator(file_path), content_type='application/vnd.apple.mpegurl')
-        response['Content-Disposition'] = f'inline; filename="{m3u8_file}"'
-        return response
-    
 class DeleteVideoView(generics.DestroyAPIView):
     # a class the views all the videos
     # in the database all of them
@@ -402,20 +420,6 @@ class AssignmentCreateView(generics.CreateAPIView):
             logger.info(f'serializer is not valid {request.data}')
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    
-    # def post(self, request, *args, **kwargs):
-    #     serializer= self.get_serializer(data=request.data)
-
-    #     if serializer.is_valid():
-    #         #print data to console
-    #         print('assignment upload in progress')
-    #         serializer.save()
-    #         #return the success response
-    #         return Response ({"msg": "assignment creation is a success!"}, status=status.HTTP_201_CREATED)
-        
-    #     else:
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
 #display assignments created
 class AssignmentListView(generics.GenericAPIView):
         permission_classes = [permissions.AllowAny]

@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 
 from django.db import models
 
+import os
 import logging
 logger = logging.getLogger('api')
 
@@ -67,7 +68,8 @@ class Video(models.Model):
     description = models.TextField(verbose_name="description", blank=True, null=True)
     cmp_video = models.FileField(verbose_name="cmp_video",upload_to='compressed_videos/', null=True, blank=False,)
     thumbnail = models.FileField(verbose_name="thumbail",upload_to='compressed_videos/thumbnail/', null=True, blank=True,)
-    hls_path = models.CharField(verbose_name="Streaming_Path",max_length=255, blank=True, null=True)
+    hls_name = models.CharField(verbose_name="Streaming_Path",max_length=255, blank=True, null=True)
+    hls_path = models.FileField(verbose_name="hls_video",upload_to='compressed_videos/link_hls/', null=True, blank=True,)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -81,7 +83,8 @@ class Video(models.Model):
         
         # save file path for streaming
         if not self.hls_path:
-            self.hls_path = f"hls_videos/{self.id}_{self.title}"
+            name_without_extension = os.path.splitext(self.generate_filename())[0]
+            self.hls_name = f"hls_videos/{name_without_extension}"
         super().save(*args, **kwargs)
 
     # generate a searchable file name

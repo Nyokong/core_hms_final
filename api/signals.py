@@ -84,18 +84,12 @@ def create_video(sender, instance, created, **kwargs):
         logger.info(f'Name of VIDEO {instance.cmp_video.name}')
         logger.info(f'ID: {instance.id} - {instance.title}')
 
-        curr_vid = Video.objects.get(id=instance.id)
-
-        # if curr_vid.id == :
-        #     pass
         # Use regex to find the numeric part at the end of the filename
         title_code = instance.title[:3].upper()
         full_name = f'{instance.cmp_video.name}'
 
         filename = full_name.split('/')[-1]
 
-        number = 0
-    
         # Find the position of the title_code in the filename
         pos = filename.find(title_code)
         if pos != -1:
@@ -104,8 +98,6 @@ def create_video(sender, instance, created, **kwargs):
             
         logger.info(f'Added video {instance.user.id}_{title_code}{str(numeric_part)} - now creating a task to generate .m3u8')
         # Trigger the background task to create the .m3u8 playlist
-        # create_m3u8_playlist.delay(instance.cmp_video, instance.id,str(instance.cmp_video.path))
-        # create_m3u8_playlist.delay(instance.id)
         test_ffmpeg.delay(instance.id)
 
 @receiver(post_delete, sender=Video)

@@ -32,7 +32,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Install nodejs and npm
 RUN apk add --no-cache nodejs npm
-
+USER root
 # Copy the application files
 COPY . .
 
@@ -42,9 +42,9 @@ RUN python manage.py collectstatic --noinput
 # Verify the installation of django-tailwind
 RUN pip show django-tailwind
 
-WORKDIR /django
 # Ensure the entrypoint script is executable
-RUN chmod +x entrypoint.sh
+WORKDIR /django
+COPY entrypoint.sh /django/entrypoint.sh
+RUN chmod +x /django/entrypoint.sh
 
-# CMD
-CMD ["./entrypoint.sh"]
+ENTRYPOINT ["/django/entrypoint.sh"]

@@ -184,7 +184,7 @@ class VideoSerializer(serializers.ModelSerializer):
 class Videoviewlist(serializers.ModelSerializer):
     class Meta:
         model = Video
-        fields = ['id','title', 'description', 'cmp_video']
+        fields = ['id','title', 'description', 'cmp_video', 'hls_path']
 
 
 # feedback serializer goes here
