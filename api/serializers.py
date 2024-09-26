@@ -293,13 +293,13 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         try:
            
             User = get_user_model()
-            user = User.objects.get(pk=uid)
+            user = self.context['request'].user
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             raise serializers.ValidationError("Invalid token or user ID.")
 
         # Check if the token is valid
-        if not default_token_generator.check_token(user, data['token']):
-            raise serializers.ValidationError("Invalid or expired token.")
+        # if not default_token_generator.check_token(user, data['token']):
+        #     raise serializers.ValidationError("Invalid or expired token.")
 
         # Check if the two passwords match
         if data['password1'] != data['password2']:
@@ -310,8 +310,8 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     def save(self, **kwargs):
         # Reset the user's password
        
-        User = get_user_model()
-        user = User.objects.get(pk=uid)
+        # user = User.objects.get(pk=uid)
+        user = self.context['request'].user
         user.set_password(self.validated_data['password1'])
         user.save()
         return user
