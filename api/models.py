@@ -140,7 +140,7 @@ class Assignment(models.Model):
     description = models.TextField(verbose_name="description", blank=True, null=True)
 
     # attachment is optional
-    attachment= models.FileField(verbose_name="attachment",upload_to='attachments/', unique=False, null=True)
+    attachment= models.FileField(verbose_name="attachment",upload_to='attachments/', unique=False, null=True, blank=True)
     # the time it was created
     due_date = models.DateTimeField(verbose_name="due_date")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -178,7 +178,7 @@ class Grade(models.Model):
         def __str__(self):
             return f'Mark: {self.grade}/100'
 
-    # get the lette grade
+    # get the letter grade
     def get_letter_grade(self):
         if self.grade >= 90:
             return 'A'
@@ -210,3 +210,11 @@ class VerificationToken(models.Model):
     user = models.ForeignKey(custUser, on_delete=models.CASCADE)
     token = models.CharField(max_length=32,unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+class PasswordResetToken(models.Model):
+    user = models.ForeignKey(custUser, on_delete =models.CASCADE)
+    token = models.CharField(max_length=100, unique =True)
+    created_at = models.DateTimeField( auto_now_add=True)
+
+    def is_token_valid(self):
+        return (timezone.now() - self.created_at.days <1) #valid for 1 day

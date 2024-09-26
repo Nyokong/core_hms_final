@@ -4,10 +4,13 @@ from django.contrib.auth.password_validation import validate_password
 from .validators import validate_file_size
 from django.utils import timezone
 
-from .models import FeedbackMessage, custUser, Assignment, Video
+from .models import FeedbackMessage, custUser, Assignment, Video, Grade
 
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import check_password
+
 
 class CustomSignupSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
@@ -102,7 +105,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = custUser
-        fields = ('username', 'first_name', 'last_name')
+        fields = ('username', )
 
 class StudentNumberUpdateSerializer(serializers.ModelSerializer):
     
@@ -138,6 +141,12 @@ class LoginSerializer(serializers.Serializer):
     class Meta:
         model = custUser
         fields = ('username', 'password')
+
+class AssignUpdateSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Assignment
+        fields = ('title', 'description', 'due_date')
 
 # create assignment serializer - only lecturer can access this.
 class  AssignmentForm(serializers.Serializer):
@@ -227,3 +236,82 @@ class FeebackListSerializer(serializers.ModelSerializer):
     class Meta:
         model = FeedbackMessage
         fields = ['feedback_room','sender', 'message', 'timestamp']
+
+
+#change password serializer
+
+class ChangePasswordSerializer(serializers.ModelSerializer):
+   
+    password1 = serializers.CharField(write_only=True, required=True)
+    password2 = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model= custUser
+        fields = ['password1', 'password2']
+
+ 
+    def validate(self, data):
+        if data['password1'] != data['password2']:
+            raise serializers.ValidationError({"password2": "New passwords do not match"})
+        return data
+
+
+    def update_password(self, instance, validated_data):
+        instance.set_password(validated_data['password1'])
+        instance.save()
+        return instance
+
+class GradeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Grade
+        fields = ['lecturer', 'submission', 'grade', 'created_at']
+        read_only_fields =['created_at']
+
+    def validate_grade(self, value):
+        if value <0 or value > 100:
+            raise serializers.ValidationError("Grade must be between 0 and 100.")
+        return value
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        User = get_user_model()
+        if not User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("No user with this email exists.")
+        return value
+    
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    token = serializers.CharField()
+   
+    password1 = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        
+        try:
+           
+            User = get_user_model()
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            raise serializers.ValidationError("Invalid token or user ID.")
+
+        # Check if the token is valid
+        if not default_token_generator.check_token(user, data['token']):
+            raise serializers.ValidationError("Invalid or expired token.")
+
+        # Check if the two passwords match
+        if data['password1'] != data['password2']:
+            raise serializers.ValidationError({"password2": "The two password fields didn't match."})
+
+        return data
+
+    def save(self, **kwargs):
+        # Reset the user's password
+       
+        User = get_user_model()
+        user = User.objects.get(pk=uid)
+        user.set_password(self.validated_data['password1'])
+        user.save()
+        return user
