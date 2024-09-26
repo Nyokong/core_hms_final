@@ -181,7 +181,7 @@ class VideoSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Video
-        fields = ['title', 'description', 'cmp_video', 'thumbnail']
+        fields = ['title', 'description', 'cmp_video', 'thumbnail','hls_name' ,'hls_path','status','is_running']
 
     def validate(self, data):
         validate_file_size(data['cmp_video'])
@@ -194,7 +194,11 @@ class VideoSerializer(serializers.ModelSerializer):
             title=validated_data['title'],
             description=validated_data['description'],
             cmp_video=validated_data['cmp_video'],
-            thumbnail=validated_data['thumbnail']
+            thumbnail=validated_data['thumbnail'],
+            hls_name=validated_data['hls_name'],
+            hls_path=validated_data['hls_path'],
+            status=validated_data['status'],
+            is_running=validated_data['is_running'],
         )
 
         # save the video if is succesful
@@ -291,7 +295,6 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     def validate(self, data):
         
         try:
-           
             User = get_user_model()
             user = self.context['request'].user
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
@@ -309,7 +312,6 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
     def save(self, **kwargs):
         # Reset the user's password
-       
         # user = User.objects.get(pk=uid)
         user = self.context['request'].user
         user.set_password(self.validated_data['password1'])
