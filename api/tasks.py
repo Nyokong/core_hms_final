@@ -26,6 +26,7 @@ def encode_ffmpeg(video_id):
             logger.info(f"Processing video with ID: {video.id}")
             video.is_running = True
             video.save()
+            # 1_TES1
 
             input_video_path = video.cmp_video.path
 
@@ -33,31 +34,32 @@ def encode_ffmpeg(video_id):
             
             os.makedirs(output_dir, exist_ok=True)
 
+            # TES
             title_code = video.title[:3].upper()
-            full_name = video.cmp_video.name
-            filename = full_name.split('/')[-1]
+            # TES
+            fullName = f'{video.user.id}_{title_code}{video.id}'
+            # full_name = video.cmp_video.name
+
+            # filename = full_name.split('/')[-1]
 
             # Extract the numeric part after the title code
-            pos = filename.find(title_code)
-            if pos != -1:
-                numeric_part = filename[pos + len(title_code):]
-            else:
-                numeric_part = ""
 
-            fullvid = f'{video.user.id}_{title_code}{numeric_part}'
-            name_without_extension = fullvid.rsplit('.', 1)[0]
+            # fullvid = f'{video.user.id}_{title_code}{numeric_part}'
+            # name_without_extension = fullvid.rsplit('.', 1)[0]
 
             output_filename = os.path.splitext(os.path.basename(input_video_path))[0]+ '_hls.m3u8'
-            out_hls_folder = os.path.join(output_dir, name_without_extension)
+            out_hls_folder = os.path.join(output_dir, fullName)
             output_hls_path = os.path.join(out_hls_folder, output_filename)
 
             output_thumbnail_path = os.path.join(output_dir, os.path.splitext(os.path.basename(input_video_path))[0]+'_thumbnail.jpg')
-        
+
+            dynamic_path = "http://localhost:8000/hls"
 
             command = [
-                'ffmpeg','-i', input_video_path,
-                '-vf', 'scale=w=1280:h=720', '-c:v', 'h264', '-v:a', 'acc', '-hls_time', '10', '-hls_list_size','0', '-hls_base_url',
-                '{{dynamic_path}}/','-movflags','+faststart','-y', output_hls_path,
+                'ffmpeg', '-y', '-i', input_video_path,
+                '-vf', 'scale=w=1280:h=720', '-c:v', 'h264', '-b:v', '3000k',
+                '-hls_time', '10', '-hls_list_size', '0', '-hls_base_url', dynamic_path + '/',
+                '-movflags', '+faststart', output_hls_path,
             ]
 
             cmd_thumbnail = [
@@ -70,7 +72,7 @@ def encode_ffmpeg(video_id):
                 # '-vf', 'scale=w=640:h=360', '-c:v', 'libx264', '-b:v', '800k', '-hls_time', '10', '-hls_playlist_type', 'vod',
                 # '-hls_segment_filename', os.path.join(output_dir, '360p_%03d.ts'), os.path.join(output_dir, '360p.m3u8')
 
-            result = subprocess.run(command, capture_output=True, check=True, stdout=subprocess.PIPE)
+            result = subprocess.run(command, capture_output=True, check=True)
             result_thumbnail = subprocess.run(cmd_thumbnail, check=True)
 
             outpit_json = json.loads(result.stdout)

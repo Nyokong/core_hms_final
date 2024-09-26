@@ -40,12 +40,12 @@ WORKDIR /django
 RUN rm -f /app/tailwind.config.js /app/postcss.config.js
 RUN python manage.py collectstatic --noinput
 # Verify the installation of django-tailwind
-RUN pip show django-tailwind
+# RUN pip show django-tailwind
 
 # Ensure the entrypoint script is executable
-# WORKDIR /django
-# COPY entrypoint.sh /django/entrypoint.sh
-# RUN chmod +x /django/entrypoint.sh
+WORKDIR /django
+COPY entrypoint.sh /django/entrypoint.sh
+RUN chmod +x /django/entrypoint.sh
 
-# ENTRYPOINT ["/django/entrypoint.sh"]
+ENTRYPOINT ["/django/entrypoint.sh"]
 
