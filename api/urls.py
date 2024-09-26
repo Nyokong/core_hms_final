@@ -39,9 +39,11 @@ urlpatterns = [
     path('assign/delete/<int:pk>',views.AssignmentDeleteView.as_view(), name= 'assignment-delete'),
 
     # video views
-    path('vd/lst', views.VideoView.as_view(), name='video-list'), 
-    # path('vd/upload-old',views.UploadVideoView.as_view(), name='video-upload'),
+    path('vd/view', views.VideoView.as_view(), name='video-list'), 
+    path('vd/view/<int:id>', views.VideoPlayView.as_view(), name='video-Play'), 
+    path('vd/upload',views.UploadVideoView.as_view(), name='video-upload'),
     path('vd/del/<int:pk>',views.DeleteVideoView.as_view(), name='video-delete'),
+    path('vd/stream/<int:video_id>/<str:quality>', views.VideoStreamView.as_view(), name='stream_video'),
 
     # feedback http endpoints
     # path('feedback/msgs', views.FeedbackMessages.as_view(), name='feedback-msgs-read'),
