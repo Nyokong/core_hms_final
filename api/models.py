@@ -6,6 +6,7 @@ from django.db import models
 import os
 import logging
 logger = logging.getLogger('api')
+from datetime import timezone
 
 # importing abstract user
 from django.contrib.auth.models import AbstractUser, Group, Permission
