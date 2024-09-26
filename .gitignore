@@ -4,7 +4,10 @@ db.sqlite3
 core/__pycache__
 api/__pycache__
 .env
-media/compressed_videos/
-media/attachments/
-media/hls_videos/
+# Ignore all files in the media folder
+media/*
+
+# But do not ignore the media folder itself
+!media/
+
 api/migrations/__pycache__
