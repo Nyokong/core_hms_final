@@ -1,7 +1,7 @@
 
 # django default imports
 from django.shortcuts import render
-from django.http import StreamingHttpResponse, Http404
+from django.http import StreamingHttpResponse, Http404, HttpResponse
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.urls import reverse
@@ -10,6 +10,7 @@ from django.core.mail import send_mail
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.hashers import make_password
 
 # dajngo auth
 from django.utils.crypto import get_random_string
@@ -26,18 +27,20 @@ from rest_framework.exceptions import ValidationError
 
 
 # serializers
-from .serializers import UserSerializer, UserUpdateSerializer, Videoviewlist,LoginSerializer
-from .serializers import UserDeleteSerializer, AssignmentForm , VideoSerializer
+from .serializers import UserSerializer, UserUpdateSerializer, Videoviewlist,LoginSerializer, ChangePasswordSerializer
+from .serializers import UserDeleteSerializer, AssignmentForm , VideoSerializer, AssignUpdateSerializer
 from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer
+from .serializers import PasswordResetRequestSerializer, GradeSerializer, PasswordResetConfirmSerializer
 
 # models
 from .models import custUser, Video, Assignment
 from .models import VerificationToken
-from .models import FeedbackMessage
+from .models import FeedbackMessage, Grade,PasswordResetToken
 
 # straight imports
 import os
 import random
+import csv
 
 # settings
 from django.conf import settings
