@@ -463,3 +463,49 @@ DEBUG 2024-09-26 07:57:06,292 bootsteps ^-- substep ok
 DEBUG 2024-09-26 07:57:06,293 bootsteps | Consumer: Starting event loop
 DEBUG 2024-09-26 07:57:06,294 bootsteps | Worker: Hub.register Pool...
 INFO 2024-09-26 07:57:06,295 worker celery@5353377971de ready.
+DEBUG 2024-09-26 08:10:21,771 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-09-26 08:10:21,774 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-09-26 08:10:21,777 functional 
+def test_ffmpeg(video_id):
+    return 1
+
+DEBUG 2024-09-26 08:10:21,780 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-09-26 08:10:21,788 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-09-26 08:10:21,791 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-09-26 08:10:21,794 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+
+DEBUG 2024-09-26 08:10:21,796 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-09-26 08:10:21,802 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-09-26 08:10:21,806 functional 
+def chain(*args, **kwargs):
+    return 1
+
+INFO 2024-09-26 08:10:22,077 strategy Task api.tasks.test_ffmpeg[99968bf4-390a-4803-8e28-3cf68b837d2b] received
+DEBUG 2024-09-26 08:10:22,079 base TaskPool: Apply <function fast_trace_task at 0x7fc3c4c14fe0> (args:('api.tasks.test_ffmpeg', '99968bf4-390a-4803-8e28-3cf68b837d2b', {'lang': 'py', 'task': 'api.tasks.test_ffmpeg', 'id': '99968bf4-390a-4803-8e28-3cf68b837d2b', 'shadow': None, 'eta': None, 'expires': None, 'group': None, 'group_index': None, 'retries': 0, 'timelimit': [None, None], 'root_id': '99968bf4-390a-4803-8e28-3cf68b837d2b', 'parent_id': None, 'argsrepr': '(39,)', 'kwargsrepr': '{}', 'origin': 'gen102@13c8901e2009', 'ignore_result': False, 'replaced_task_nesting': 0, 'stamped_headers': None, 'stamps': {}, 'properties': {'correlation_id': '99968bf4-390a-4803-8e28-3cf68b837d2b', 'reply_to': '08168ee1-efcf-30cc-a992-0a1da9a44cfe', 'delivery_mode': 2, 'delivery_info': {'exchange': '', 'routing_key': 'celery'}, 'priority': 0, 'body_encoding': 'base64', 'delivery_tag': '69c170cd-de5f-4673-a806-7f814f2021e7'}, 'reply_to': '08168ee1-efcf-30cc-a992-0a1da9a44cfe', 'correlation_id': '99968bf4-390a-4803-8e28-3cf68b837d2b', 'hostname': 'celery@5353377971de', 'delivery_info': {'exchange': '', 'routing_key':... kwargs:{})
+INFO 2024-09-26 08:10:33,532 trace Task api.tasks.test_ffmpeg[99968bf4-390a-4803-8e28-3cf68b837d2b] succeeded in 11.445218293000153s: '/django/media/hls_videos/1_TES112'
+INFO 2024-09-26 08:11:50,386 strategy Task api.tasks.test_ffmpeg[8df456ac-6656-4dc3-a76c-301e4b83ad15] received
+DEBUG 2024-09-26 08:11:50,388 base TaskPool: Apply <function fast_trace_task at 0x7fc3c4c14fe0> (args:('api.tasks.test_ffmpeg', '8df456ac-6656-4dc3-a76c-301e4b83ad15', {'lang': 'py', 'task': 'api.tasks.test_ffmpeg', 'id': '8df456ac-6656-4dc3-a76c-301e4b83ad15', 'shadow': None, 'eta': None, 'expires': None, 'group': None, 'group_index': None, 'retries': 0, 'timelimit': [None, None], 'root_id': '8df456ac-6656-4dc3-a76c-301e4b83ad15', 'parent_id': None, 'argsrepr': '(40,)', 'kwargsrepr': '{}', 'origin': 'gen102@13c8901e2009', 'ignore_result': False, 'replaced_task_nesting': 0, 'stamped_headers': None, 'stamps': {}, 'properties': {'correlation_id': '8df456ac-6656-4dc3-a76c-301e4b83ad15', 'reply_to': '675238df-78e8-3a3d-99be-8176a5003ae8', 'delivery_mode': 2, 'delivery_info': {'exchange': '', 'routing_key': 'celery'}, 'priority': 0, 'body_encoding': 'base64', 'delivery_tag': 'b1c890d5-e18f-4318-8745-3e660cfffb1f'}, 'reply_to': '675238df-78e8-3a3d-99be-8176a5003ae8', 'correlation_id': '8df456ac-6656-4dc3-a76c-301e4b83ad15', 'hostname': 'celery@5353377971de', 'delivery_info': {'exchange': '', 'routing_key':... kwargs:{})
+INFO 2024-09-26 08:12:07,862 trace Task api.tasks.test_ffmpeg[8df456ac-6656-4dc3-a76c-301e4b83ad15] succeeded in 17.470336292999946s: '/django/media/hls_videos/1_TES113'
