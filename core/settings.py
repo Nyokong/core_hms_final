@@ -29,9 +29,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
+# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
 
-# ALLOWED_HOSTS = ['127.0.0.1', 'localhost',"http://localhost:3000",]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1','localhost:8000']
 
 # INTERNAL_IPS = [
 #     '127.0.0.1',
@@ -52,6 +52,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 # For development
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://localhost:8000",
 ]
 
 # Allow CORS for localhost:3000 (Next.js)
@@ -62,6 +63,7 @@ CORS_ORIGIN_WHITELIST = [
 
 # Allow all headers (optional, you can be more restrictive)
 CORS_ALLOW_HEADERS = ['*']
+ALLOWED_HOSTS  = ['*']
 
 # SESSION_COOKIE_DOMAIN = 'http://localhost:3000'
 # CSRF_COOKIE_DOMAIN = 'http://localhost:3000'
@@ -182,6 +184,8 @@ MIDDLEWARE = [
     # 'api.middleware.DeleteMessagesCookieMiddleware',
 ]
 
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
+
 ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
@@ -209,12 +213,12 @@ ASGI_APPLICATION = "core.asgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 # DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
 # AZURE_ACCOUNT_NAME = os.getenv('AZURE_ACCOUNT_NAME')
@@ -225,16 +229,16 @@ ASGI_APPLICATION = "core.asgi.application"
 #     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv("DB_NAME"),
-        'USER': os.getenv("DB_USER"),
-        'PASSWORD': os.getenv("DB_PASSWORD"),
-        'HOST': os.getenv("DB_HOST"),  # This should match the service name in docker-compose.yml
-        'PORT': os.getenv("DB_PORT"),
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': os.getenv("DB_NAME"),
+#         'USER': os.getenv("DB_USER"),
+#         'PASSWORD': os.getenv("DB_PASSWORD"),
+#         'HOST': 'db',  # This should match the service name in docker-compose.yml
+#         'PORT': '5432',
+#     }
+# }
 
 CELERY_IMPORTS = ('api.tasks',)
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
@@ -312,7 +316,7 @@ ACCOUNT_ADAPTER = 'api.account_adapter.MyAccountAdapter'
 # LOGIN_REDIRECT_URL = 'http://localhost:3000'
 SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
-SITE_ID = 7
+SITE_ID = 8
 
 
 # Internationalization
@@ -360,6 +364,12 @@ LOGGING = {
         'console': {
             'class': 'logging.StreamHandler',
         },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'celery.log'),
+            'formatter': 'verbose',
+        },
     },
     'loggers': {
         'django.request': {
@@ -369,6 +379,11 @@ LOGGING = {
         },
         'api': { 
             'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'celery': {
+            'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': True,
         },

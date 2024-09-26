@@ -1,72 +1,6 @@
-
-
 services:
 # CI/CD
-  django:
-    container_name: hms_core
-    build: 
-      context: .
-      dockerfile: Dockerfile.django
-    command: python manage.py runserver 0.0.0.0:8000
-    # command: daphne -b 0.0.0.0:8000 core.asgi:application
-    # command: uvicorn core.asgi:application --port 8000 --log-level debug --reload
-    volumes: 
-      - .:/usr/src/app/
-      - /staticfiles:/code/staticfiles
-      - /media:/usr/src/app/  # Mount the media folder
-    ports:
-      - 8000:8000
-    env_file:
-      - .env
-    depends_on:
-      - redis
-      - db
-    environment: 
-      - DEBUG=1
-      - SECRET_KEY=django-insecure-oe2s8g*4lnepk$cn6%+(78a$d&*(f&9%&u!!%jyrp)d1!ihg#*
-      - ALLOWED_HOSTS=localhost,127.0.0.1
-      - REDIS_URL=redis://redis:6379/1
-      - CELERY_BROKER=redis://redis:6379/0
-      - CELERY_BACKEND=redis://redis:6379/0
-      - DATABASE_URL=postgres://gitgang_postgres:gitgang_postgres@db:5432/gitgang_postgres
-    user: "admin"
-
-  celery:
-    build: 
-      context: .
-      dockerfile: Dockerfile.celery
-    command: celery --app core worker --loglevel=info
-    volumes: 
-      - .:/usr/src/app/
-      - /media:/usr/src/app/media  # Mount the media folder
-    environment: 
-      - DEBUG=1
-      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
-      - CELERY_BROKER=redis://redis:6379/0
-      - CELERY_BACKEND=redis://redis:6379/0
-      - REDIS_URL=redis://redis:6379/1
-      - DATABASE_URL=postgres://gitgang_postgres:gitgang_postgres@db:5432/gitgang_postgres
-    depends_on:
-      - redis
-      - db 
-    user: "admin"
-    
-  db:
-    restart: always
-    image: postgres:16.3-alpine3.20
-    container_name: hms_db
-    env_file:
-      - .env
-    environment:
-      POSTGRES_DB: db
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: amin
-    ports:
-      - "5432:5432"
-    volumes:
-      - dbdata:/var/lib/postgresql/data/
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-
+  # Redis
   redis:
     image: redis:7.4.0-alpine
     container_name: redis
@@ -74,7 +8,109 @@ services:
     ports:
       - "6379:6379"
 
+  # Postgresql Database
+  db:
+    container_name: db
+    restart: always
+    image: postgres:16.3-alpine3.20
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/db:/var/lib/postgresql/data"
+    # networks:
+    #   app_net:
+    #     ipv4_address: 192.168.0.2
+
+  # # PGADMIN
+  # pgadmin:
+  #   container_name: pgadmin4
+  #   image: dpage/pgadmin4
+  #   restart: always
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: root@root.com
+  #     PGADMIN_DEFAULT_PASSWORD: root
+  #   ports:
+  #     - "5050:80"
+  #   volumes:
+  #     - ./data/pgadmin:/var/lib/pgadmin"
+  #   networks:
+  #     app_net:
+  #       ipv4_address: 192.168.0.3
+
+  # django
+  app:
+    container_name: core_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    image: app:django
+    entrypoint: ./entrypoint.sh
+    volumes:
+      - .:/django
+      - ./staticfiles:/code/staticfiles
+      - ./media:/django/media
+      - ./data/db:/var/lib/postgresql/data"
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+      - redis
+    environment:
+      DEBUG: 1
+      DB_NAME: db
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_HOST: db
+      ALLOWED_HOSTS: localhost,127.0.0.1
+      CELERY_BROKER: redis://redis:6379/0
+      CELERY_BACKEND: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+    # networks:
+    #   - app_net
+
+  celery:
+    restart: always
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: celery
+    command: celery -A core worker -l DEBUG
+    volumes:
+      - .:/django
+      - ./media:/django/media
+      - ./data/db:/var/lib/postgresql/data"
+    depends_on:
+      - db 
+      - redis
+      - app
+    environment: 
+      DEBUG: 1
+      DJANGO_ALLOWED_HOSTS: localhost 127.0.0.1 [::1]
+      CELERY_BROKER: redis://redis:6379/0
+      CELERY_BACKEND: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+  #     # - DATABASE_URL=postgres://gitgang_postgres:gitgang_postgres@db:5432/gitgang_postgres
+  #     ALLOWED_HOSTS: localhost,127.0.0.1
+  #     CELERY_BROKER: redis://redis:6379/0
+  #     CELERY_BACKEND: redis://redis:6379/0
+  #     CELERY_BROKER_URL: redis://redis:6379/0
+
+# Networks and Volumes
+# networks:
+#   app_net:
+#     ipam:
+#       driver: default
+#       config: 
+#         - subnet: "192.168.0.0/24"
+#           gateway: 192.168.0.1 
+
 volumes:
-  dbdata:
-
-
+  db-data:
+    # driver: bridge
+    # driver_opts:
+    #   size: "10GiB"

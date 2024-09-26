@@ -72,7 +72,7 @@ class Video(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'uploaded by: {self.user} | {self.title} - {self.title}'
+        return f'uploaded by: {self.user} | {self.id} - {self.title}'
 
     def save(self, *args, **kwargs):
         if not self.pk:  # Check if the object is being created
@@ -92,10 +92,13 @@ class Video(models.Model):
         # Get the first 3 letters of the title
         title_code = self.title[:3].upper()
 
+        # default
+        new_number_str = "00001"
+
         if Video.objects.exists():
             # Get the last video
             last_video = Video.objects.order_by('-id').first()
-            print(f"Last video: {last_video}")
+            print(f"Last video: {last_video}\n")
 
             if last_video:
                 try:
@@ -111,15 +114,14 @@ class Video(models.Model):
                     new_number = number + 1
 
                     # Pad the new number with leading zeros to match the original length
-                    new_number_str = str(new_number).zfill(len(number_str))
+                    new_number_str = str(new_number)
+                    # new_number_str = str(new_number).zfill(len(number_str))
 
-                except (IndexError, ValueError):
-                    new_number_str = "00001"
+                except (IndexError, ValueError)as e:
+                    logger.warning(f"Error extracting number from filename: {e}")
             else:
-                new_number_str = "00001"
-                logger.warning('last video was not found')
+                logger.warning('Last video was not found')
         else:
-            new_number_str = "00001"
             print("No videos found.")
 
         # 1_TES00001.mp4
