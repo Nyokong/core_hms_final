@@ -49,11 +49,11 @@ services:
       dockerfile: Dockerfile
     command: python manage.py runserver 0.0.0.0:8000
     image: app:django
-    entrypoint: ./entrypoint.sh
+    entrypoint: /django/entrypoint.sh
     volumes:
-      - .:/django
+      - .:/django:rw
       - ./staticfiles:/code/staticfiles
-      - ./media:/django/media
+      - ./media:/django/media:rw
       - ./data/db:/var/lib/postgresql/data"
     ports:
       - 8000:8000
@@ -81,14 +81,15 @@ services:
     container_name: celery
     command: celery -A core worker -l DEBUG
     volumes:
-      - .:/django
-      - ./media:/django/media
+      - .:/django:rw
+      - ./media:/django/media:rw
       - ./data/db:/var/lib/postgresql/data"
     depends_on:
       - db 
       - redis
       - app
     environment: 
+      DJANGO_MEDIA_ROOT: /django/media
       DEBUG: 1
       DJANGO_ALLOWED_HOSTS: localhost 127.0.0.1 [::1]
       CELERY_BROKER: redis://redis:6379/0

@@ -72,13 +72,30 @@ def test_ffmpeg(video_id):
         if result.returncode != 0:
             logger.error('FFmpeg command failed')
             return None
+        
+        if result.returncode == 0:
+            # Assuming the output_dir is within MEDIA_ROOT
+            relative_path = os.path.relpath(os.path.join(output_dir, '360p.m3u8'), settings.MEDIA_ROOT)
+            video = Video.objects.get(id=video_id)
 
-        os.remove(temp_file_path)
+            # Retrieve the Video instance by ID
+            # Update the vid360p field
+            video.vid360p = relative_path
+            video.save(update_fields=['vid360p'])
 
-        video.hls_path = f"hls_videos/{video.user.id}_{title_code}{video.id}"
-        video.save()
+            return video
+        else:
+            print(f"Error: {result.stderr}")
+            return None
 
-        return output_dir
+        # os.remove(temp_file_path)
+
+        # # http://localhost:8000/media/hls_videos/{video.user.id}_{title_code}{video.id}
+
+        # video.hls_path = f"http://localhost:8000/media/hls_videos/{video.user.id}_{title_code}{video.id}"
+        # video.save()
+
+        # return output_dir
     except Exception as e:
         logger.error(f"Error during video processing: {e}")
         return None

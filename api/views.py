@@ -1,7 +1,7 @@
 
 # django default imports
 from django.shortcuts import render
-from django.http import StreamingHttpResponse, Http404
+from django.http import StreamingHttpResponse, Http404, HttpResponse
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.urls import reverse
@@ -10,6 +10,7 @@ from django.core.mail import send_mail
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.hashers import make_password
 
 # dajngo auth
 from django.utils.crypto import get_random_string
@@ -26,18 +27,20 @@ from rest_framework.exceptions import ValidationError
 
 
 # serializers
-from .serializers import UserSerializer, UserUpdateSerializer, Videoviewlist,LoginSerializer
-from .serializers import UserDeleteSerializer, AssignmentForm , VideoSerializer
+from .serializers import UserSerializer, UserUpdateSerializer, Videoviewlist,LoginSerializer, ChangePasswordSerializer
+from .serializers import UserDeleteSerializer, AssignmentForm , VideoSerializer, AssignUpdateSerializer
 from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer
+from .serializers import PasswordResetRequestSerializer, GradeSerializer, PasswordResetConfirmSerializer
 
 # models
 from .models import custUser, Video, Assignment
 from .models import VerificationToken
-from .models import FeedbackMessage
+from .models import FeedbackMessage, Grade,PasswordResetToken
 
 # straight imports
 import os
 import random
+import csv
 
 # settings
 from django.conf import settings
@@ -47,7 +50,7 @@ import logging
 logger = logging.getLogger('api')
 
 # Create your views here.
-# ----------------------------------------------------------------- &
+
 # create user viewset api endpoint
 class UserCreateView(generics.CreateAPIView):
     serializer_class = UserSerializer
@@ -142,11 +145,11 @@ class UserUpdateView(generics.RetrieveUpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         user = self.get_object()
-        serializer = self.get_serializer(data=request.data,instance=user)
+        serializer = self.get_serializer(user, data=request.data)
 
         # if user is valid - check 
         if serializer.is_valid():
-            user.save()
+            serializer.save()
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         
@@ -159,7 +162,7 @@ from urllib.parse import urlencode
 from rest_framework_simplejwt.tokens import RefreshToken
 import requests
 
-class AddStudentNumberView(generics.RetrieveUpdateAPIView):
+class AddStudentNumberView(generics.UpdateAPIView):
 
     queryset = custUser.objects.all()
     serializer_class = UserUpdateSerializer 
@@ -167,6 +170,7 @@ class AddStudentNumberView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
 
 class UserProfileView(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
@@ -267,12 +271,13 @@ class UserListViewSet(APIView):
 class GoogAftermathView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         return render(request, 'thank_you.html')
-    
+
+   
 class UploadVideoView(generics.CreateAPIView):
     serializer_class = VideoSerializer  
 
     # only authenticated users can access this page?
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     # post 
     def post(self, request, *args, **kwargs):
@@ -302,6 +307,28 @@ class VideoView(generics.GenericAPIView):
         serializer = self.get_serializer(query, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+# import file response
+from django.http import FileResponse
+
+class VideoPlayView(generics.GenericAPIView):
+    # a class the views all the videos
+    # in the database all of them
+    permission_classes = [permissions.AllowAny]
+
+    # overwrite the get query method
+    def get_queryset(self, id):
+        return Video.objects.get(id=id)
+
+    def get(self, request, id):
+        try:
+            video = self.get_queryset(id)
+
+            logger.info(f'Requesting video {video.title}')
+            return FileResponse(video.cmp_video.open(), content_type='video/mp4')
+        except Video.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 class VideoStreamView(generics.GenericAPIView):
 
@@ -360,6 +387,33 @@ class DeleteVideoView(generics.DestroyAPIView):
         return Video.objects.all()  
 
 
+class VideoView(generics.GenericAPIView):
+    # a class the views all the videos
+    # in the database all of them
+    permission_classes = [permissions.AllowAny]
+    serializer_class = Videoviewlist
+
+    # overwrite the get query method
+    def get_queryset(self):
+        return Video.objects.all()
+
+    def get(self, request, format=None):
+        query = self.get_queryset()
+
+        serializer = self.get_serializer(query, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class DeleteVideoView(generics.DestroyAPIView):
+    # a class the views all the videos
+    # in the database all of them
+    permission_classes = [permissions.AllowAny]
+
+    # retrieve all videos
+    def get_queryset(self):
+        return Video.objects.all()  
+
+
 # create assignments
 class AssignmentCreateView(generics.CreateAPIView):
     serializer_class = AssignmentForm
@@ -374,25 +428,10 @@ class AssignmentCreateView(generics.CreateAPIView):
 
         if serializer.is_valid():
             video = serializer.save()
-            logger.info(f"serializer is valid {video}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             logger.info(f'serializer is not valid {request.data}')
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    
-    # def post(self, request, *args, **kwargs):
-    #     serializer= self.get_serializer(data=request.data)
-
-    #     if serializer.is_valid():
-    #         #print data to console
-    #         print('assignment upload in progress')
-    #         serializer.save()
-    #         #return the success response
-    #         return Response ({"msg": "assignment creation is a success!"}, status=status.HTTP_201_CREATED)
-        
-    #     else:
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 #display assignments created
 class AssignmentListView(generics.GenericAPIView):
@@ -409,20 +448,20 @@ class AssignmentListView(generics.GenericAPIView):
 # update assignments - only logged the lecturer
 class AssignmentUpdateView(generics.RetrieveUpdateAPIView):
     queryset= Assignment.objects.all()
-    serializer_class = AssignmentForm
-    permission_classes =(IsAuthenticated,)
-    lookup_field ='id'
+    serializer_class = AssignUpdateSerializer
+    permission_classes = [permissions.AllowAny,]
 
     def get_object(self):
-        return super().get_object()
+        obj = get_object_or_404(self.queryset, id=self.kwargs["id"])
+        return obj
     
     def update(self, request, *args, **kwargs):
         assignment = self.get_object()
-        serializer = self.get_serializer(assignment, data=request.data, partial = True)
+        serializer = self.get_serializer(assignment, data=request.data)
 
         # if assignment is valid - check 
         if serializer.is_valid():
-            assignment.save()
+            serializer.save()
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         
@@ -442,6 +481,7 @@ class AssignmentDeleteView(generics.DestroyAPIView):
         assignment =self.get_object()
         assignment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
     
 # feedback messages go here
 # Read all feed back messages
@@ -461,7 +501,46 @@ class CreateFeedbackMessageView(generics.CreateAPIView):
         
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#update feedback
+class UpdateFeedbackMessage(generics.UpdateAPIView):
+    permission_classes = [permissions.AllowAny]
+    queryset = FeedbackMessage.objects.all()
+    serializer_class = FeedbackMsgSerializer
+
+
+    def get_object(self):
+        obj = get_object_or_404(self.queryset, id=self.kwargs["pk"])
+        return obj
+    
+    def update(self, request, *args, **kwargs):
+        message = self.get_object()
+        serializer = self.get_serializer(message, data=request.data)
+
+    
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
         
+#delete feedback
+
+class DeleteFeedbackMessage (generics.DestroyAPIView):
+    permission_classes = [permissions.AllowAny]
+    queryset = FeedbackMessage.objects.all()
+    serializer_class = FeedbackMsgSerializer
+
+
+    def get_object(self):
+        feedback_id = self.kwargs.get("pk")
+        return get_object_or_404(FeedbackMessage, id =feedback_id)
+
+    def destroy(self, request, *args, **kwargs):
+        feedback=self.get_object()
+        feedback.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
 
 class FeedbackMessages(generics.GenericAPIView):
     # gets users who are authenticated
@@ -478,6 +557,164 @@ class FeedbackMessages(generics.GenericAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    
+
+class ExportCSVView(APIView):
+
+    permission_classes = [IsAuthenticated]
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="data.csv"'
+
+        writer = csv.writer(response)
+
+        writer.writerow(['Feedback  Room', 'Sender', 'Feedback', 'Timestamp'])
+
+        data = FeedbackMessage.objects.all().values_list('feedback_room','sender', 'message', 'timestamp')
+
+        for row in data:
+            writer.writerow(row)
+
+        return response
+
+#change password
+
+class ChangePasswordView(generics.UpdateAPIView):
+    queryset = custUser.objects.all()
+    serializer_class = ChangePasswordSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        user= self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+
+            #update the user's password
+            serializer.update_password(user, serializer.validated_data)
+            return Response({"msg": "Password updated successfully."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#creating grades
+class GradeCreateView(generics.CreateAPIView):
+    queryset = Grade.objects.all()
+    serializer_class = GradeSerializer
+    permission_classes = [permissions.AllowAny,]
+
+    
 
 
+
+#update grades
+class GradeUpdateView(generics.UpdateAPIView):
+    queryset = Grade.objects.all()
+    serializer_class = GradeSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_object(self):
+        # Fetch the object based on the primary key (id)
+        obj = get_object_or_404(self.queryset, id=self.kwargs["pk"])
+        return obj
+
+    def update(self, request, *args, **kwargs):
+    
+        grade = self.get_object()
+
+        serializer = self.get_serializer(grade, data=request.data)
+
+      
+        if serializer.is_valid():
+          
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+     
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+#delete grades
+
+class GradeDeleteView(generics.DestroyAPIView):
+    queryset = Grade.objects.all()
+    serializer_class = GradeSerializer
+    permission_classes = [permissions.AllowAny,]
+
+
+    def get_object(self):
+        grade_id = self.kwargs.get("pk")
+        return get_object_or_404(Grade, id =grade_id)
+
+    def destroy(self, request, *args, **kwargs):
+        grade=self.get_object()
+        grade.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+#viewing grades
+
+class GradeListView(generics.ListAPIView):
+    queryset = Grade.objects.all()
+    serializer_class = GradeSerializer
+    permission_classes = [permissions.AllowAny,]
+
+
+
+class PasswordResetRequestView(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = PasswordResetRequestSerializer
+
+
+    def post(self, request, *args, **kwargs):
+        email = request.data.get("email")
+        try:
+            user = custUser.objects.get(email=email)
+        except custUser.DoesNotExist:
+            return Response({"error": "User with this email does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Generate token
+        reset_token = get_random_string(length=5)
+        
+        # Storing the token in a PasswordResetToken model
+        PasswordResetToken.objects.create(user=user, token=reset_token)
+
+        # Send email with the reset link
+        reset_link = f'http://127.0.0.1:8000/api/reset-password-confirm/?token={reset_token}'
+        subject = "Password Reset Request"
+        message = f"Hello,\n\nPlease click the link below to reset your password:\n{reset_link}\n\nIf you did not request this, please ignore this email."
+        sender = settings.EMAIL_HOST_USER
+
+        send_mail(subject, message, sender, [email], fail_silently=False)
+
+        return Response({"message": "Password reset email sent successfully."}, status=status.HTTP_200_OK)
+
+
+class PasswordResetConfirmView(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = PasswordResetConfirmSerializer
+
+
+    def post(self, request, *args, **kwargs):
+        token = request.data.get("token")
+        password1 = request.data.get("password1")
+        password2 = request.data.get("password2")
+
+        if password1 != password2:
+            return Response({"error": "Passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            reset_token = PasswordResetToken.objects.get(token=token)
+        except PasswordResetToken.DoesNotExist:
+            return Response({"error": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = reset_token.user
+        user.password = make_password(password1)
+        user.save()
+
+        # Optionally, delete the used token
+        reset_token.delete()
+
+        return Response({"message": "Password reset successfully."}, status=status.HTTP_200_OK)
     

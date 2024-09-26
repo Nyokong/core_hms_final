@@ -3,8 +3,10 @@ from django.core.exceptions import ValidationError
 
 from django.db import models
 
+import os
 import logging
 logger = logging.getLogger('api')
+from datetime import timezone
 
 # importing abstract user
 from django.contrib.auth.models import AbstractUser, Group, Permission
@@ -21,6 +23,7 @@ class custUser(AbstractUser):
     username = models.CharField(verbose_name="Username", max_length=8, unique=True)
     student_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     is_lecturer = models.BooleanField(default=False)
+    email = models.EmailField(unique=True)
 
     groups = models.ManyToManyField(Group, related_name='custom_users')
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_perms')
@@ -67,7 +70,8 @@ class Video(models.Model):
     description = models.TextField(verbose_name="description", blank=True, null=True)
     cmp_video = models.FileField(verbose_name="cmp_video",upload_to='compressed_videos/', null=True, blank=False,)
     thumbnail = models.FileField(verbose_name="thumbail",upload_to='compressed_videos/thumbnail/', null=True, blank=True,)
-    hls_path = models.CharField(verbose_name="Streaming_Path",max_length=255, blank=True, null=True)
+    hls_name = models.CharField(verbose_name="Streaming_Path",max_length=255, blank=True, null=True)
+    hls_path = models.FileField(verbose_name="hls_video",upload_to='compressed_videos/link_hls/', null=True, blank=True,)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -81,7 +85,8 @@ class Video(models.Model):
         
         # save file path for streaming
         if not self.hls_path:
-            self.hls_path = f"hls_videos/{self.id}_{self.title}"
+            name_without_extension = os.path.splitext(self.generate_filename())[0]
+            self.hls_name = f"hls_videos/{name_without_extension}"
         super().save(*args, **kwargs)
 
     # generate a searchable file name
@@ -134,11 +139,13 @@ class Assignment(models.Model):
     created_by = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='lecturer_creator')
     title = models.CharField(verbose_name="title", max_length=255)
     description = models.TextField(verbose_name="description", blank=True, null=True)
+
     # attachment is optional
-    attachment= models.FileField(verbose_name="attachment",upload_to='attachments/', unique=False, null=True)
+    attachment= models.FileField(verbose_name="attachment",upload_to='attachments/', unique=False, null=True, blank=True)
     # the time it was created
     due_date = models.DateTimeField(verbose_name="due_date")
     created_at = models.DateTimeField(auto_now_add=True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, default=1)
 
     def __str__(self):
         return f'{self.title} - created: {self.created_at}'
@@ -149,6 +156,7 @@ class Assignment(models.Model):
 
 # submitted
 class Submission(models.Model):
+    title = models.CharField(max_length=100, null=True, blank=True)
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='assignment_being_submitted')
     student = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='student_submitting_assignment')
     # what they submitting
@@ -163,7 +171,7 @@ class Submission(models.Model):
 class Grade(models.Model):
     lecturer = models.ForeignKey(custUser, on_delete=models.CASCADE)
     submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
-    grade = models.DecimalField(verbose_name="Percentage Grade",max_digits=3, decimal_places=2)  # e.g.,'A++', 'A+', 'B-', etc.
+    grade = models.DecimalField(verbose_name="Percentage Grade",max_digits=5, decimal_places=2)  # e.g.,'A++', 'A+', 'B-', etc.
     feedback = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -171,7 +179,7 @@ class Grade(models.Model):
         def __str__(self):
             return f'Mark: {self.grade}/100'
 
-    # get the lette grade
+    # get the letter grade
     def get_letter_grade(self):
         if self.grade >= 90:
             return 'A'
@@ -184,7 +192,7 @@ class Grade(models.Model):
         else:
             return 'F'
         
-class FeedbackRoom(models.Model):
+class FeedbackRoom(models.Model): 
     # this is all the conversations they've had
     lecturer = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='lecturer_in_feedback')
     student = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='student_in_feedback')
@@ -203,3 +211,11 @@ class VerificationToken(models.Model):
     user = models.ForeignKey(custUser, on_delete=models.CASCADE)
     token = models.CharField(max_length=32,unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+class PasswordResetToken(models.Model):
+    user = models.ForeignKey(custUser, on_delete =models.CASCADE)
+    token = models.CharField(max_length=100, unique =True)
+    created_at = models.DateTimeField( auto_now_add=True)
+
+    def is_token_valid(self):
+        return (timezone.now() - self.created_at.days <1) #valid for 1 day
