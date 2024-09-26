@@ -217,7 +217,7 @@ def google_login(request):
     return redirect(url)
 
 
-class AddStudentNumberView(generics.RetrieveUpdateAPIView):
+class AddStudentNumberView(generics.UpdateAPIView):
 
     queryset = custUser.objects.all()
     serializer_class = UserUpdateSerializer 
@@ -225,6 +225,7 @@ class AddStudentNumberView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
 
 class UserProfileView(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
