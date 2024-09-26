@@ -103,7 +103,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = custUser
-        fields = ('username', 'first_name', 'last_name')
+        fields = ('username', )
 
 class StudentNumberUpdateSerializer(serializers.ModelSerializer):
     
