@@ -140,7 +140,7 @@ class LoginSerializer(serializers.Serializer):
         fields = ('username', 'password')
 
 # create assignment serializer - only lecturer can access this.
-class AssignmentForm(serializers.Serializer):
+class  AssignmentForm(serializers.Serializer):
     title=serializers.CharField(max_length=240)
     description= serializers.CharField()
     due_date = serializers.DateTimeField(default=timezone.now)
@@ -172,7 +172,7 @@ class VideoSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Video
-        fields = ['title', 'description', 'cmp_video']
+        fields = ['title', 'description', 'cmp_video', 'thumbnail']
 
     def validate(self, data):
         validate_file_size(data['cmp_video'])
@@ -184,7 +184,8 @@ class VideoSerializer(serializers.ModelSerializer):
             user=self.context['request'].user,
             title=validated_data['title'],
             description=validated_data['description'],
-            cmp_video=validated_data['cmp_video']
+            cmp_video=validated_data['cmp_video'],
+            thumbnail=validated_data['thumbnail']
         )
 
         # save the video if is succesful
