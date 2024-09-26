@@ -44,7 +44,7 @@ RUN pip show django-tailwind
 
 WORKDIR /django
 # Ensure the entrypoint script is executable
-RUN chmod +x entrypoint.sh
+#RUN chmod +x entrypoint.sh
 
 # CMD
-CMD ["./entrypoint.sh"]
+#CMD ["./entrypoint.sh"]
