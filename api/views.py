@@ -617,7 +617,7 @@ class PasswordResetRequestView(generics.GenericAPIView):
         # Generate token
         reset_token = get_random_string(length=5)
         
-        # Store the token in a PasswordResetToken model (you need to create this model)
+        # Storing the token in a PasswordResetToken model
         PasswordResetToken.objects.create(user=user, token=reset_token)
 
         # Send email with the reset link
