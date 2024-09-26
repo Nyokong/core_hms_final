@@ -4,5 +4,7 @@ db.sqlite3
 core/__pycache__
 api/__pycache__
 .env
-media/
+media/compressed_videos/
+media/attachments/
+media/hls_videos/
 api/migrations/__pycache__
