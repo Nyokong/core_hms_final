@@ -272,7 +272,7 @@ class UploadVideoView(generics.CreateAPIView):
     serializer_class = VideoSerializer  
 
     # only authenticated users can access this page?
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     # post 
     def post(self, request, *args, **kwargs):
@@ -302,6 +302,28 @@ class VideoView(generics.GenericAPIView):
         serializer = self.get_serializer(query, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+# import file response
+from django.http import FileResponse
+
+class VideoPlayView(generics.GenericAPIView):
+    # a class the views all the videos
+    # in the database all of them
+    permission_classes = [permissions.AllowAny]
+
+    # overwrite the get query method
+    def get_queryset(self, id):
+        return Video.objects.get(id=id)
+
+    def get(self, request, id):
+        try:
+            video = self.get_queryset(id)
+
+            logger.info(f'Requesting video {video.title}')
+            return FileResponse(video.cmp_video.open(), content_type='video/mp4')
+        except Video.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 class VideoStreamView(generics.GenericAPIView):
 

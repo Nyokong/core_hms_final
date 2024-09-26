@@ -51,9 +51,9 @@ services:
     image: app:django
     entrypoint: ./entrypoint.sh
     volumes:
-      - .:/django
+      - .:/django:rw
       - ./staticfiles:/code/staticfiles
-      - ./media:/django/media
+      - ./media:/django/media:rw
       - ./data/db:/var/lib/postgresql/data"
     ports:
       - 8000:8000
@@ -81,8 +81,8 @@ services:
     container_name: celery
     command: celery -A core worker -l DEBUG
     volumes:
-      - .:/django
-      - ./media:/django/media
+      - .:/django:rw
+      - ./media:/django/media:rw
       - ./data/db:/var/lib/postgresql/data"
     depends_on:
       - db 
