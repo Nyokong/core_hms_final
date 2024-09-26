@@ -115,8 +115,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
 
     # tailwind modules
-    'tailwind',
-    'theme',  
+    # 'tailwind',
+    # 'new_theme', 
 ]
 
 TAILWIND_APP_NAME = 'theme'

@@ -272,7 +272,6 @@ class GoogAftermathView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         return render(request, 'thank_you.html')
 
-   
 class UploadVideoView(generics.CreateAPIView):
     serializer_class = VideoSerializer  
 
@@ -342,40 +341,9 @@ class VideoStreamView(generics.GenericAPIView):
         except Video.DoesNotExist:
             logger.error(f"Video with ID {video_id} not found")
             raise Http404("Video not found")
-
-        # look for the hls video file path
-        hls_folder = os.path.join(settings.MEDIA_ROOT, video.hls_path)
-        m3u8_file = f"{quality}.m3u8"
-        file_path = os.path.join(hls_folder, m3u8_file)
-
-        test_path = f"/usr/src/app/media/{video.hls_path}/{quality}.m3u8"
-
-        logger.info(test_path)
-
-        # if the path doesnt exist
-        if not os.path.exists(test_path):
-            logger.error(f"File {test_path} not found for video {video_id} with quality {quality}")
-            raise Http404("Video not found")
-
-        # if the path doesnt exist
-        if not os.path.exists(file_path):
-            logger.error(f"File {file_path} not found for video {video_id} with quality {quality}")
-            raise Http404("Video not found")
         
-        # if quality doesnt exist
-        if not os.path.exists(file_path):
-            raise Http404("Quality not available")
+        return Response({},status=status.HTTP_200_OK)
 
-        def file_iterator(file_path, chunk_size=8192):
-            with open(file_path, 'rb') as f:
-                while chunk := f.read(chunk_size):
-                    yield chunk
-
-
-        logger.info(f"Serving file {file_path} for video {video_id}")
-        response = StreamingHttpResponse(file_iterator(file_path), content_type='application/vnd.apple.mpegurl')
-        response['Content-Disposition'] = f'inline; filename="{m3u8_file}"'
-        return response
     
 class DeleteVideoView(generics.DestroyAPIView):
     # a class the views all the videos
