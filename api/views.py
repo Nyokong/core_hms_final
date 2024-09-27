@@ -657,4 +657,3 @@ class PasswordResetConfirmView(generics.GenericAPIView):
         reset_token.delete()
 
         return Response({"message": "Password reset successfully."}, status=status.HTTP_200_OK)
-    
