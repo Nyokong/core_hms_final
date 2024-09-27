@@ -3,7 +3,6 @@ db.sqlite3
 .DS_Store
 core/__pycache__
 api/__pycache__
-.env
 # Ignore all files in the media folder
 media/*
 
