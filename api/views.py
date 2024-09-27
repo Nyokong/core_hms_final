@@ -724,6 +724,22 @@ class SubmissionCreateView(generics.CreateAPIView):
                 logger.info(f'serializer is not valid{request.data}')
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+#viewing submission
 
+class SubmissionListView(generics. GenericAPIView):
+    serializer_class = SubmissionSerializer
+    permission_classes =[permissions.AllowAny]
+
+
+    def get_queryset(self):
+        submission_id = self.kwargs['submission_id']
+        return Submission.objects.filter(id= submission_id)
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    
     
     
