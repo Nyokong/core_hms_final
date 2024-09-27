@@ -117,6 +117,9 @@ INSTALLED_APPS = [
     # tailwind modules
     # 'tailwind',
     # 'new_theme', 
+
+    # storages 
+    'storages',
 ]
 
 TAILWIND_APP_NAME = 'theme'
@@ -220,10 +223,12 @@ DATABASES = {
     }
 }
 
-# DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
-# AZURE_ACCOUNT_NAME = os.getenv('AZURE_ACCOUNT_NAME')
-# AZURE_ACCOUNT_KEY = os.getenv('AZURE_ACCOUNT_KEY')
-# AZURE_CONTAINER = os.getenv('AZURE_CONTAINER')
+DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+
+AZURE_ACCOUNT_NAME=os.getenv("AZURE_ACCOUNT_NAME")
+AZURE_ACCOUNT_KEY=os.getenv("AZURE_ACCOUNT_KEY")
+AZURE_CONTAINER=os.getenv("AZURE_CONTAINER")
+# AZURE_CONNECTION_STRING = os.getenv("AZURE_CONNECTION_STRING")
 
 # DATABASES = {
 #     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))

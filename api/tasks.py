@@ -83,35 +83,35 @@ def encode_ffmpeg(video_id):
         #     '+faststart','-y' , output_dir
         # ]
 
-        def create_playlist(video_path, output_dir):
-            """Creates a streamable playlist (.m3u8) with multiple bitrates.
-            Args:
-                video_path: Path to the input video file.
-                output_dir: Directory to save the output playlist and segments.
-            """
+        # def create_playlist(video_path, output_dir):
+        #     """Creates a streamable playlist (.m3u8) with multiple bitrates.
+        #     Args:
+        #         video_path: Path to the input video file.
+        #         output_dir: Directory to save the output playlist and segments.
+        #     """
 
-            # Create output directory if it doesn't exist
-            os.makedirs(output_dir, exist_ok=True)
+        #     # Create output directory if it doesn't exist
+        #     os.makedirs(output_dir, exist_ok=True)
 
-            # FFmpeg command to create a playlist with multiple bitrates
-            ffmpeg_cmd = [
-                "ffmpeg",
-                "-i", video_path,
-                "-c:v", "libx264",
-                "-b:v", "500k,1000k,1500k",
-                "-c:a", "aac",
-                "-b:a", "128k",
-                "-f", "hls",
-                "-hls_time", "10",
-                "-hls_list_size", "0",
-                "-hls_wrap", "10",
-                os.path.join(output_dir, "playlist.m3u8")
-            ]
+        #     # FFmpeg command to create a playlist with multiple bitrates
+        #     ffmpeg_cmd = [
+        #         "ffmpeg",
+        #         "-i", video_path,
+        #         "-c:v", "libx264",
+        #         "-b:v", "500k,1000k,1500k",
+        #         "-c:a", "aac",
+        #         "-b:a", "128k",
+        #         "-f", "hls",
+        #         "-hls_time", "10",
+        #         "-hls_list_size", "0",
+        #         "-hls_wrap", "10",
+        #         os.path.join(output_dir, "playlist.m3u8")
+        #     ]
 
-            # Execute the FFmpeg command
-            subprocess.run(ffmpeg_cmd, check=True)
+        #     # Execute the FFmpeg command
+        #     subprocess.run(ffmpeg_cmd, check=True)
 
-        create_playlist(temp_file_path, output_dir)
+        # create_playlist(temp_file_path, output_dir)
 
         thumbnail_output_dir = os.path.join(settings.MEDIA_ROOT, 'compressed_videos/thumbnail',f'{name_without_extension}')
         os.makedirs(thumbnail_output_dir, exist_ok=True)
