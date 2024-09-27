@@ -35,6 +35,12 @@ class custUser(AbstractUser):
     def save(self, *args, **kwargs):
         # overwrite the default email to the school email
         # this will set the default email into the default school email
+        if self.username.isdigit():
+            if not self.email:
+                self.email = f"{self.student_number}@mynwu.ac.za"
+        elif self.student_number==self.username:
+            if not self.email:
+                self.email = f"{self.student_number}@mynwu.ac.za"
         if self.student_number:
             if not self.email:
                 self.email = f"{self.student_number}@mynwu.ac.za"
@@ -111,40 +117,28 @@ class Video(models.Model):
         title_code = self.title[:3].upper()
 
         # default
-        new_number_str = "00001"
+        # new_number_str = "00001"
+        new_id = 1
 
         if Video.objects.exists():
             # Get the last video
             last_video = Video.objects.order_by('-id').first()
-            print(f"Last video: {last_video}\n")
 
             if last_video:
                 try:
-                    # Extract the numeric part of the filename
-                    match = re.search(r'(\d+)(?=\.\w+$)', last_video.cmp_video.name)
-                    if not match:
-                        raise ValueError("No numeric part found in the filename")
 
-                    number_str = match.group(1)
-                    number = int(number_str)
-
-                    # Increment the number
-                    new_number = number + 1
-
-                    # Pad the new number with leading zeros to match the original length
-                    new_number_str = str(new_number)
-                    # new_number_str = str(new_number).zfill(len(number_str))
-
+                    new_id = last_video.id + 1
                 except (IndexError, ValueError)as e:
                     logger.warning(f"Error extracting number from filename: {e}")
             else:
                 logger.warning('Last video was not found')
+                new_id = 1
         else:
             print("No videos found.")
 
         # 1_TES00001.mp4
         # Combine elements to form the filename
-        filename = f"{user_id}_{title_code}{new_number_str}.mp4"
+        filename = f"{user_id}_{title_code}{new_id}.mp4"
         return filename
 
 # assignment
