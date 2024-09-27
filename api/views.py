@@ -30,12 +30,12 @@ from rest_framework.exceptions import ValidationError
 from .serializers import UserSerializer, UserUpdateSerializer, Videoviewlist,LoginSerializer, ChangePasswordSerializer
 from .serializers import UserDeleteSerializer, AssignmentForm , VideoSerializer, AssignUpdateSerializer
 from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer
-from .serializers import PasswordResetRequestSerializer, GradeSerializer, PasswordResetConfirmSerializer
+from .serializers import PasswordResetRequestSerializer, GradeSerializer, PasswordResetConfirmSerializer, SubmissionSerializer
 
 # models
 from .models import custUser, Video, Assignment
 from .models import VerificationToken
-from .models import FeedbackMessage, Grade,PasswordResetToken
+from .models import FeedbackMessage, Grade,PasswordResetToken, Submission
 
 # straight imports
 import os
@@ -269,10 +269,14 @@ class UserListViewSet(APIView):
         return Response(serializer.data)
 
 class GoogAftermathView(generics.GenericAPIView):
+
+    def get_queryset(self):
+        return custUser.objects.all()
+        # return custUser.objects.get(id=request['user'].id)
+    
     def get(self, request, *args, **kwargs):
         return render(request, 'thank_you.html')
 
-   
 class UploadVideoView(generics.CreateAPIView):
     serializer_class = VideoSerializer  
 
@@ -342,40 +346,9 @@ class VideoStreamView(generics.GenericAPIView):
         except Video.DoesNotExist:
             logger.error(f"Video with ID {video_id} not found")
             raise Http404("Video not found")
-
-        # look for the hls video file path
-        hls_folder = os.path.join(settings.MEDIA_ROOT, video.hls_path)
-        m3u8_file = f"{quality}.m3u8"
-        file_path = os.path.join(hls_folder, m3u8_file)
-
-        test_path = f"/usr/src/app/media/{video.hls_path}/{quality}.m3u8"
-
-        logger.info(test_path)
-
-        # if the path doesnt exist
-        if not os.path.exists(test_path):
-            logger.error(f"File {test_path} not found for video {video_id} with quality {quality}")
-            raise Http404("Video not found")
-
-        # if the path doesnt exist
-        if not os.path.exists(file_path):
-            logger.error(f"File {file_path} not found for video {video_id} with quality {quality}")
-            raise Http404("Video not found")
         
-        # if quality doesnt exist
-        if not os.path.exists(file_path):
-            raise Http404("Quality not available")
+        return Response({},status=status.HTTP_200_OK)
 
-        def file_iterator(file_path, chunk_size=8192):
-            with open(file_path, 'rb') as f:
-                while chunk := f.read(chunk_size):
-                    yield chunk
-
-
-        logger.info(f"Serving file {file_path} for video {video_id}")
-        response = StreamingHttpResponse(file_iterator(file_path), content_type='application/vnd.apple.mpegurl')
-        response['Content-Disposition'] = f'inline; filename="{m3u8_file}"'
-        return response
     
 class DeleteVideoView(generics.DestroyAPIView):
     # a class the views all the videos
@@ -557,6 +530,19 @@ class FeedbackMessages(generics.GenericAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class AllRoomsView(generics.GenericAPIView):
+    # gets users who are authenticated
+    # for later purpose permissions might change
+    permission_classes = [permissions.AllowAny]
+    serializer_class = FeebackListSerializer
+
+    def get_queryset(self, id):
+        return FeedbackMessage.objects.get(lecturer=id)
+
+    def get(self, request, id):
+        queryset = self.get_queryset(lecturer=id)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 
 class ExportCSVView(APIView):
@@ -717,4 +703,58 @@ class PasswordResetConfirmView(generics.GenericAPIView):
         reset_token.delete()
 
         return Response({"message": "Password reset successfully."}, status=status.HTTP_200_OK)
+
+
+#creating a submission
+
+class SubmissionCreateView(generics.CreateAPIView):
+    serializer_class = SubmissionSerializer
+    permission_classes =[permissions.AllowAny]
+
+    def get_queryset(self):
+        return Submission.objects.all()
+
+        def post(self, request, *args, **kwargs):
+            serializer = self.get_serializer(data =request.data)
+
+            if serializer.is_valid():
+                submission = serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                logger.info(f'serializer is not valid{request.data}')
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#viewing submission
+
+class SubmissionListView(generics. GenericAPIView):
+    serializer_class = SubmissionSerializer
+    permission_classes =[permissions.AllowAny]
+
+
+    def get_queryset(self):
+        submission_id = self.kwargs['id']
+        return Submission.objects.filter(id= submission_id)
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+ #deleting assignment
+
+
+class SubmissionDeleteView(generics.DestroyAPIView):
+    serializer_class = SubmissionSerializer
+    permission_classes =[permissions.AllowAny]
+
+
+    def get_object(self):
+        submission_id= self.kwargs.get('id')
+        return get_object_or_404(Submission, id = submission_id)
+
+    def destroy(self, request, *args, **kwargs):
+        submission =self.get_object()
+        submission.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
     

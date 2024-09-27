@@ -23,7 +23,7 @@ class custUser(AbstractUser):
     username = models.CharField(verbose_name="Username", max_length=8, unique=True)
     student_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     is_lecturer = models.BooleanField(default=False)
-    email = models.EmailField(unique=True)
+    # email = models.EmailField(unique=True)
 
     groups = models.ManyToManyField(Group, related_name='custom_users')
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_perms')
@@ -35,6 +35,12 @@ class custUser(AbstractUser):
     def save(self, *args, **kwargs):
         # overwrite the default email to the school email
         # this will set the default email into the default school email
+        if self.username.isdigit():
+            if not self.email:
+                self.email = f"{self.student_number}@mynwu.ac.za"
+        elif self.student_number==self.username:
+            if not self.email:
+                self.email = f"{self.student_number}@mynwu.ac.za"
         if self.student_number:
             if not self.email:
                 self.email = f"{self.student_number}@mynwu.ac.za"
@@ -65,13 +71,26 @@ class Student(models.Model):
 
 # video uploading model
 class Video(models.Model):
+    PENDING = 'pending'
+    PROCESSING = 'processing'
+    COMPLETED = 'completed'
+
+    STATUS_CHOICES = (
+        (PENDING, 'pending'),
+        (PROCESSING, 'processing'),
+        (COMPLETED, 'completed'),
+    )
+
     user = models.ForeignKey(custUser, on_delete=models.CASCADE)
     title = models.CharField(verbose_name="title", max_length=255)
     description = models.TextField(verbose_name="description", blank=True, null=True)
     cmp_video = models.FileField(verbose_name="cmp_video",upload_to='compressed_videos/', null=True, blank=False,)
+    video_length = models.CharField(verbose_name='video_length', max_length=100, null=True, blank=True)
     thumbnail = models.FileField(verbose_name="thumbail",upload_to='compressed_videos/thumbnail/', null=True, blank=True,)
     hls_name = models.CharField(verbose_name="Streaming_Path",max_length=255, blank=True, null=True)
-    hls_path = models.FileField(verbose_name="hls_video",upload_to='compressed_videos/link_hls/', null=True, blank=True,)
+    hls_path = models.CharField(verbose_name="hls_video",max_length=500, null=True, blank=True,)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=PENDING)
+    is_running = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -98,40 +117,28 @@ class Video(models.Model):
         title_code = self.title[:3].upper()
 
         # default
-        new_number_str = "00001"
+        # new_number_str = "00001"
+        new_id = 1
 
         if Video.objects.exists():
             # Get the last video
             last_video = Video.objects.order_by('-id').first()
-            print(f"Last video: {last_video}\n")
 
             if last_video:
                 try:
-                    # Extract the numeric part of the filename
-                    match = re.search(r'(\d+)(?=\.\w+$)', last_video.cmp_video.name)
-                    if not match:
-                        raise ValueError("No numeric part found in the filename")
 
-                    number_str = match.group(1)
-                    number = int(number_str)
-
-                    # Increment the number
-                    new_number = number + 1
-
-                    # Pad the new number with leading zeros to match the original length
-                    new_number_str = str(new_number)
-                    # new_number_str = str(new_number).zfill(len(number_str))
-
+                    new_id = last_video.id + 1
                 except (IndexError, ValueError)as e:
                     logger.warning(f"Error extracting number from filename: {e}")
             else:
                 logger.warning('Last video was not found')
+                new_id = 1
         else:
             print("No videos found.")
 
         # 1_TES00001.mp4
         # Combine elements to form the filename
-        filename = f"{user_id}_{title_code}{new_number_str}.mp4"
+        filename = f"{user_id}_{title_code}{new_id}.mp4"
         return filename
 
 # assignment
@@ -145,7 +152,7 @@ class Assignment(models.Model):
     # the time it was created
     due_date = models.DateTimeField(verbose_name="due_date")
     created_at = models.DateTimeField(auto_now_add=True)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, default=1)
+    # student = models.ForeignKey(Student, on_delete=models.CASCADE, default=1)
 
     def __str__(self):
         return f'{self.title} - created: {self.created_at}'
@@ -156,7 +163,7 @@ class Assignment(models.Model):
 
 # submitted
 class Submission(models.Model):
-    title = models.CharField(max_length=100, null=True, blank=True)
+    # title = models.CharField(max_length=100, null=True, blank=True)
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='assignment_being_submitted')
     student = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='student_submitting_assignment')
     # what they submitting

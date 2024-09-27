@@ -115,8 +115,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
 
     # tailwind modules
-    'tailwind',
-    'theme',  
+    # 'tailwind',
+    # 'new_theme', 
 ]
 
 TAILWIND_APP_NAME = 'theme'
@@ -345,6 +345,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Check if the media folder exists, if not, create it
+if not os.path.exists(MEDIA_ROOT):
+    os.makedirs(MEDIA_ROOT)
+
+if not os.path.exists(f'{MEDIA_ROOT}/compressed_videos'):
+    os.makedirs(f'{MEDIA_ROOT}/compressed_videos')
+
+if not os.path.exists(f'{MEDIA_ROOT}/attachments'):
+    os.makedirs(f'{MEDIA_ROOT}/attachments')
+
+if not os.path.exists(f'{MEDIA_ROOT}/hls_videos'):
+    os.makedirs(f'{MEDIA_ROOT}/hls_videos')
 
 
 # logging settings

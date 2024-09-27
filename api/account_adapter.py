@@ -17,15 +17,16 @@ class MyAccountAdapter(DefaultAccountAdapter):
         refresh_token = str(refresh)
 
         # # Create the response object
-        # response = 'http://localhost:8000'
+        response = 'http://localhost:8000/api/thank-you'
 
         # # Set the access and refresh tokens as cookies
-        # response.set_cookie('access_token', access_token, httponly=True, secure=True)
-        # response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True)
+        response.set_cookie('access_token', access_token, httponly=True, secure=True)
+        response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True)
 
         # logger.info(f'Redirecting user {user} with token {tokens["access"]} from redirect')
         logger.info(f'Logging {user} From Google but needs Student Number')
 
         # go to the front end to add employee number
-        return 'http://localhost:3000'
+        return response
+        # return 'http://localhost:3000'
     

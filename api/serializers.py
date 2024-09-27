@@ -4,7 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from .validators import validate_file_size
 from django.utils import timezone
 
-from .models import FeedbackMessage, custUser, Assignment, Video, Grade
+from .models import FeedbackMessage, custUser, Assignment, Video, Grade, Submission
 
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
@@ -181,7 +181,7 @@ class VideoSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Video
-        fields = ['title', 'description', 'cmp_video', 'thumbnail']
+        fields = ['title', 'description', 'cmp_video', 'thumbnail','hls_name' ,'hls_path','status','is_running']
 
     def validate(self, data):
         validate_file_size(data['cmp_video'])
@@ -194,7 +194,11 @@ class VideoSerializer(serializers.ModelSerializer):
             title=validated_data['title'],
             description=validated_data['description'],
             cmp_video=validated_data['cmp_video'],
-            thumbnail=validated_data['thumbnail']
+            thumbnail=validated_data['thumbnail'],
+            hls_name=validated_data['hls_name'],
+            hls_path=validated_data['hls_path'],
+            status=validated_data['status'],
+            is_running=validated_data['is_running'],
         )
 
         # save the video if is succesful
@@ -206,7 +210,7 @@ class VideoSerializer(serializers.ModelSerializer):
 class Videoviewlist(serializers.ModelSerializer):
     class Meta:
         model = Video
-        fields = ['id','title', 'description', 'cmp_video', 'hls_path']
+        fields = ['id','title', 'description', 'cmp_video', 'thumbnail','hls_name' ,'hls_path','status','is_running']
 
 
 # feedback serializer goes here
@@ -291,7 +295,6 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     def validate(self, data):
         
         try:
-           
             User = get_user_model()
             user = self.context['request'].user
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
@@ -309,9 +312,14 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
     def save(self, **kwargs):
         # Reset the user's password
-       
         # user = User.objects.get(pk=uid)
         user = self.context['request'].user
         user.set_password(self.validated_data['password1'])
         user.save()
         return user
+
+
+class SubmissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Submission
+        fields = ['assignment','student','video', 'submitted_at']

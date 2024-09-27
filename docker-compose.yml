@@ -47,7 +47,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: python manage.py runserver 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:8000 
     image: app:django
     entrypoint: /django/entrypoint.sh
     volumes:
@@ -65,6 +65,7 @@ services:
       DB_NAME: db
       DB_USER: admin
       DB_PASSWORD: admin
+      DJANGO_MEDIA_ROOT: /media
       DB_HOST: db
       ALLOWED_HOSTS: localhost,127.0.0.1
       CELERY_BROKER: redis://redis:6379/0
@@ -89,7 +90,7 @@ services:
       - redis
       - app
     environment: 
-      DJANGO_MEDIA_ROOT: /django/media
+      DJANGO_MEDIA_ROOT: /media
       DEBUG: 1
       DJANGO_ALLOWED_HOSTS: localhost 127.0.0.1 [::1]
       CELERY_BROKER: redis://redis:6379/0
