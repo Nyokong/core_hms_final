@@ -732,7 +732,7 @@ class SubmissionListView(generics. GenericAPIView):
 
 
     def get_queryset(self):
-        submission_id = self.kwargs['submission_id']
+        submission_id = self.kwargs['id']
         return Submission.objects.filter(id= submission_id)
 
     def get(self, request, *args, **kwargs):
@@ -740,6 +740,21 @@ class SubmissionListView(generics. GenericAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    
+ #deleting assignment
+
+
+class SubmissionDeleteView(generics.DestroyAPIView):
+    serializer_class = SubmissionSerializer
+    permission_classes =[permissions.AllowAny]
+
+
+    def get_object(self):
+        submission_id= self.kwargs.get('id')
+        return get_object_or_404(Submission, id = submission_id)
+
+    def destroy(self, request, *args, **kwargs):
+        submission =self.get_object()
+        submission.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
     
