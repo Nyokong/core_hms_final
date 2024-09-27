@@ -4,7 +4,7 @@
 please dont be in the core folder
 
 ```plaintext
-├── DjangoMainFolder
+├── core_hms_final
     └── api
         ├── admin.py
         ├── models.py
@@ -19,6 +19,7 @@ please dont be in the core folder
     ├── Dockerfile
     ├── entrypoint.sh
     ├── manage.py
+    ├── setup.py
     └── requirements.txt
 
 HMS-app/
@@ -35,13 +36,39 @@ HMS-app/
 └── docker-compose.yml
 ```
 
-run this command in the DjangoMainFolder
+run this command in the core_hms_final
+for easy access our code, basically let us set it up for you
+all you need to run is the ./setup.sh file in Gitbash
+# Please note this only works on Gitbash
 
 ```bash
-    python -m venv hms-venv
+    ./setup.sh
 ```
 
-2.install requirements
+this file will basically setup the environment the way we had it in development 
+well hopefully.
+
+# if you get an error running docker with ./setup.sh file
+
+this is expected since you possibly running this in windows
+
+then take the manual road
+suppose your env and all your files were not setup by the ./setup.sh file 
+then follow the next steps
+
+# outside the core_hms_final folder
+
+```plaintext
+├── where you cloned the repository
+    └── core_hms_final
+```
+
+1. Run this to create a python environment
+```bash
+    python -m venv hms_venv
+```
+
+2.install requirements by running this code
 
 ```bash
     pip install -r requirements.txt
