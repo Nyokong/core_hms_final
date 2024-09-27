@@ -63,6 +63,7 @@ urlpatterns = [
     path('grades/delete/<int:pk>', views.GradeDeleteView.as_view(), name ='grade-delete'),
 
     # submissions
+    path('submission/create', views.SubmissionCreateView.as_view(), name='submission-create'),
 
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

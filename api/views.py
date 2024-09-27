@@ -30,12 +30,12 @@ from rest_framework.exceptions import ValidationError
 from .serializers import UserSerializer, UserUpdateSerializer, Videoviewlist,LoginSerializer, ChangePasswordSerializer
 from .serializers import UserDeleteSerializer, AssignmentForm , VideoSerializer, AssignUpdateSerializer
 from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer
-from .serializers import PasswordResetRequestSerializer, GradeSerializer, PasswordResetConfirmSerializer
+from .serializers import PasswordResetRequestSerializer, GradeSerializer, PasswordResetConfirmSerializer, SubmissionSerializer
 
 # models
 from .models import custUser, Video, Assignment
 from .models import VerificationToken
-from .models import FeedbackMessage, Grade,PasswordResetToken
+from .models import FeedbackMessage, Grade,PasswordResetToken, Submission
 
 # straight imports
 import os
@@ -703,3 +703,27 @@ class PasswordResetConfirmView(generics.GenericAPIView):
         reset_token.delete()
 
         return Response({"message": "Password reset successfully."}, status=status.HTTP_200_OK)
+
+
+#creating a submission
+
+class SubmissionCreateView(generics.CreateAPIView):
+    serializer_class = SubmissionSerializer
+    permission_classes =[permissions.AllowAny]
+
+    def get_queryset(self):
+        return Submission.objects.all()
+
+        def post(self, request, *args, **kwargs):
+            serializer = self.get_serializer(data =request.data)
+
+            if serializer.is_valid():
+                submission = serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                logger.info(f'serializer is not valid{request.data}')
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    
+    

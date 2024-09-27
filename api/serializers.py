@@ -4,7 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from .validators import validate_file_size
 from django.utils import timezone
 
-from .models import FeedbackMessage, custUser, Assignment, Video, Grade
+from .models import FeedbackMessage, custUser, Assignment, Video, Grade, Submission
 
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
@@ -317,3 +317,9 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         user.set_password(self.validated_data['password1'])
         user.save()
         return user
+
+
+class SubmissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Submission
+        fields = ['assignment','student','video', 'submitted_at']
