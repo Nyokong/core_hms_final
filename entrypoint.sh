@@ -1,11 +1,15 @@
 #!/bin/ash
 
+# clear python cache
+rm -rf __pycache__
+
 # start migrations
 echo "Make database migrations"
 python manage.py makemigrations
 
 echo "Apply database migrations"
 python manage.py migrate
+
 
 # # Navigate to the directory containing package.json
 # echo "Navigate to the directory containing package.json"
