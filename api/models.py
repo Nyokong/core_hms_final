@@ -152,7 +152,7 @@ class Assignment(models.Model):
     # the time it was created
     due_date = models.DateTimeField(verbose_name="due_date")
     created_at = models.DateTimeField(auto_now_add=True)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, default=1)
+    # student = models.ForeignKey(Student, on_delete=models.CASCADE, default=1)
 
     def __str__(self):
         return f'{self.title} - created: {self.created_at}'
@@ -163,7 +163,7 @@ class Assignment(models.Model):
 
 # submitted
 class Submission(models.Model):
-    title = models.CharField(max_length=100, null=True, blank=True)
+    # title = models.CharField(max_length=100, null=True, blank=True)
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='assignment_being_submitted')
     student = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='student_submitting_assignment')
     # what they submitting

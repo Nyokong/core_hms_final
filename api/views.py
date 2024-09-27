@@ -269,6 +269,11 @@ class UserListViewSet(APIView):
         return Response(serializer.data)
 
 class GoogAftermathView(generics.GenericAPIView):
+
+    def get_queryset(self):
+        return custUser.objects.all()
+        # return custUser.objects.get(id=request['user'].id)
+    
     def get(self, request, *args, **kwargs):
         return render(request, 'thank_you.html')
 
@@ -525,6 +530,19 @@ class FeedbackMessages(generics.GenericAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class AllRoomsView(generics.GenericAPIView):
+    # gets users who are authenticated
+    # for later purpose permissions might change
+    permission_classes = [permissions.AllowAny]
+    serializer_class = FeebackListSerializer
+
+    def get_queryset(self, id):
+        return FeedbackMessage.objects.get(lecturer=id)
+
+    def get(self, request, id):
+        queryset = self.get_queryset(lecturer=id)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 
 class ExportCSVView(APIView):

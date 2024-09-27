@@ -25,6 +25,8 @@ def encode_ffmpeg(video_id):
         try:
             video = Video.objects.get(id=video_id)
             logger.info(f"Found video: {video}")
+
+            file_path = video.cmp_video.path
         except Video.DoesNotExist:
             logger.error(f"Video with ID {video_id} does not exist.")
             return None
@@ -56,32 +58,32 @@ def encode_ffmpeg(video_id):
 
         logger.info(f'FILE PATH: {temp_file_path}')
 
-        # command = [
-        #     'ffmpeg', '-y', '-i', temp_file_path,
-        #     '-vf', 'scale=w=1280:h=720', '-c:v', 'libx264', '-b:v', '3000k', '-hls_time', '10', '-hls_playlist_type', 'vod',
-        #     '-hls_segment_filename', os.path.join(output_dir, '720p_%03d.ts'), os.path.join(output_dir, '720p.m3u8'),
-        #     '-vf', 'scale=w=854:h=480', '-c:v', 'libx264', '-b:v', '1500k', '-hls_time', '10', '-hls_playlist_type', 'vod',
-        #     '-hls_segment_filename', os.path.join(output_dir, '480p_%03d.ts'), os.path.join(output_dir, '480p.m3u8'),
-        #     '-vf', 'scale=w=640:h=360', '-c:v', 'libx264', '-b:v', '800k', '-hls_time', '10', '-hls_playlist_type', 'vod',
-        #     '-hls_segment_filename', os.path.join(output_dir, '360p_%03d.ts'), os.path.join(output_dir, '360p.m3u8')
-        # ]
+        command = [
+            'ffmpeg', '-y', '-i', temp_file_path,
+            '-vf', 'scale=w=1280:h=720', '-c:v', 'libx264', '-b:v', '3000k', '-hls_time', '10', '-hls_playlist_type', 'vod',
+            '-hls_segment_filename', os.path.join(output_dir, '720p_%03d.ts'), os.path.join(output_dir, '720p.m3u8'),
+            '-vf', 'scale=w=854:h=480', '-c:v', 'libx264', '-b:v', '1500k', '-hls_time', '10', '-hls_playlist_type', 'vod',
+            '-hls_segment_filename', os.path.join(output_dir, '480p_%03d.ts'), os.path.join(output_dir, '480p.m3u8'),
+            '-vf', 'scale=w=640:h=360', '-c:v', 'libx264', '-b:v', '800k', '-hls_time', '10', '-hls_playlist_type', 'vod',
+            '-hls_segment_filename', os.path.join(output_dir, '360p_%03d.ts'), os.path.join(output_dir, '360p.m3u8')
+        ]
 
         dynamic_path = "http://localhost:8000/media/hls_videos"
 
-        command = [
-            'ffmpeg', '-i', 
-            temp_file_path,
-            '-c:v', 'h264', 
-            '-c:a', 'aac',
-            '-hls_time', '5', 
-            '-hls_list_size', '0', 
-            '-hls_base_url', 
-            dynamic_path + '/',
-            '-movflags', 
-            '+faststart','-y' , output_dir
-        ]
+        # command = [
+        #     'ffmpeg', '-i', 
+        #     file_path,
+        #     '-c:v', 'h264', 
+        #     '-c:a', 'aac',
+        #     '-hls_time', '5', 
+        #     '-hls_list_size', '0', 
+        #     '-hls_base_url', 
+        #     dynamic_path + '/',
+        #     '-movflags', 
+        #     '+faststart','-y' , output_dir
+        # ]
 
-        thumbnail_output_dir = os.path.join(settings.MEDIA_ROOT, 'thumbnail',f'{name_without_extension}')
+        thumbnail_output_dir = os.path.join(settings.MEDIA_ROOT, 'compressed_videos/thumbnail',f'{name_without_extension}')
         os.makedirs(thumbnail_output_dir, exist_ok=True)
 
         result = subprocess.run(command, capture_output=True, text=True)
