@@ -24,7 +24,6 @@ urlpatterns = [
     path('usr/reset-password', views.PasswordResetRequestView.as_view(), name ='reset-password'),
     path('usr/reset-password-confirm', views.PasswordResetConfirmView.as_view(), name ='reset-password-confirm'),
 
-
     # i hate allatuh urls
     path('thank-you', views.GoogAftermathView.as_view(), name='thank-you'),
 
@@ -39,26 +38,32 @@ urlpatterns = [
     path('assign/delete/<int:pk>',views.AssignmentDeleteView.as_view(), name= 'assignment-delete'),
 
     # video views
-    path('vd/lst', views.VideoView.as_view(), name='video-list'), 
-    # path('vd/upload-old',views.UploadVideoView.as_view(), name='video-upload'),
+    path('vd/view', views.VideoView.as_view(), name='video-list'), 
+    path('vd/view/<int:id>', views.VideoPlayView.as_view(), name='video-Play'), 
+    path('vd/upload',views.UploadVideoView.as_view(), name='video-upload'),
     path('vd/del/<int:pk>',views.DeleteVideoView.as_view(), name='video-delete'),
+    path('vd/stream/<int:video_id>/<str:quality>', views.VideoStreamView.as_view(), name='stream_video'),
 
     # feedback http endpoints
-    # path('feedback/msgs', views.FeedbackMessages.as_view(), name='feedback-msgs-read'),
-    path('feedback-room/<int:room_id>/messages/', views.FeedbackMessages.as_view(), name='feedback_room_messages'),
+    path('feedback/msgs', views.FeedbackMessages.as_view(), name='feedback-msgs-read'),
+    # make update of feedback
+    path('feedback/<int:id>/rooms', views.AllRoomsView.as_view(), name='rooms'),
+    path('feedback-room/<int:room_id>/messages', views.FeedbackMessages.as_view(), name='feedback_room_messages'),
     path('feedback/update/<int:pk>', views.UpdateFeedbackMessage.as_view(), name ='feedback-update'),
     path('feedback/delete/<int:pk>', views.DeleteFeedbackMessage.as_view(), name ='feedback-delete'),
-   
 
-
-    #downloading CSV
-    path('csv', views.ExportCSVView.as_view(), name='export-csv'),
+    #downloading 
+    path('download/csv', views.ExportCSVView.as_view(), name='export-csv'),
+    # path('download/video/<int:id>', views.DownloadVideoView.as_view(), name='export-video'),
 
     #grade
     path('grades/create', views.GradeCreateView.as_view(), name='grade-create'),
     path('grades/update/<int:pk>', views.GradeUpdateView.as_view(), name ='grade-update'),
     path('grades', views.GradeListView.as_view(), name='grade-list'),
     path('grades/delete/<int:pk>', views.GradeDeleteView.as_view(), name ='grade-delete'),
+
+    # submissions
+
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

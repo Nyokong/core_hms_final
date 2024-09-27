@@ -33,6 +33,7 @@ class CustomSignupSerializer(serializers.Serializer):
         return get_adapter().clean_password(password)
 
     def validate(self, data):
+        email = self.validate_email(data['email'])
         if data['password1'] != data['password2']:
             raise serializers.ValidationError("The two password fields didn't match.")
         return data
@@ -70,6 +71,7 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True},
             'password2': {'write_only': True},
+            'email': {'required': True},
         }
 
     def validate(self, attrs):
@@ -127,6 +129,15 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=8)
     password = serializers.CharField(max_length=80)
 
+    def validate(self, attrs):
+        username = attrs.get('username')
+        password = attrs.get('password')
+
+        if not custUser.objects.filter(username=username).exists():
+            raise serializers.ValidationError("Invalid username or password.")
+        
+        return attrs
+    
     class Meta:
         model = custUser
         fields = ('username', 'password')
@@ -138,7 +149,7 @@ class AssignUpdateSerializer(serializers.ModelSerializer):
         fields = ('title', 'description', 'due_date')
 
 # create assignment serializer - only lecturer can access this.
-class AssignmentForm(serializers.Serializer):
+class  AssignmentForm(serializers.Serializer):
     title=serializers.CharField(max_length=240)
     description= serializers.CharField()
     due_date = serializers.DateTimeField(default=timezone.now)
@@ -149,7 +160,8 @@ class AssignmentForm(serializers.Serializer):
             created_by=self.context['request'].user,
             title=validated_data['title'],
             description=validated_data['description'],
-            due_date=validated_data['due_date'],
+            due_date=validated_data.get('due_date', timezone.now()),  # Ensure due_date is included
+            attachment=validated_data.get('attachment')  # Include attachment if necessary
         )
 
         # save the video if is succesful
@@ -169,7 +181,7 @@ class VideoSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Video
-        fields = ['title', 'description', 'cmp_video']
+        fields = ['title', 'description', 'cmp_video', 'thumbnail','hls_name' ,'hls_path','status','is_running']
 
     def validate(self, data):
         validate_file_size(data['cmp_video'])
@@ -181,7 +193,12 @@ class VideoSerializer(serializers.ModelSerializer):
             user=self.context['request'].user,
             title=validated_data['title'],
             description=validated_data['description'],
-            cmp_video=validated_data['cmp_video']
+            cmp_video=validated_data['cmp_video'],
+            thumbnail=validated_data['thumbnail'],
+            hls_name=validated_data['hls_name'],
+            hls_path=validated_data['hls_path'],
+            status=validated_data['status'],
+            is_running=validated_data['is_running'],
         )
 
         # save the video if is succesful
@@ -193,7 +210,7 @@ class VideoSerializer(serializers.ModelSerializer):
 class Videoviewlist(serializers.ModelSerializer):
     class Meta:
         model = Video
-        fields = ['id','title', 'description', 'cmp_video']
+        fields = ['id','title', 'description', 'cmp_video', 'thumbnail','hls_name' ,'hls_path','status','is_running']
 
 
 # feedback serializer goes here
@@ -278,15 +295,14 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     def validate(self, data):
         
         try:
-           
             User = get_user_model()
-            user = User.objects.get(pk=uid)
+            user = self.context['request'].user
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             raise serializers.ValidationError("Invalid token or user ID.")
 
         # Check if the token is valid
-        if not default_token_generator.check_token(user, data['token']):
-            raise serializers.ValidationError("Invalid or expired token.")
+        # if not default_token_generator.check_token(user, data['token']):
+        #     raise serializers.ValidationError("Invalid or expired token.")
 
         # Check if the two passwords match
         if data['password1'] != data['password2']:
@@ -296,9 +312,8 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
     def save(self, **kwargs):
         # Reset the user's password
-       
-        User = get_user_model()
-        user = User.objects.get(pk=uid)
+        # user = User.objects.get(pk=uid)
+        user = self.context['request'].user
         user.set_password(self.validated_data['password1'])
         user.save()
         return user

@@ -29,9 +29,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
 
-# ALLOWED_HOSTS = ['127.0.0.1', 'localhost',"http://localhost:3000",]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1','localhost:8000']
 
 # INTERNAL_IPS = [
 #     '127.0.0.1',
@@ -52,6 +52,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 # For development
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://localhost:8000",
 ]
 
 # Allow CORS for localhost:3000 (Next.js)
@@ -62,6 +63,7 @@ CORS_ORIGIN_WHITELIST = [
 
 # Allow all headers (optional, you can be more restrictive)
 CORS_ALLOW_HEADERS = ['*']
+ALLOWED_HOSTS  = ['*']
 
 # SESSION_COOKIE_DOMAIN = 'http://localhost:3000'
 # CSRF_COOKIE_DOMAIN = 'http://localhost:3000'
@@ -72,6 +74,9 @@ SESSION_COOKIE_SAMESITE = 'Lax'  # Allow cross-site cookies
 
 # custom Auth user model
 AUTH_USER_MODEL = 'api.custUser'
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100MB in bytes
+FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100MB in bytes
 
 # Application definition
 
@@ -110,8 +115,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
 
     # tailwind modules
-    'tailwind',
-    'theme',  
+    # 'tailwind',
+    # 'new_theme', 
 ]
 
 TAILWIND_APP_NAME = 'theme'
@@ -179,6 +184,8 @@ MIDDLEWARE = [
     # 'api.middleware.DeleteMessagesCookieMiddleware',
 ]
 
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
+
 ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
@@ -224,15 +231,16 @@ DATABASES = {
 
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
 #         'NAME': os.getenv("DB_NAME"),
 #         'USER': os.getenv("DB_USER"),
 #         'PASSWORD': os.getenv("DB_PASSWORD"),
-#         'HOST': os.getenv("DB_HOST"),  # This should match the service name in docker-compose.yml
-#         'PORT': os.getenv("DB_PORT"),
+#         'HOST': 'db',  # This should match the service name in docker-compose.yml
+#         'PORT': '5432',
 #     }
 # }
 
+CELERY_IMPORTS = ('api.tasks',)
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
@@ -308,7 +316,7 @@ ACCOUNT_ADAPTER = 'api.account_adapter.MyAccountAdapter'
 # LOGIN_REDIRECT_URL = 'http://localhost:3000'
 SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
-SITE_ID = 1
+SITE_ID = 8
 
 
 # Internationalization
@@ -338,6 +346,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Check if the media folder exists, if not, create it
+if not os.path.exists(MEDIA_ROOT):
+    os.makedirs(MEDIA_ROOT)
+
+if not os.path.exists(f'{MEDIA_ROOT}/compressed_videos'):
+    os.makedirs(f'{MEDIA_ROOT}/compressed_videos')
+
+if not os.path.exists(f'{MEDIA_ROOT}/attachments'):
+    os.makedirs(f'{MEDIA_ROOT}/attachments')
+
+if not os.path.exists(f'{MEDIA_ROOT}/hls_videos'):
+    os.makedirs(f'{MEDIA_ROOT}/hls_videos')
+
+
 # logging settings
 LOGGING = {
     'version': 1,
@@ -356,6 +378,12 @@ LOGGING = {
         'console': {
             'class': 'logging.StreamHandler',
         },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'celery.log'),
+            'formatter': 'verbose',
+        },
     },
     'loggers': {
         'django.request': {
@@ -365,6 +393,11 @@ LOGGING = {
         },
         'api': { 
             'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'celery': {
+            'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': True,
         },

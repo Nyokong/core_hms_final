@@ -1,5 +1,22 @@
-from django.shortcuts import render
 
+# django default imports
+from django.shortcuts import render
+from django.http import StreamingHttpResponse, Http404, HttpResponse
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+from django.contrib.sessions.models import Session
+from django.utils import timezone
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.hashers import make_password
+
+# dajngo auth
+from django.utils.crypto import get_random_string
+from django.contrib.auth import authenticate, login
+
+# rest framework imports
 from rest_framework import viewsets, permissions, generics, permissions, status
 from rest_framework.response import Response
 from rest_framework import status 
@@ -8,36 +25,29 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
 
-# dajngo auth
-from django.utils.crypto import get_random_string
-from django.contrib.auth import authenticate, login
 
-from .serializers import UserSerializer, UserUpdateSerializer, Videoviewlist,LoginSerializer
-from .serializers import UserDeleteSerializer, AssignmentForm , VideoSerializer, ChangePasswordSerializer
-from .models import custUser, Video, Assignment, Grade
+# serializers
+from .serializers import UserSerializer, UserUpdateSerializer, Videoviewlist,LoginSerializer, ChangePasswordSerializer
+from .serializers import UserDeleteSerializer, AssignmentForm , VideoSerializer, AssignUpdateSerializer
+from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer
+from .serializers import PasswordResetRequestSerializer, GradeSerializer, PasswordResetConfirmSerializer
+
+# models
+from .models import custUser, Video, Assignment
 from .models import VerificationToken
+from .models import FeedbackMessage, Grade,PasswordResetToken
 
-from django.utils.http import urlsafe_base64_decode
-from django.contrib.auth.tokens import default_token_generator
-from django.urls import reverse
-from django.utils.encoding import force_bytes
-from django.core.mail import send_mail
-
-from django.contrib.sessions.models import Session
-from django.utils import timezone
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
-from .models import FeedbackMessage, PasswordResetToken
-from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer, AssignUpdateSerializer, GradeSerializer, PasswordResetConfirmSerializer, PasswordResetRequestSerializer
-
+# straight imports
 import os
 import random
 import csv
 
-from django.contrib.auth.hashers import make_password
-
 # settings
 from django.conf import settings
+
+# logging
+import logging
+logger = logging.getLogger('api')
 
 # Create your views here.
 
@@ -152,71 +162,6 @@ from urllib.parse import urlencode
 from rest_framework_simplejwt.tokens import RefreshToken
 import requests
 
-class GoogleLoginView(generics.GenericAPIView):
-    def get(self, request, *args, **kwargs):
-        base_url = "https://accounts.google.com/o/oauth2/auth"
-        params = {
-            "client_id": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
-            "redirect_uri": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI,
-            "response_type": "code",
-            "scope": "openid email profile",
-            "state": "random_state_string",  # You should generate a random state string for security
-        }
-        url = f"{base_url}?{urlencode(params)}"
-        return redirect(url)
-
-class GoogleCallbackView(View):
-
-    def get(self, request, *args, **kwargs):
-        code = request.GET.get('code')
-        state = request.GET.get('state')
-
-        # Exchange the authorization code for access and refresh tokens
-        token_url = "https://oauth2.googleapis.com/token"
-        data = {
-            "code": code,
-            "client_id": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
-            "client_secret": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
-            "redirect_uri": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI,
-            "grant_type": "authorization_code",
-        }
-        response = requests.post(token_url, data=data)
-        tokens = response.json()
-
-        # Use the tokens to get user info and log the user in
-        user_info_url = "https://www.googleapis.com/oauth2/v3/userinfo"
-        headers = {"Authorization": f"Bearer {tokens['access_token']}"}
-        user_info = requests.get(user_info_url, headers=headers).json()
-
-        # Create or get the user and log them in
-        # (You need to implement this part according to your user model and authentication system)
-
-        # Generate your own JWT tokens for the user
-        refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)
-        refresh_token = str(refresh)
-
-        # Redirect to your frontend with the tokens
-        response = redirect('http://localhost:3000')
-        response.set_cookie('access_token', access_token, httponly=True, secure=True)
-        response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True)
-
-        return response
-
-
-def google_login(request):
-    base_url = "https://accounts.google.com/o/oauth2/auth"
-    params = {
-        "client_id": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
-        "redirect_uri": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI,
-        "response_type": "code",
-        "scope": "openid email profile",
-        "state": "random_state_string",  # You should generate a random state string for security
-    }
-    url = f"{base_url}?{urlencode(params)}"
-    return redirect(url)
-
-
 class AddStudentNumberView(generics.UpdateAPIView):
 
     queryset = custUser.objects.all()
@@ -324,9 +269,97 @@ class UserListViewSet(APIView):
         return Response(serializer.data)
 
 class GoogAftermathView(generics.GenericAPIView):
+
+    def get_queryset(self):
+        return custUser.objects.all()
+        # return custUser.objects.get(id=request['user'].id)
+    
     def get(self, request, *args, **kwargs):
         return render(request, 'thank_you.html')
+
+class UploadVideoView(generics.CreateAPIView):
+    serializer_class = VideoSerializer  
+
+    # only authenticated users can access this page?
+    permission_classes = [permissions.IsAuthenticated]
+
+    # post 
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            video = serializer.save()
+            logger.info(f"serializer is valid {video}")
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            logger.info(f'serializer is not valid {request.data}')
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class VideoView(generics.GenericAPIView):
+    # a class the views all the videos
+    # in the database all of them
+    permission_classes = [permissions.AllowAny]
+    serializer_class = Videoviewlist
+
+    # overwrite the get query method
+    def get_queryset(self):
+        return Video.objects.all()
+
+    def get(self, request, format=None):
+        query = self.get_queryset()
+
+        serializer = self.get_serializer(query, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+# import file response
+from django.http import FileResponse
+
+class VideoPlayView(generics.GenericAPIView):
+    # a class the views all the videos
+    # in the database all of them
+    permission_classes = [permissions.AllowAny]
+
+    # overwrite the get query method
+    def get_queryset(self, id):
+        return Video.objects.get(id=id)
+
+    def get(self, request, id):
+        try:
+            video = self.get_queryset(id)
+
+            logger.info(f'Requesting video {video.title}')
+            return FileResponse(video.cmp_video.open(), content_type='video/mp4')
+        except Video.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class VideoStreamView(generics.GenericAPIView):
+
+    # any one can view or stream
+    permission_classes = [permissions.AllowAny]
+
+
+    def get(self, request, video_id, quality):
+        try:
+            video = Video.objects.get(id=video_id)
+        except Video.DoesNotExist:
+            logger.error(f"Video with ID {video_id} not found")
+            raise Http404("Video not found")
+        
+        return Response({},status=status.HTTP_200_OK)
+
     
+class DeleteVideoView(generics.DestroyAPIView):
+    # a class the views all the videos
+    # in the database all of them
+    permission_classes = [permissions.AllowAny]
+
+    # retrieve all videos
+    def get_queryset(self):
+        return Video.objects.all()  
+
+
 class VideoView(generics.GenericAPIView):
     # a class the views all the videos
     # in the database all of them
@@ -497,6 +530,19 @@ class FeedbackMessages(generics.GenericAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class AllRoomsView(generics.GenericAPIView):
+    # gets users who are authenticated
+    # for later purpose permissions might change
+    permission_classes = [permissions.AllowAny]
+    serializer_class = FeebackListSerializer
+
+    def get_queryset(self, id):
+        return FeedbackMessage.objects.get(lecturer=id)
+
+    def get(self, request, id):
+        queryset = self.get_queryset(lecturer=id)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 
 class ExportCSVView(APIView):
