@@ -165,6 +165,20 @@ Sure, let's go through the steps to fix the errors and set up your Django projec
     SITE_ID = 10
 ```
 
+ - it might be that you have to add "127.0.0.1" in the sites
+
+ - go to social applications
+
+ - add NEW SOCIAL APPLICATION
+
+   - for testing purposes
+   
+```python 
+    NAME = 'hms-gitgang-app'
+    GOOGLE_KEY= '979126883974-8n6macqjc0uibb9hit6188i8bqs7vjb8.apps.googleusercontent.com '
+    GOOGLE_SECRET='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'
+```
+
 5. **Access the local server**:
    - Open your browser and go to `localhost:8000/admin/` to log into the admin side.
 
