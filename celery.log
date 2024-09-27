@@ -5483,3 +5483,490 @@ DEBUG 2024-09-27 12:44:52,363 bootsteps ^-- substep ok
 DEBUG 2024-09-27 12:44:52,364 bootsteps | Consumer: Starting event loop
 DEBUG 2024-09-27 12:44:52,367 bootsteps | Worker: Hub.register Pool...
 INFO 2024-09-27 12:44:52,373 worker celery@d07a61d0508e ready.
+DEBUG 2024-09-27 14:48:56,581 bootsteps | Worker: Closing Hub...
+DEBUG 2024-09-27 14:48:56,594 bootsteps | Worker: Closing Pool...
+DEBUG 2024-09-27 14:48:56,608 bootsteps | Worker: Closing Consumer...
+DEBUG 2024-09-27 14:48:56,611 bootsteps | Worker: Stopping Consumer...
+DEBUG 2024-09-27 14:48:56,622 bootsteps | Consumer: Closing Connection...
+DEBUG 2024-09-27 14:48:56,626 bootsteps | Consumer: Closing Events...
+DEBUG 2024-09-27 14:48:56,630 bootsteps | Consumer: Closing Heart...
+DEBUG 2024-09-27 14:48:56,636 bootsteps | Consumer: Closing Mingle...
+DEBUG 2024-09-27 14:48:56,641 bootsteps | Consumer: Closing Tasks...
+DEBUG 2024-09-27 14:48:56,644 bootsteps | Consumer: Closing Control...
+DEBUG 2024-09-27 14:48:56,650 bootsteps | Consumer: Closing Gossip...
+DEBUG 2024-09-27 14:48:56,665 bootsteps | Consumer: Closing event loop...
+DEBUG 2024-09-27 14:48:56,667 bootsteps | Consumer: Stopping event loop...
+DEBUG 2024-09-27 14:48:56,669 bootsteps | Consumer: Stopping Gossip...
+DEBUG 2024-09-27 14:48:56,713 bootsteps | Consumer: Stopping Control...
+DEBUG 2024-09-27 14:48:56,727 bootsteps | Consumer: Stopping Tasks...
+DEBUG 2024-09-27 14:48:56,731 tasks Canceling task consumer...
+DEBUG 2024-09-27 14:48:56,736 bootsteps | Consumer: Stopping Mingle...
+DEBUG 2024-09-27 14:48:56,742 bootsteps | Consumer: Stopping Heart...
+DEBUG 2024-09-27 14:48:56,750 bootsteps | Consumer: Stopping Events...
+DEBUG 2024-09-27 14:48:56,755 bootsteps | Consumer: Stopping Connection...
+DEBUG 2024-09-27 14:48:56,757 bootsteps | Worker: Stopping Pool...
+DEBUG 2024-09-27 14:48:57,864 bootsteps | Worker: Stopping Hub...
+DEBUG 2024-09-27 14:48:57,874 bootsteps | Consumer: Shutdown Gossip...
+DEBUG 2024-09-27 14:48:57,888 bootsteps | Consumer: Shutdown Control...
+DEBUG 2024-09-27 14:48:57,895 bootsteps | Consumer: Shutdown Tasks...
+DEBUG 2024-09-27 14:48:57,903 tasks Canceling task consumer...
+DEBUG 2024-09-27 14:48:57,907 tasks Closing consumer channel...
+DEBUG 2024-09-27 14:48:57,915 bootsteps | Consumer: Shutdown Heart...
+DEBUG 2024-09-27 14:48:57,919 bootsteps | Consumer: Shutdown Events...
+DEBUG 2024-09-27 14:48:57,936 bootsteps | Consumer: Shutdown Connection...
+DEBUG 2024-09-27 14:48:57,982 asynpool removing tasks from inqueue until task handler finished
+DEBUG 2024-09-27 14:50:13,055 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+
+DEBUG 2024-09-27 14:50:13,058 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-09-27 14:50:13,060 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-09-27 14:50:13,063 functional 
+def chain(*args, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 14:50:13,067 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-09-27 14:50:13,071 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 14:50:13,080 functional 
+def encode_ffmpeg(video_id):
+    return 1
+
+DEBUG 2024-09-27 14:50:13,084 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 14:50:13,088 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-09-27 14:50:13,097 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 14:50:13,155 bootsteps | Worker: Preparing bootsteps.
+DEBUG 2024-09-27 14:50:13,162 bootsteps | Worker: Building graph...
+DEBUG 2024-09-27 14:50:13,165 bootsteps | Worker: New boot order: {Timer, Hub, Pool, Autoscaler, Beat, StateDB, Consumer}
+DEBUG 2024-09-27 14:50:13,196 bootsteps | Consumer: Preparing bootsteps.
+DEBUG 2024-09-27 14:50:13,202 bootsteps | Consumer: Building graph...
+DEBUG 2024-09-27 14:50:13,255 bootsteps | Consumer: New boot order: {Connection, Events, Heart, Mingle, Tasks, Control, Agent, Gossip, event loop}
+DEBUG 2024-09-27 14:50:13,316 bootsteps | Worker: Starting Hub
+DEBUG 2024-09-27 14:50:13,317 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:50:13,318 bootsteps | Worker: Starting Pool
+DEBUG 2024-09-27 14:50:13,767 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:50:13,771 bootsteps | Worker: Starting Consumer
+DEBUG 2024-09-27 14:50:13,779 bootsteps | Consumer: Starting Connection
+INFO 2024-09-27 14:50:13,799 connection Connected to redis://redis:6379/0
+DEBUG 2024-09-27 14:50:13,801 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:50:13,805 bootsteps | Consumer: Starting Events
+DEBUG 2024-09-27 14:50:13,818 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:50:13,821 bootsteps | Consumer: Starting Heart
+DEBUG 2024-09-27 14:50:13,835 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:50:13,837 bootsteps | Consumer: Starting Mingle
+INFO 2024-09-27 14:50:13,842 mingle mingle: searching for neighbors
+INFO 2024-09-27 14:50:14,875 mingle mingle: all alone
+DEBUG 2024-09-27 14:50:14,878 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:50:14,881 bootsteps | Consumer: Starting Tasks
+DEBUG 2024-09-27 14:50:14,897 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:50:14,899 bootsteps | Consumer: Starting Control
+DEBUG 2024-09-27 14:50:14,934 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:50:14,936 bootsteps | Consumer: Starting Gossip
+DEBUG 2024-09-27 14:50:14,962 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:50:14,963 bootsteps | Consumer: Starting event loop
+DEBUG 2024-09-27 14:50:14,967 bootsteps | Worker: Hub.register Pool...
+INFO 2024-09-27 14:50:14,987 worker celery@95089709354d ready.
+DEBUG 2024-09-27 14:54:32,046 bootsteps | Worker: Closing Hub...
+DEBUG 2024-09-27 14:54:32,048 bootsteps | Worker: Closing Pool...
+DEBUG 2024-09-27 14:54:32,060 bootsteps | Worker: Closing Consumer...
+DEBUG 2024-09-27 14:54:32,064 bootsteps | Worker: Stopping Consumer...
+DEBUG 2024-09-27 14:54:32,074 bootsteps | Consumer: Closing Connection...
+DEBUG 2024-09-27 14:54:32,080 bootsteps | Consumer: Closing Events...
+DEBUG 2024-09-27 14:54:32,084 bootsteps | Consumer: Closing Heart...
+DEBUG 2024-09-27 14:54:32,095 bootsteps | Consumer: Closing Mingle...
+DEBUG 2024-09-27 14:54:32,097 bootsteps | Consumer: Closing Tasks...
+DEBUG 2024-09-27 14:54:32,104 bootsteps | Consumer: Closing Control...
+DEBUG 2024-09-27 14:54:32,107 bootsteps | Consumer: Closing Gossip...
+DEBUG 2024-09-27 14:54:32,112 bootsteps | Consumer: Closing event loop...
+DEBUG 2024-09-27 14:54:32,114 bootsteps | Consumer: Stopping event loop...
+DEBUG 2024-09-27 14:54:32,127 bootsteps | Consumer: Stopping Gossip...
+DEBUG 2024-09-27 14:54:32,144 bootsteps | Consumer: Stopping Control...
+DEBUG 2024-09-27 14:54:32,151 bootsteps | Consumer: Stopping Tasks...
+DEBUG 2024-09-27 14:54:32,159 tasks Canceling task consumer...
+DEBUG 2024-09-27 14:54:32,161 bootsteps | Consumer: Stopping Mingle...
+DEBUG 2024-09-27 14:54:32,162 bootsteps | Consumer: Stopping Heart...
+DEBUG 2024-09-27 14:54:32,168 bootsteps | Consumer: Stopping Events...
+DEBUG 2024-09-27 14:54:32,175 bootsteps | Consumer: Stopping Connection...
+DEBUG 2024-09-27 14:54:32,175 bootsteps | Worker: Stopping Pool...
+DEBUG 2024-09-27 14:54:33,189 bootsteps | Worker: Stopping Hub...
+DEBUG 2024-09-27 14:54:33,371 bootsteps | Consumer: Shutdown Gossip...
+DEBUG 2024-09-27 14:54:33,398 bootsteps | Consumer: Shutdown Control...
+DEBUG 2024-09-27 14:54:33,410 bootsteps | Consumer: Shutdown Tasks...
+DEBUG 2024-09-27 14:54:33,428 tasks Canceling task consumer...
+DEBUG 2024-09-27 14:54:33,445 tasks Closing consumer channel...
+DEBUG 2024-09-27 14:54:33,448 bootsteps | Consumer: Shutdown Heart...
+DEBUG 2024-09-27 14:54:33,473 bootsteps | Consumer: Shutdown Events...
+DEBUG 2024-09-27 14:54:33,498 bootsteps | Consumer: Shutdown Connection...
+DEBUG 2024-09-27 14:54:33,520 asynpool removing tasks from inqueue until task handler finished
+DEBUG 2024-09-27 14:55:08,488 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+
+DEBUG 2024-09-27 14:55:08,490 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-09-27 14:55:08,492 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-09-27 14:55:08,496 functional 
+def chain(*args, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 14:55:08,499 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-09-27 14:55:08,502 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 14:55:08,505 functional 
+def encode_ffmpeg(video_id):
+    return 1
+
+DEBUG 2024-09-27 14:55:08,507 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 14:55:08,510 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-09-27 14:55:08,513 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 14:55:08,538 bootsteps | Worker: Preparing bootsteps.
+DEBUG 2024-09-27 14:55:08,545 bootsteps | Worker: Building graph...
+DEBUG 2024-09-27 14:55:08,547 bootsteps | Worker: New boot order: {StateDB, Timer, Hub, Pool, Autoscaler, Beat, Consumer}
+DEBUG 2024-09-27 14:55:08,561 bootsteps | Consumer: Preparing bootsteps.
+DEBUG 2024-09-27 14:55:08,564 bootsteps | Consumer: Building graph...
+DEBUG 2024-09-27 14:55:08,590 bootsteps | Consumer: New boot order: {Connection, Events, Mingle, Tasks, Control, Heart, Gossip, Agent, event loop}
+DEBUG 2024-09-27 14:55:08,618 bootsteps | Worker: Starting Hub
+DEBUG 2024-09-27 14:55:08,619 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:55:08,628 bootsteps | Worker: Starting Pool
+DEBUG 2024-09-27 14:55:09,014 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:55:09,020 bootsteps | Worker: Starting Consumer
+DEBUG 2024-09-27 14:55:09,022 bootsteps | Consumer: Starting Connection
+INFO 2024-09-27 14:55:09,043 connection Connected to redis://redis:6379/0
+DEBUG 2024-09-27 14:55:09,044 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:55:09,046 bootsteps | Consumer: Starting Events
+DEBUG 2024-09-27 14:55:09,059 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:55:09,062 bootsteps | Consumer: Starting Mingle
+INFO 2024-09-27 14:55:09,064 mingle mingle: searching for neighbors
+INFO 2024-09-27 14:55:10,147 mingle mingle: all alone
+DEBUG 2024-09-27 14:55:10,148 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:55:10,149 bootsteps | Consumer: Starting Tasks
+DEBUG 2024-09-27 14:55:10,159 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:55:10,160 bootsteps | Consumer: Starting Control
+DEBUG 2024-09-27 14:55:10,169 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:55:10,170 bootsteps | Consumer: Starting Heart
+DEBUG 2024-09-27 14:55:10,179 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:55:10,181 bootsteps | Consumer: Starting Gossip
+DEBUG 2024-09-27 14:55:10,195 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:55:10,197 bootsteps | Consumer: Starting event loop
+DEBUG 2024-09-27 14:55:10,199 bootsteps | Worker: Hub.register Pool...
+INFO 2024-09-27 14:55:10,202 worker celery@7aedf22f177d ready.
+DEBUG 2024-09-27 14:57:29,901 bootsteps | Worker: Closing Hub...
+DEBUG 2024-09-27 14:57:29,904 bootsteps | Worker: Closing Pool...
+DEBUG 2024-09-27 14:57:29,909 bootsteps | Worker: Closing Consumer...
+DEBUG 2024-09-27 14:57:29,911 bootsteps | Worker: Stopping Consumer...
+DEBUG 2024-09-27 14:57:29,924 bootsteps | Consumer: Closing Connection...
+DEBUG 2024-09-27 14:57:29,925 bootsteps | Consumer: Closing Events...
+DEBUG 2024-09-27 14:57:29,929 bootsteps | Consumer: Closing Mingle...
+DEBUG 2024-09-27 14:57:29,935 bootsteps | Consumer: Closing Tasks...
+DEBUG 2024-09-27 14:57:29,938 bootsteps | Consumer: Closing Control...
+DEBUG 2024-09-27 14:57:29,942 bootsteps | Consumer: Closing Heart...
+DEBUG 2024-09-27 14:57:29,945 bootsteps | Consumer: Closing Gossip...
+DEBUG 2024-09-27 14:57:29,950 bootsteps | Consumer: Closing event loop...
+DEBUG 2024-09-27 14:57:29,956 bootsteps | Consumer: Stopping event loop...
+DEBUG 2024-09-27 14:57:29,959 bootsteps | Consumer: Stopping Gossip...
+DEBUG 2024-09-27 14:57:29,972 bootsteps | Consumer: Stopping Heart...
+DEBUG 2024-09-27 14:57:29,975 bootsteps | Consumer: Stopping Control...
+DEBUG 2024-09-27 14:57:29,988 bootsteps | Consumer: Stopping Tasks...
+DEBUG 2024-09-27 14:57:29,989 tasks Canceling task consumer...
+DEBUG 2024-09-27 14:57:29,990 bootsteps | Consumer: Stopping Mingle...
+DEBUG 2024-09-27 14:57:29,991 bootsteps | Consumer: Stopping Events...
+DEBUG 2024-09-27 14:57:29,992 bootsteps | Consumer: Stopping Connection...
+DEBUG 2024-09-27 14:57:29,992 bootsteps | Worker: Stopping Pool...
+DEBUG 2024-09-27 14:57:31,010 bootsteps | Worker: Stopping Hub...
+DEBUG 2024-09-27 14:57:31,011 bootsteps | Consumer: Shutdown Gossip...
+DEBUG 2024-09-27 14:57:31,018 bootsteps | Consumer: Shutdown Heart...
+DEBUG 2024-09-27 14:57:31,020 bootsteps | Consumer: Shutdown Control...
+DEBUG 2024-09-27 14:57:31,025 bootsteps | Consumer: Shutdown Tasks...
+DEBUG 2024-09-27 14:57:31,026 tasks Canceling task consumer...
+DEBUG 2024-09-27 14:57:31,030 tasks Closing consumer channel...
+DEBUG 2024-09-27 14:57:31,033 bootsteps | Consumer: Shutdown Events...
+DEBUG 2024-09-27 14:57:31,037 bootsteps | Consumer: Shutdown Connection...
+DEBUG 2024-09-27 14:57:31,042 asynpool removing tasks from inqueue until task handler finished
+DEBUG 2024-09-27 14:57:54,842 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+
+DEBUG 2024-09-27 14:57:54,845 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-09-27 14:57:54,848 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-09-27 14:57:54,852 functional 
+def chain(*args, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 14:57:54,858 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-09-27 14:57:54,861 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 14:57:54,866 functional 
+def encode_ffmpeg(video_id):
+    return 1
+
+DEBUG 2024-09-27 14:57:54,870 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 14:57:54,872 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-09-27 14:57:54,876 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 14:57:54,907 bootsteps | Worker: Preparing bootsteps.
+DEBUG 2024-09-27 14:57:54,911 bootsteps | Worker: Building graph...
+DEBUG 2024-09-27 14:57:54,920 bootsteps | Worker: New boot order: {Timer, Hub, Pool, Autoscaler, Beat, StateDB, Consumer}
+DEBUG 2024-09-27 14:57:54,936 bootsteps | Consumer: Preparing bootsteps.
+DEBUG 2024-09-27 14:57:54,941 bootsteps | Consumer: Building graph...
+DEBUG 2024-09-27 14:57:54,980 bootsteps | Consumer: New boot order: {Connection, Events, Mingle, Tasks, Control, Agent, Heart, Gossip, event loop}
+DEBUG 2024-09-27 14:57:55,023 bootsteps | Worker: Starting Hub
+DEBUG 2024-09-27 14:57:55,028 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:57:55,054 bootsteps | Worker: Starting Pool
+DEBUG 2024-09-27 14:57:55,662 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:57:55,665 bootsteps | Worker: Starting Consumer
+DEBUG 2024-09-27 14:57:55,668 bootsteps | Consumer: Starting Connection
+INFO 2024-09-27 14:57:55,698 connection Connected to redis://redis:6379/0
+DEBUG 2024-09-27 14:57:55,701 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:57:55,704 bootsteps | Consumer: Starting Events
+DEBUG 2024-09-27 14:57:55,716 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:57:55,720 bootsteps | Consumer: Starting Mingle
+INFO 2024-09-27 14:57:55,724 mingle mingle: searching for neighbors
+INFO 2024-09-27 14:57:56,755 mingle mingle: all alone
+DEBUG 2024-09-27 14:57:56,758 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:57:56,760 bootsteps | Consumer: Starting Tasks
+DEBUG 2024-09-27 14:57:56,774 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:57:56,775 bootsteps | Consumer: Starting Control
+DEBUG 2024-09-27 14:57:56,791 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:57:56,793 bootsteps | Consumer: Starting Heart
+DEBUG 2024-09-27 14:57:56,802 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:57:56,804 bootsteps | Consumer: Starting Gossip
+DEBUG 2024-09-27 14:57:56,821 bootsteps ^-- substep ok
+DEBUG 2024-09-27 14:57:56,822 bootsteps | Consumer: Starting event loop
+DEBUG 2024-09-27 14:57:56,824 bootsteps | Worker: Hub.register Pool...
+INFO 2024-09-27 14:57:56,832 worker celery@0e0290267a41 ready.
+DEBUG 2024-09-27 15:50:06,435 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+
+DEBUG 2024-09-27 15:50:06,437 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-09-27 15:50:06,439 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-09-27 15:50:06,441 functional 
+def chain(*args, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 15:50:06,443 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-09-27 15:50:06,445 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 15:50:06,447 functional 
+def encode_ffmpeg(video_id):
+    return 1
+
+DEBUG 2024-09-27 15:50:06,449 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 15:50:06,451 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-09-27 15:50:06,453 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 15:50:06,497 bootsteps | Worker: Preparing bootsteps.
+DEBUG 2024-09-27 15:50:06,502 bootsteps | Worker: Building graph...
+DEBUG 2024-09-27 15:50:06,503 bootsteps | Worker: New boot order: {StateDB, Beat, Timer, Hub, Pool, Autoscaler, Consumer}
+DEBUG 2024-09-27 15:50:06,527 bootsteps | Consumer: Preparing bootsteps.
+DEBUG 2024-09-27 15:50:06,528 bootsteps | Consumer: Building graph...
+DEBUG 2024-09-27 15:50:06,558 bootsteps | Consumer: New boot order: {Connection, Events, Mingle, Gossip, Heart, Tasks, Control, Agent, event loop}
+DEBUG 2024-09-27 15:50:06,592 bootsteps | Worker: Starting Hub
+DEBUG 2024-09-27 15:50:06,593 bootsteps ^-- substep ok
+DEBUG 2024-09-27 15:50:06,593 bootsteps | Worker: Starting Pool
+DEBUG 2024-09-27 15:50:06,945 bootsteps ^-- substep ok
+DEBUG 2024-09-27 15:50:06,947 bootsteps | Worker: Starting Consumer
+DEBUG 2024-09-27 15:50:06,951 bootsteps | Consumer: Starting Connection
+ERROR 2024-09-27 15:50:11,963 consumer consumer: Cannot connect to redis://redis:6379/0: Error -3 connecting to redis:6379. Try again..
+Trying again in 2.00 seconds... (1/100)
+
+ERROR 2024-09-27 15:50:17,348 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 4.00 seconds... (2/100)
+
+ERROR 2024-09-27 15:50:26,355 consumer consumer: Cannot connect to redis://redis:6379/0: Error -3 connecting to redis:6379. Try again..
+Trying again in 6.00 seconds... (3/100)
+
+ERROR 2024-09-27 15:50:37,363 consumer consumer: Cannot connect to redis://redis:6379/0: Error -3 connecting to redis:6379. Try again..
+Trying again in 8.00 seconds... (4/100)
+
+ERROR 2024-09-27 15:50:50,472 consumer consumer: Cannot connect to redis://redis:6379/0: Error -3 connecting to redis:6379. Try again..
+Trying again in 10.00 seconds... (5/100)
+
+ERROR 2024-09-27 15:51:05,481 consumer consumer: Cannot connect to redis://redis:6379/0: Error -3 connecting to redis:6379. Try again..
+Trying again in 12.00 seconds... (6/100)
+
+ERROR 2024-09-27 15:51:22,485 consumer consumer: Cannot connect to redis://redis:6379/0: Error -3 connecting to redis:6379. Try again..
+Trying again in 14.00 seconds... (7/100)
+
+ERROR 2024-09-27 15:51:41,495 consumer consumer: Cannot connect to redis://redis:6379/0: Error -3 connecting to redis:6379. Try again..
+Trying again in 16.00 seconds... (8/100)
+
+ERROR 2024-09-27 15:52:02,502 consumer consumer: Cannot connect to redis://redis:6379/0: Error -3 connecting to redis:6379. Try again..
+Trying again in 18.00 seconds... (9/100)
+
+ERROR 2024-09-27 15:52:25,712 consumer consumer: Cannot connect to redis://redis:6379/0: Error -3 connecting to redis:6379. Try again..
+Trying again in 20.00 seconds... (10/100)
+
+ERROR 2024-09-27 15:52:50,720 consumer consumer: Cannot connect to redis://redis:6379/0: Error -3 connecting to redis:6379. Try again..
+Trying again in 22.00 seconds... (11/100)
+
+ERROR 2024-09-27 15:53:17,725 consumer consumer: Cannot connect to redis://redis:6379/0: Error -3 connecting to redis:6379. Try again..
+Trying again in 24.00 seconds... (12/100)
+
+ERROR 2024-09-27 15:53:46,743 consumer consumer: Cannot connect to redis://redis:6379/0: Error -3 connecting to redis:6379. Try again..
+Trying again in 26.00 seconds... (13/100)
+
+ERROR 2024-09-27 15:54:17,750 consumer consumer: Cannot connect to redis://redis:6379/0: Error -3 connecting to redis:6379. Try again..
+Trying again in 28.00 seconds... (14/100)
+
+DEBUG 2024-09-27 15:54:30,754 bootsteps | Worker: Closing Hub...
+DEBUG 2024-09-27 15:54:30,755 bootsteps | Worker: Closing Pool...
+DEBUG 2024-09-27 15:54:30,756 bootsteps | Worker: Closing Consumer...
+DEBUG 2024-09-27 15:54:30,758 bootsteps | Worker: Stopping Consumer...
+DEBUG 2024-09-27 15:54:30,760 bootsteps | Worker: Stopping Pool...
+DEBUG 2024-09-27 15:54:31,772 bootsteps | Worker: Stopping Hub...
+DEBUG 2024-09-27 15:54:31,773 bootsteps | Consumer: Shutdown Control...
+DEBUG 2024-09-27 15:54:31,774 bootsteps | Consumer: Shutdown Tasks...
+DEBUG 2024-09-27 15:54:31,775 bootsteps | Consumer: Shutdown Heart...
+DEBUG 2024-09-27 15:54:31,777 bootsteps | Consumer: Shutdown Gossip...
+DEBUG 2024-09-27 15:54:31,780 bootsteps | Consumer: Shutdown Events...
+DEBUG 2024-09-27 15:54:31,782 bootsteps | Consumer: Shutdown Connection...
+DEBUG 2024-09-27 15:54:31,786 asynpool removing tasks from inqueue until task handler finished
+DEBUG 2024-09-27 15:54:59,197 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+
+DEBUG 2024-09-27 15:54:59,200 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-09-27 15:54:59,203 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-09-27 15:54:59,208 functional 
+def chain(*args, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 15:54:59,211 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-09-27 15:54:59,216 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 15:54:59,219 functional 
+def encode_ffmpeg(video_id):
+    return 1
+
+DEBUG 2024-09-27 15:54:59,222 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 15:54:59,224 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-09-27 15:54:59,227 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-09-27 15:54:59,261 bootsteps | Worker: Preparing bootsteps.
+DEBUG 2024-09-27 15:54:59,268 bootsteps | Worker: Building graph...
+DEBUG 2024-09-27 15:54:59,272 bootsteps | Worker: New boot order: {StateDB, Beat, Timer, Hub, Pool, Autoscaler, Consumer}
+DEBUG 2024-09-27 15:54:59,284 bootsteps | Consumer: Preparing bootsteps.
+DEBUG 2024-09-27 15:54:59,285 bootsteps | Consumer: Building graph...
+DEBUG 2024-09-27 15:54:59,323 bootsteps | Consumer: New boot order: {Connection, Events, Heart, Agent, Mingle, Gossip, Tasks, Control, event loop}
+DEBUG 2024-09-27 15:54:59,368 bootsteps | Worker: Starting Hub
+DEBUG 2024-09-27 15:54:59,372 bootsteps ^-- substep ok
+DEBUG 2024-09-27 15:54:59,378 bootsteps | Worker: Starting Pool
+DEBUG 2024-09-27 15:54:59,862 bootsteps ^-- substep ok
+DEBUG 2024-09-27 15:54:59,863 bootsteps | Worker: Starting Consumer
+DEBUG 2024-09-27 15:54:59,868 bootsteps | Consumer: Starting Connection
+INFO 2024-09-27 15:54:59,886 connection Connected to redis://redis:6379/0
+DEBUG 2024-09-27 15:54:59,888 bootsteps ^-- substep ok
+DEBUG 2024-09-27 15:54:59,890 bootsteps | Consumer: Starting Events
+DEBUG 2024-09-27 15:54:59,904 bootsteps ^-- substep ok
+DEBUG 2024-09-27 15:54:59,907 bootsteps | Consumer: Starting Heart
+DEBUG 2024-09-27 15:54:59,919 bootsteps ^-- substep ok
+DEBUG 2024-09-27 15:54:59,922 bootsteps | Consumer: Starting Mingle
+INFO 2024-09-27 15:54:59,929 mingle mingle: searching for neighbors
+INFO 2024-09-27 15:55:00,952 mingle mingle: all alone
+DEBUG 2024-09-27 15:55:00,953 bootsteps ^-- substep ok
+DEBUG 2024-09-27 15:55:00,956 bootsteps | Consumer: Starting Gossip
+DEBUG 2024-09-27 15:55:00,968 bootsteps ^-- substep ok
+DEBUG 2024-09-27 15:55:00,970 bootsteps | Consumer: Starting Tasks
+DEBUG 2024-09-27 15:55:00,986 bootsteps ^-- substep ok
+DEBUG 2024-09-27 15:55:00,992 bootsteps | Consumer: Starting Control
+DEBUG 2024-09-27 15:55:01,003 bootsteps ^-- substep ok
+DEBUG 2024-09-27 15:55:01,009 bootsteps | Consumer: Starting event loop
+DEBUG 2024-09-27 15:55:01,011 bootsteps | Worker: Hub.register Pool...
+INFO 2024-09-27 15:55:01,014 worker celery@cfd538bfcedb ready.
