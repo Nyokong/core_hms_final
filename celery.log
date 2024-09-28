@@ -13276,3 +13276,46 @@ def chain(*args, **kwargs):
 INFO 2024-09-28 14:30:01,037 strategy Task api.tasks.encode_ffmpeg[8219491b-5af0-443f-b84a-97dbf9ed5894] received
 DEBUG 2024-09-28 14:30:01,044 base TaskPool: Apply <function fast_trace_task at 0x7f094584cfe0> (args:('api.tasks.encode_ffmpeg', '8219491b-5af0-443f-b84a-97dbf9ed5894', {'lang': 'py', 'task': 'api.tasks.encode_ffmpeg', 'id': '8219491b-5af0-443f-b84a-97dbf9ed5894', 'shadow': None, 'eta': None, 'expires': None, 'group': None, 'group_index': None, 'retries': 0, 'timelimit': [None, None], 'root_id': '8219491b-5af0-443f-b84a-97dbf9ed5894', 'parent_id': None, 'argsrepr': "(2, '/django/media/compressed_videos/1_TES2_3NSiY8x.mp4')", 'kwargsrepr': '{}', 'origin': 'gen61@ef1a14f230bb', 'ignore_result': False, 'replaced_task_nesting': 0, 'stamped_headers': None, 'stamps': {}, 'properties': {'correlation_id': '8219491b-5af0-443f-b84a-97dbf9ed5894', 'reply_to': '625ea783-b727-34c2-a2c6-897e314fe1ca', 'delivery_mode': 2, 'delivery_info': {'exchange': '', 'routing_key': 'celery'}, 'priority': 0, 'body_encoding': 'base64', 'delivery_tag': '5cacc60f-3d11-4449-b242-6258dcbe810a'}, 'reply_to': '625ea783-b727-34c2-a2c6-897e314fe1ca', 'correlation_id': '8219491b-5af0-443f-b84a-97dbf9ed5894', 'hostname': 'celery@177421378bd5',... kwargs:{})
 INFO 2024-09-28 14:30:01,875 trace Task api.tasks.encode_ffmpeg[8219491b-5af0-443f-b84a-97dbf9ed5894] succeeded in 0.8158111800003098s: None
+DEBUG 2024-09-28 14:31:18,966 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-09-28 14:31:18,982 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-09-28 14:31:18,985 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-09-28 14:31:18,991 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-09-28 14:31:18,996 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-09-28 14:31:19,000 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+
+DEBUG 2024-09-28 14:31:19,005 functional 
+def encode_ffmpeg(video_id, input_file_path):
+    return 1
+
+DEBUG 2024-09-28 14:31:19,012 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-09-28 14:31:19,016 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-09-28 14:31:19,018 functional 
+def chain(*args, **kwargs):
+    return 1
+
+INFO 2024-09-28 14:31:19,174 strategy Task api.tasks.encode_ffmpeg[5d485347-3e76-4ffb-aa0a-63630aa29678] received
+DEBUG 2024-09-28 14:31:19,180 base TaskPool: Apply <function fast_trace_task at 0x7f094584cfe0> (args:('api.tasks.encode_ffmpeg', '5d485347-3e76-4ffb-aa0a-63630aa29678', {'lang': 'py', 'task': 'api.tasks.encode_ffmpeg', 'id': '5d485347-3e76-4ffb-aa0a-63630aa29678', 'shadow': None, 'eta': None, 'expires': None, 'group': None, 'group_index': None, 'retries': 0, 'timelimit': [None, None], 'root_id': '5d485347-3e76-4ffb-aa0a-63630aa29678', 'parent_id': None, 'argsrepr': "(3, '/django/media/compressed_videos/1_TES3.mp4')", 'kwargsrepr': '{}', 'origin': 'gen77@ef1a14f230bb', 'ignore_result': False, 'replaced_task_nesting': 0, 'stamped_headers': None, 'stamps': {}, 'properties': {'correlation_id': '5d485347-3e76-4ffb-aa0a-63630aa29678', 'reply_to': 'c3f2afab-5f96-3fde-b173-5f03a76e7893', 'delivery_mode': 2, 'delivery_info': {'exchange': '', 'routing_key': 'celery'}, 'priority': 0, 'body_encoding': 'base64', 'delivery_tag': '5cf0670a-ad05-4136-994a-091625556cde'}, 'reply_to': 'c3f2afab-5f96-3fde-b173-5f03a76e7893', 'correlation_id': '5d485347-3e76-4ffb-aa0a-63630aa29678', 'hostname': 'celery@177421378bd5',... kwargs:{})
+INFO 2024-09-28 14:31:20,601 trace Task api.tasks.encode_ffmpeg[5d485347-3e76-4ffb-aa0a-63630aa29678] succeeded in 1.4045052099972963s: None
