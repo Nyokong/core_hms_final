@@ -83,6 +83,7 @@ def create_video(sender, instance, created, **kwargs):
     if created:
         logger.info(f'Name of VIDEO {instance.cmp_video.name}')
         logger.info(f'ID: {instance.id} - {instance.title}')
+        logger.info(f'PATH: {instance.cmp_video.path}')
 
         # Use regex to find the numeric part at the end of the filename
         title_code = instance.title[:3].upper()
@@ -98,7 +99,7 @@ def create_video(sender, instance, created, **kwargs):
             
         logger.info(f'Added video {instance.user.id}_{title_code}{str(numeric_part)} - now creating a task to generate .m3u8')
         # Trigger the background task to create the .m3u8 playlist
-        encode_ffmpeg.delay(instance.id)
+        encode_ffmpeg.delay(instance.id, instance.cmp_video.path)
 
 @receiver(post_delete, sender=Video)
 def delete_related_files(sender, instance, **kwargs):
