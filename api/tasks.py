@@ -71,6 +71,7 @@ def encode_ffmpeg(video_id, input_file_path):
             '-vf', 'scale=w=426:h=240', '-c:v', 'libx264', '-b:v', '550k', '-hls_time', '2', '-hls_playlist_type', 'vod',
             '-hls_segment_filename', os.path.join(output_dir, '240p_%03d.ts'), os.path.join(output_dir, '240p.m3u8')
         ]
+        
         # Execute the FFmpeg command
         result = subprocess.run(command, check=True, stdout=subprocess.PIPE)
 
