@@ -26,7 +26,6 @@ def encode_ffmpeg(video_id, input_file_path):
             video = Video.objects.get(id=video_id)
             logger.info(f"Found video: {video}")
 
-            file_path = video.cmp_video.path
         except Video.DoesNotExist:
             logger.error(f"Video with ID {video_id} does not exist.")
             return None
@@ -63,25 +62,48 @@ def encode_ffmpeg(video_id, input_file_path):
         # FFmpeg command to create a playlist with multiple bitrates
         command = [
             'ffmpeg', '-y', '-i', temp_file_path,
-            '-vf', 'scale=w=1280:h=720', '-c:v', 'libx264', '-b:v', '3000k', '-hls_time', '10', '-hls_playlist_type', 'vod',
-            '-hls_segment_filename', os.path.join(output_dir, '720p_%01d.ts'), os.path.join(output_dir, '720p.m3u8'),
-            '-vf', 'scale=w=854:h=480', '-c:v', 'libx264', '-b:v', '1500k', '-hls_time', '10', '-hls_playlist_type', 'vod',
-            '-hls_segment_filename', os.path.join(output_dir, '480p_%01d.ts'), os.path.join(output_dir, '480p.m3u8'),
-            '-vf', 'scale=w=640:h=360', '-c:v', 'libx264', '-b:v', '800k', '-hls_time', '10', '-hls_playlist_type', 'vod',
-            '-hls_segment_filename', os.path.join(output_dir, '360p_%01d.ts'), os.path.join(output_dir, '360p.m3u8'),
-            '-master_playlist_file', os.path.join(output_dir, 'master.m3u8')  # Add this line to create a master playlist
+            '-vf', 'scale=w=1280:h=720', '-c:v', 'libx264', '-b:v', '3000k', '-hls_time', '5', '-hls_playlist_type', 'vod',
+            '-hls_segment_filename', os.path.join(output_dir, '720p_%03d.ts'), os.path.join(output_dir, '720p.m3u8'),
+            '-vf', 'scale=w=854:h=480', '-c:v', 'libx264', '-b:v', '1500k', '-hls_time', '5', '-hls_playlist_type', 'vod',
+            '-hls_segment_filename', os.path.join(output_dir, '480p_%03d.ts'), os.path.join(output_dir, '480p.m3u8'),
+            '-vf', 'scale=w=640:h=360', '-c:v', 'libx264', '-b:v', '800k', '-hls_time', '5', '-hls_playlist_type', 'vod',
+            '-hls_segment_filename', os.path.join(output_dir, '360p_%03d.ts'), os.path.join(output_dir, '360p.m3u8')
         ]
-
+        # FFmpeg command to create a playlist with multiple bitrates
         # command = [
         #     'ffmpeg', '-y', '-i', temp_file_path,
         #     '-vf', 'scale=w=1280:h=720', '-c:v', 'libx264', '-b:v', '3000k', '-hls_time', '10', '-hls_playlist_type', 'vod',
-        #     '-hls_segment_filename', os.path.join(output_dir, '720p_%03d.ts'), os.path.join(output_dir, '720p.m3u8'),
+        #     '-hls_segment_filename', os.path.join(output_dir, '720p_%03d.ts'),
         #     '-vf', 'scale=w=854:h=480', '-c:v', 'libx264', '-b:v', '1500k', '-hls_time', '10', '-hls_playlist_type', 'vod',
-        #     '-hls_segment_filename', os.path.join(output_dir, '480p_%03d.ts'), os.path.join(output_dir, '480p.m3u8'),
+        #     '-hls_segment_filename', os.path.join(output_dir, '480p_%03d.ts'),
         #     '-vf', 'scale=w=640:h=360', '-c:v', 'libx264', '-b:v', '800k', '-hls_time', '10', '-hls_playlist_type', 'vod',
-        #     '-hls_segment_filename', os.path.join(output_dir, '360p_%03d.ts'), os.path.join(output_dir, '360p.m3u8')
+        #     '-hls_segment_filename', os.path.join(output_dir, '360p_%03d.ts'),
+        #     '-var_stream_map', "v:0,name:720p v:1,name:480p v:2,name:360p" ,
+        #     '-master_pl_name', os.path.join(output_dir, 'playlist.ts'),
+        #     os.path.join(output_dir, 'playlist.m3u8')
         # ]
 
+        # command = [
+        #     'ffmpeg', '-i', temp_file_path, '-c:v', 
+        #     'libx264', '-c:a', 'aac', 
+        #     '-b:v', '3000k', '-b:a',
+        #     '128k', '-hls_time', '10', '-hls_playlist_type', 'vod',
+        #     '-hls_segment_filename', os.path.join(output_dir, '720p_%03d.ts'),
+        #     '-master_pl_name', os.path.join(output_dir, 'playlist.m3u8')
+        # ]
+
+        # command = [
+        #     'ffmpeg','-y','-i', input.mp4 \
+        #     -map v:0 -vf scale=w=1280:h=720 -c:v:0 libx264 -b:v:0 3000k -hls_time 10 -hls_playlist_type vod \
+        #     -hls_segment_filename output/720p_%03d.ts \
+        #     -map v:0 -vf scale=w=854:h=480 -c:v:1 libx264 -b:v:1 1500k -hls_time 10 -hls_playlist_type vod \
+        #     -hls_segment_filename output/480p_%03d.ts \
+        #     -map v:0 -vf scale=w=640:h=360 -c:v:2 libx264 -b:v:2 800k -hls_time 10 -hls_playlist_type vod \
+        #     -hls_segment_filename output/360p_%03d.ts \
+        #     -var_stream_map "v:0,name:720p v:1,name:480p v:2,name:360p" \
+        #     -master_pl_name output/playlist.m3u8 \
+        #     output/variant_%v.m3u8
+        # ]
         # Execute the FFmpeg command
         result = subprocess.run(command, check=True, stdout=subprocess.PIPE)
 
@@ -92,40 +114,22 @@ def encode_ffmpeg(video_id, input_file_path):
         for stream in outpit_json['streams']:
             if stream['codec_type'] == 'video':
                 video_length = float(stream['duration'])
-                break
+                logger.info(f'VIDEO LENGTH: {video_length}')
 
-        logger.info(f'FFmpeg stdout: {result.stdout}')
-        logger.error(f'FFmpeg stderr: {result.stderr}')
         # and result_thumbnail.returncode !=0
         if result.returncode != 0 :
             logger.error('FFmpeg command failed')
             return None
-        else:
-            pass
 
-        video.hls_path = output_dir
-        video.video_length = video_length
-        video.thumbnail = thumbnail_output_dir
-        video.status = 'completed'
+        video.hls_name = "SAVED"
         video.is_running = False
         video.save()
 
-        os.remove(temp_file_path)
+        data = {'temp_path': f'{temp_file_path}', '720p_Path': f'{os.path.join(output_dir, '720p.m3u8')}'}
+        return data
 
-        thumbnail_output_dir = os.path.join(settings.MEDIA_ROOT, 'compressed_videos/thumbnail',f'{name_without_extension}')
-        os.makedirs(thumbnail_output_dir, exist_ok=True)
+        # os.remove(temp_file_path)
 
-        # result = subprocess.run(command, capture_output=True, text=True)
-
-        # cmd_thumbnail = [
-        #     'ffmpeg', '-y', '-i', temp_file_path,
-        #     '-ss', '2', '-vframes', '1', '-q:v', '2', thumbnail_output_dir,
-        # ]
-
-        # result = subprocess.run(command, check=True)
-        # result_thumbnail = subprocess.run(cmd_thumbnail, check=True)
-
-        return output_dir
+        # return output_dir
     except Exception as e:
         logger.error(f"Error during video processing: {e}")
- 

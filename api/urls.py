@@ -42,7 +42,9 @@ urlpatterns = [
     path('vd/view/<int:id>', views.VideoPlayView.as_view(), name='video-Play'), 
     path('vd/upload',views.UploadVideoView.as_view(), name='video-upload'),
     path('vd/del/<int:pk>',views.DeleteVideoView.as_view(), name='video-delete'),
+
     path('vd/stream/<int:video_id>/<str:quality>', views.VideoStreamView.as_view(), name='stream_video'),
+    path('vd/stream/<int:video_id>/<str:segment>', views.VideoStreamSegmentsView.as_view(), name='segments_video'),
 
     # feedback http endpoints
     path('feedback/msgs', views.FeedbackMessages.as_view(), name='feedback-msgs-read'),

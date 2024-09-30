@@ -84,6 +84,7 @@ services:
     volumes:
       - .:/django:rw
       - ./media:/django/media:rw
+      - ./postgres_data:/var/lib/postgresql/data"
     depends_on:
       - redis
       - app

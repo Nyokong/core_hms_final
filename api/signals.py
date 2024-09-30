@@ -16,6 +16,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Video
 from api.tasks import encode_ffmpeg
 
+from celery import result
+
 # straight imports
 from django.conf import settings
 import os
