@@ -62,48 +62,15 @@ def encode_ffmpeg(video_id, input_file_path):
         # FFmpeg command to create a playlist with multiple bitrates
         command = [
             'ffmpeg', '-y', '-i', temp_file_path,
-            '-vf', 'scale=w=1280:h=720', '-c:v', 'libx264', '-b:v', '3000k', '-hls_time', '5', '-hls_playlist_type', 'vod',
+            '-vf', 'scale=w=1280:h=720', '-c:v', 'libx264', '-b:v', '3000k', '-hls_time', '2', '-hls_playlist_type', 'vod',
             '-hls_segment_filename', os.path.join(output_dir, '720p_%03d.ts'), os.path.join(output_dir, '720p.m3u8'),
-            '-vf', 'scale=w=854:h=480', '-c:v', 'libx264', '-b:v', '1500k', '-hls_time', '5', '-hls_playlist_type', 'vod',
+            '-vf', 'scale=w=854:h=480', '-c:v', 'libx264', '-b:v', '1500k', '-hls_time', '2', '-hls_playlist_type', 'vod',
             '-hls_segment_filename', os.path.join(output_dir, '480p_%03d.ts'), os.path.join(output_dir, '480p.m3u8'),
-            '-vf', 'scale=w=640:h=360', '-c:v', 'libx264', '-b:v', '800k', '-hls_time', '5', '-hls_playlist_type', 'vod',
-            '-hls_segment_filename', os.path.join(output_dir, '360p_%03d.ts'), os.path.join(output_dir, '360p.m3u8')
+            '-vf', 'scale=w=640:h=360', '-c:v', 'libx264', '-b:v', '800k', '-hls_time', '2', '-hls_playlist_type', 'vod',
+            '-hls_segment_filename', os.path.join(output_dir, '360p_%03d.ts'), os.path.join(output_dir, '360p.m3u8'),
+            '-vf', 'scale=w=426:h=240', '-c:v', 'libx264', '-b:v', '550k', '-hls_time', '2', '-hls_playlist_type', 'vod',
+            '-hls_segment_filename', os.path.join(output_dir, '240p_%03d.ts'), os.path.join(output_dir, '240p.m3u8')
         ]
-        # FFmpeg command to create a playlist with multiple bitrates
-        # command = [
-        #     'ffmpeg', '-y', '-i', temp_file_path,
-        #     '-vf', 'scale=w=1280:h=720', '-c:v', 'libx264', '-b:v', '3000k', '-hls_time', '10', '-hls_playlist_type', 'vod',
-        #     '-hls_segment_filename', os.path.join(output_dir, '720p_%03d.ts'),
-        #     '-vf', 'scale=w=854:h=480', '-c:v', 'libx264', '-b:v', '1500k', '-hls_time', '10', '-hls_playlist_type', 'vod',
-        #     '-hls_segment_filename', os.path.join(output_dir, '480p_%03d.ts'),
-        #     '-vf', 'scale=w=640:h=360', '-c:v', 'libx264', '-b:v', '800k', '-hls_time', '10', '-hls_playlist_type', 'vod',
-        #     '-hls_segment_filename', os.path.join(output_dir, '360p_%03d.ts'),
-        #     '-var_stream_map', "v:0,name:720p v:1,name:480p v:2,name:360p" ,
-        #     '-master_pl_name', os.path.join(output_dir, 'playlist.ts'),
-        #     os.path.join(output_dir, 'playlist.m3u8')
-        # ]
-
-        # command = [
-        #     'ffmpeg', '-i', temp_file_path, '-c:v', 
-        #     'libx264', '-c:a', 'aac', 
-        #     '-b:v', '3000k', '-b:a',
-        #     '128k', '-hls_time', '10', '-hls_playlist_type', 'vod',
-        #     '-hls_segment_filename', os.path.join(output_dir, '720p_%03d.ts'),
-        #     '-master_pl_name', os.path.join(output_dir, 'playlist.m3u8')
-        # ]
-
-        # command = [
-        #     'ffmpeg','-y','-i', input.mp4 \
-        #     -map v:0 -vf scale=w=1280:h=720 -c:v:0 libx264 -b:v:0 3000k -hls_time 10 -hls_playlist_type vod \
-        #     -hls_segment_filename output/720p_%03d.ts \
-        #     -map v:0 -vf scale=w=854:h=480 -c:v:1 libx264 -b:v:1 1500k -hls_time 10 -hls_playlist_type vod \
-        #     -hls_segment_filename output/480p_%03d.ts \
-        #     -map v:0 -vf scale=w=640:h=360 -c:v:2 libx264 -b:v:2 800k -hls_time 10 -hls_playlist_type vod \
-        #     -hls_segment_filename output/360p_%03d.ts \
-        #     -var_stream_map "v:0,name:720p v:1,name:480p v:2,name:360p" \
-        #     -master_pl_name output/playlist.m3u8 \
-        #     output/variant_%v.m3u8
-        # ]
         # Execute the FFmpeg command
         result = subprocess.run(command, check=True, stdout=subprocess.PIPE)
 
