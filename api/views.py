@@ -405,8 +405,15 @@ class VideoStreamSegmentsView(generics.GenericAPIView):
 
         except Video.DoesNotExist:
             return Response({'error': 'Video not found'}, status=status.HTTP_404_NOT_FOUND)
-        
-        
+
+class DownloadVideoView(APIView):
+    def get(self, request, video_id):
+        try:
+            video = Video.objects.get(id=video_id)
+            file_path = video.cmp_video.path
+            return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=video.cmp_video.name)
+        except Video.DoesNotExist:
+            return Response({"error": "Video not found"}, status=status.HTTP_404_NOT_FOUND)
     
 class DeleteVideoView(generics.DestroyAPIView):
     # a class the views all the videos

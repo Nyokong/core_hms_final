@@ -71,9 +71,34 @@ def encode_ffmpeg(video_id, input_file_path):
             '-vf', 'scale=w=426:h=240', '-c:v', 'libx264', '-b:v', '550k', '-hls_time', '2', '-hls_playlist_type', 'vod',
             '-hls_segment_filename', os.path.join(output_dir, '240p_%03d.ts'), os.path.join(output_dir, '240p.m3u8')
         ]
-        
+
         # Execute the FFmpeg command
         result = subprocess.run(command, check=True, stdout=subprocess.PIPE)
+
+        def create_master_playlist(directory, output_file):
+            # Define the resolutions and corresponding bandwidths
+            resolutions = {
+                '240p': 550000,
+                '360p': 800000,
+                '480p': 1500000,
+                '720p': 3000000
+            }
+
+            # Start the master playlist content
+            master_playlist_content = "#EXTM3U\n"
+
+            # Iterate over the resolutions and create the EXT-X-STREAM-INF entries
+            for resolution, bandwidth in resolutions.items():
+                playlist_file = f"{resolution}.m3u8"
+                if os.path.exists(os.path.join(directory, playlist_file)):
+                    master_playlist_content += f"#EXT-X-STREAM-INF:BANDWIDTH={bandwidth},RESOLUTION={resolution}\n"
+                    master_playlist_content += f"{playlist_file}\n"
+
+            # Write the master playlist to the output file
+            with open(output_file, 'w') as f:
+                f.write(master_playlist_content)
+
+            print(f"Master playlist created at {output_file}")
 
         outpit_json = json.loads(result.stdout)
 
