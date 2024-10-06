@@ -40,6 +40,9 @@ urlpatterns = [
 
     # socials all auth login
     path('accounts/', include('allauth.urls')),
+    path('accounts/google/login/callback/', api_views.custom_google_login, name='custom_google_login'),
+    path('dj-rest-auth/', include('dj_rest_auth.urls')),
+    
 
 ]
 

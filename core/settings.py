@@ -78,6 +78,7 @@ AUTH_USER_MODEL = 'api.custUser'
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100MB in bytes
 FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100MB in bytes
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -104,6 +105,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework_simplejwt',
+    'dj_rest_auth',
+    'rest_framework.authtoken',
 
     # install app api
     'api',
@@ -114,15 +117,16 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
 
-    # tailwind modules
-    # 'tailwind',
-    # 'new_theme', 
-
     # storages 
     'storages',
 ]
 
 TAILWIND_APP_NAME = 'theme'
+
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'jwt-auth',
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -183,7 +187,7 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
 
     # my redirect middleware
-    # 'api.middleware.CustomRedirectMiddleware',
+    'api.middleware.CustomRedirectMiddleware',
     # 'api.middleware.DeleteMessagesCookieMiddleware',
 ]
 
@@ -318,10 +322,10 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 ACCOUNT_ADAPTER = 'api.account_adapter.MyAccountAdapter'
-# LOGIN_REDIRECT_URL = 'http://localhost:3000'
-SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
+LOGIN_REDIRECT_URL = 'http://localhost:8000/api/thank-you'
+# SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
-SITE_ID = 10
+SITE_ID = 11
 
 
 # Internationalization

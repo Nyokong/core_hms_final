@@ -8,7 +8,10 @@ logger = logging.getLogger('api')
 class MySocialAccountAdapter(DefaultSocialAccountAdapter):
     def complete_login(self, request, sociallogin, **kwargs):
         user = sociallogin.user
-        # user = request.user
+        re_user = request.user
+
+        logger.info(f'SOCIAL {user}')
+        logger.info(f'REQUEST {re_user}')
 
         # Generate the access and refresh tokens
         refresh = RefreshToken.for_user(user)
@@ -26,5 +29,5 @@ class MySocialAccountAdapter(DefaultSocialAccountAdapter):
         logger.info(f'Logging {user} From Google but needs Student Number')
 
         # go to the front end to add employee number
-        return response
+        return 'http://localhost:8000/api/thank-you'
         

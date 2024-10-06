@@ -37,7 +37,6 @@ USER root
 COPY . .
 
 WORKDIR /django
-RUN rm -f /app/tailwind.config.js /app/postcss.config.js
 RUN python manage.py collectstatic --noinput
 # Verify the installation of django-tailwind
 # RUN pip show django-tailwind

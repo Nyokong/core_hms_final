@@ -5,10 +5,47 @@
     <meta charset="UTF-8">
     <title>{% block title %}Thank you{% endblock %}</title>
 </head>
+<script>
+    let allCookies = document.cookie;
+    {% comment %} console.log(`All Cookies: ${allCookies}`); // Outputs something like: "username=John Doe; sessionid=abc123" {% endcomment %}
+
+    window.close();
+
+    // Function to get a specific cookie by name
+    function getCookie(name) {
+        let cookieArr = document.cookie.split(';');
+        for (let i = 0; i < cookieArr.length; i++) {
+            let cookiePair = cookieArr[i].split('=');
+            if (name === cookiePair[0].trim()) {
+                return decodeURIComponent(cookiePair[1]);
+            }
+        }
+        return null;
+    }
+
+    // Example usage
+    let sessionCookie = getCookie('messages');
+    {% comment %} console.log(sessionCookie); {% endcomment %}
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // Function to get a specific cookie by name
+        function getCookie(name) {
+            let cookieArr = document.cookie.split(';');
+            for (let i = 0; i < cookieArr.length; i++) {
+                let cookiePair = cookieArr[i].split('=');
+                if (name === cookiePair[0].trim()) {
+                    return decodeURIComponent(cookiePair[1]);
+                }
+            }
+            return null;
+        }
+    });
+</script>
 <body>
     {% block content %}
     <!-- Content goes here -->
-     Stuff goes here
+        Stuff goes here
 
     <h1>Thank You</h1>
     {% endblock %}

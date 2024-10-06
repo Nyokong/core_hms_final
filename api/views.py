@@ -11,10 +11,13 @@ from django.contrib.sessions.models import Session
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth import logout
+from django.http import JsonResponse
 
 # dajngo auth
 from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate, login
+from allauth.socialaccount.models import SocialToken
 
 # rest framework imports
 from rest_framework import viewsets, permissions, generics, permissions, status
@@ -100,6 +103,24 @@ class UserCreateView(generics.CreateAPIView):
         send_mail(subject, message, sender, [f'{email}'], fail_silently=False)
 
         return Response({'Success': "Verification email sent"}, status=status.HTTP_200_OK)
+
+def custom_google_login(request):
+    user = request.user
+    if user.is_authenticated:
+        logger.info(f"USER is logged {user}")
+        try:
+            token = SocialToken.objects.get(account__user=user, account__provider='google')
+            response = JsonResponse({'message': 'Logged in successfully'})
+            response.set_cookie('auth_token', token.token, httponly=True)
+
+            login(request, user)
+            return redirect('thank-you')
+        except SocialToken.DoesNotExist:
+            return JsonResponse({'error': 'Token not found'}, status=400)
+    else:
+        logger.info("Something went wrong")
+    
+    return redirect('http://localhost:8000/api/thank-you')
 
 class VerificationView(generics.GenericAPIView):
     queryset = custUser.objects.all()
@@ -269,13 +290,43 @@ class UserListViewSet(APIView):
 
         return Response(serializer.data)
 
-class GoogAftermathView(generics.GenericAPIView):
+from rest_framework_simplejwt.tokens import RefreshToken
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from dj_rest_auth.registration.views import SocialLoginView
 
-    def get_queryset(self):
-        return custUser.objects.all()
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
+    client_class = OAuth2Client
+    callback_url = 'http://localhost:8000/accounts/google/login/callback/'
+
+class CustomTokenView(APIView):
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key})
+
+class GoogAftermathView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self, id):
+        return custUser.objects.get(id=id)
         # return custUser.objects.get(id=request['user'].id)
     
     def get(self, request, *args, **kwargs):
+        # logout(request)
+
+        # response = redirect('thank-you')  # Redirect to home page after logout
+    
+        # Delete the messages cookie
+        # response.delete_cookie('messages')
+
+        user = self.get_queryset(id=request.user.id)
+
+        login(request,user)
+
+        logger.info(f'USER: {user}')
+
         return render(request, 'thank_you.html')
 
 class UploadVideoView(generics.CreateAPIView):
@@ -406,9 +457,13 @@ class VideoStreamSegmentsView(generics.GenericAPIView):
         except Video.DoesNotExist:
             return Response({'error': 'Video not found'}, status=status.HTTP_404_NOT_FOUND)
 
-class DownloadVideoView(APIView):
+class DownloadVideoView(generics.GenericAPIView):
+    # any one can view or stream
+    permission_classes = [permissions.AllowAny]
+
     def get(self, request, video_id):
         try:
+            # get video
             video = Video.objects.get(id=video_id)
             file_path = video.cmp_video.path
             return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=video.cmp_video.name)
