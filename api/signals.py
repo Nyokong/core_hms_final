@@ -10,6 +10,8 @@ from allauth.account.signals import user_logged_in
 from django.db.models.signals import post_save, post_delete
 from allauth.socialaccount.models import SocialAccount
 
+from django.contrib.auth import login
+
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -63,6 +65,12 @@ def user_logged_in_receiver(request, user, **kwargs):
     try:
         # social_account = SocialAccount.objects.get(id=user)
         custom_user = custUser.objects.get(username=user)
+
+        # login(request=request, user=custom_user)
+
+        logger.info(f'SESSION USER: {request.COOKIES.get('sessionid')}')
+
+        # logger.info()
         
         # Check if the student's number is empty
         if custom_user.student_number:
@@ -78,6 +86,10 @@ def user_logged_in_receiver(request, user, **kwargs):
         logger.error(f'custUser does not exist for user {user}')
         return False
 
+
+# @receiver(post_save, sender=SocialAccount)
+# def get_user_data(sender, instance, created, **kwargs):
+#     requests.post('http://localhost:3000/api/notify', json={'user_id': user.id})
 
 # video signals
 @receiver(post_save, sender=Video)

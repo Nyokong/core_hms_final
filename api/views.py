@@ -12,12 +12,12 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import logout
-from django.http import JsonResponse
+
 
 # dajngo auth
 from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate, login
-from allauth.socialaccount.models import SocialToken
+
 
 # rest framework imports
 from rest_framework import viewsets, permissions, generics, permissions, status
@@ -104,23 +104,7 @@ class UserCreateView(generics.CreateAPIView):
 
         return Response({'Success': "Verification email sent"}, status=status.HTTP_200_OK)
 
-def custom_google_login(request):
-    user = request.user
-    if user.is_authenticated:
-        logger.info(f"USER is logged {user}")
-        try:
-            token = SocialToken.objects.get(account__user=user, account__provider='google')
-            response = JsonResponse({'message': 'Logged in successfully'})
-            response.set_cookie('auth_token', token.token, httponly=True)
 
-            login(request, user)
-            return redirect('thank-you')
-        except SocialToken.DoesNotExist:
-            return JsonResponse({'error': 'Token not found'}, status=400)
-    else:
-        logger.info("Something went wrong")
-    
-    return redirect('http://localhost:8000/api/thank-you')
 
 class VerificationView(generics.GenericAPIView):
     queryset = custUser.objects.all()
@@ -195,7 +179,7 @@ class AddStudentNumberView(generics.UpdateAPIView):
 
 
 class UserProfileView(generics.GenericAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         user = request.user
@@ -205,6 +189,7 @@ class UserProfileView(generics.GenericAPIView):
         'username': user.username,
         'first_name': user.first_name,
         'email': user.email,
+        'student_number':user.student_number
         # Add any other user fields you need
         }
         
@@ -260,6 +245,7 @@ class LoginAPIView(generics.GenericAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 # class verify Email view 
 class VerifyEmailView(generics.GenericAPIView):
 
@@ -291,20 +277,7 @@ class UserListViewSet(APIView):
         return Response(serializer.data)
 
 from rest_framework_simplejwt.tokens import RefreshToken
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from dj_rest_auth.registration.views import SocialLoginView
-
-class GoogleLogin(SocialLoginView):
-    adapter_class = GoogleOAuth2Adapter
-    client_class = OAuth2Client
-    callback_url = 'http://localhost:8000/accounts/google/login/callback/'
-
-class CustomTokenView(APIView):
-    def post(self, request, *args, **kwargs):
-        user = request.user
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key})
+from .signals import user_logged_in_receiver
 
 class GoogAftermathView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -314,18 +287,23 @@ class GoogAftermathView(generics.GenericAPIView):
         # return custUser.objects.get(id=request['user'].id)
     
     def get(self, request, *args, **kwargs):
+        # Save the logged-in user to a variable
+        logged_user = request.user
+
+        # Clear the session
         # logout(request)
 
-        # response = redirect('thank-you')  # Redirect to home page after logout
-    
-        # Delete the messages cookie
-        # response.delete_cookie('messages')
+        # Create a response object
+        response = HttpResponse("All sessions and cookies have been cleared.")
 
-        user = self.get_queryset(id=request.user.id)
+        # Clear all cookies
+        for cookie in request.COOKIES:
+            response.delete_cookie(cookie)
 
-        login(request,user)
+        # Specifically delete the 'messages' cookie
+        response.delete_cookie('messages')
 
-        logger.info(f'USER: {user}')
+        logger.info(f'USER: {logged_user}')
 
         return render(request, 'thank_you.html')
 

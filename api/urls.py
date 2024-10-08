@@ -24,8 +24,6 @@ urlpatterns = [
     path('usr/reset-password', views.PasswordResetRequestView.as_view(), name ='reset-password'),
     path('usr/reset-password-confirm', views.PasswordResetConfirmView.as_view(), name ='reset-password-confirm'),
 
-    path('auth/google/', views.GoogleLogin.as_view(), name='google_login'),
-    path('auth/token/', views.CustomTokenView.as_view(), name='token_view'),
 
     # i hate allatuh urls
     path('thank-you', views.GoogAftermathView.as_view(), name='thank-you'),

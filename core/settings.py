@@ -105,8 +105,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework_simplejwt',
-    'dj_rest_auth',
     'rest_framework.authtoken',
+    'dj_rest_auth',
 
     # install app api
     'api',
@@ -120,8 +120,6 @@ INSTALLED_APPS = [
     # storages 
     'storages',
 ]
-
-TAILWIND_APP_NAME = 'theme'
 
 REST_AUTH = {
     'USE_JWT': True,
@@ -321,7 +319,17 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-ACCOUNT_ADAPTER = 'api.account_adapter.MyAccountAdapter'
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '979126883974-8n6macqjc0uibb9hit6188i8bqs7vjb8.apps.googleusercontent.com',
+            'secret': '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',
+            'key': ''
+        }
+    }
+}
+
+# ACCOUNT_ADAPTER = 'api.account_adapter.MyAccountAdapter'
 LOGIN_REDIRECT_URL = 'http://localhost:8000/api/thank-you'
 # SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 

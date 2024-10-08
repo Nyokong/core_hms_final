@@ -9,7 +9,7 @@
     let allCookies = document.cookie;
     {% comment %} console.log(`All Cookies: ${allCookies}`); // Outputs something like: "username=John Doe; sessionid=abc123" {% endcomment %}
 
-    window.close();
+    {% comment %} window.close(); {% endcomment %}
 
     // Function to get a specific cookie by name
     function getCookie(name) {
@@ -23,9 +23,13 @@
         return null;
     }
 
+    window.close();
     // Example usage
-    let sessionCookie = getCookie('messages');
-    {% comment %} console.log(sessionCookie); {% endcomment %}
+    let sessionCookie = getCookie('sessionid');
+
+    console.log(document.cookie);
+
+    console.log(sessionCookie);
 
     document.addEventListener('DOMContentLoaded', function() {
 
