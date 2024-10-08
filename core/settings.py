@@ -313,7 +313,7 @@ SOCIALACCOUNT_PROVIDERS = {
             'email',
         ],
         'AUTH_PARAMS': {
-            'access_type': 'online',
+            'access_type': 'offline',
         },
         'OAUTH_PKCE_ENABLED': True,
     }
@@ -333,7 +333,7 @@ SOCIALACCOUNT_PROVIDERS = {
 LOGIN_REDIRECT_URL = 'http://localhost:8000/api/thank-you'
 # SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
-SITE_ID = 11
+SITE_ID = 1
 
 
 # Internationalization

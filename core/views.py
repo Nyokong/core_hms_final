@@ -23,21 +23,21 @@ class GoogleLogin(SocialLoginView): # if you want to use Authorization Code Gran
     callback_url = 'http://localhost:3000/'
     client_class = OAuth2Client
 
-    def post(self, request, *args, **kwargs):
-        # Call the parent post method to handle the authentication
-        response = super().post(request, *args, **kwargs)
+    # def post(self, request, *args, **kwargs):
+    #     # Call the parent post method to handle the authentication
+    #     response = super().post(request, *args, **kwargs)
 
-        # Check if the user was authenticated successfully
-        if response.status_code == 200:
-            user = request.user
-            # Create a session for the user
-            login(request, user)
-            # Optionally, set a cookie
-            response.set_cookie('sessionid', request.session.session_key)
+    #     # Check if the user was authenticated successfully
+    #     if response.status_code == 200:
+    #         user = request.user
+    #         # Create a session for the user
+    #         login(request, user)
+    #         # Optionally, set a cookie
+    #         response.set_cookie('sessionid', request.session.session_key)
 
-            logger.info(f'USER: {user} is logged in')
+    #         logger.info(f'USER: {user} is logged in')
 
-        return response
+    #     return response
 
 def custom_google_login(request):
     user = request.user
