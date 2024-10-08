@@ -20,7 +20,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./data/db:/var/lib/postgresql/data"
+      - ./postgres_data:/var/lib/postgresql/data"
     # networks:
     #   app_net:
     #     ipv4_address: 192.168.0.2
@@ -54,7 +54,7 @@ services:
       - .:/django:rw
       - ./staticfiles:/code/staticfiles
       - ./media:/django/media:rw
-      - ./data/db:/var/lib/postgresql/data"
+      - ./postgres_data:/var/lib/postgresql/data"
     ports:
       - 8000:8000
     depends_on:
@@ -84,14 +84,17 @@ services:
     volumes:
       - .:/django:rw
       - ./media:/django/media:rw
-      - ./data/db:/var/lib/postgresql/data"
+      - ./postgres_data:/var/lib/postgresql/data"
     depends_on:
-      - db 
       - redis
       - app
     environment: 
       DJANGO_MEDIA_ROOT: /media
       DEBUG: 1
+      DB_NAME: db
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_HOST: db
       DJANGO_ALLOWED_HOSTS: localhost 127.0.0.1 [::1]
       CELERY_BROKER: redis://redis:6379/0
       CELERY_BACKEND: redis://redis:6379/0
@@ -112,7 +115,7 @@ services:
 #           gateway: 192.168.0.1 
 
 volumes:
-  db-data:
+  postgres_data:
     # driver: bridge
     # driver_opts:
     #   size: "10GiB"

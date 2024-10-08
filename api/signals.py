@@ -10,11 +10,15 @@ from allauth.account.signals import user_logged_in
 from django.db.models.signals import post_save, post_delete
 from allauth.socialaccount.models import SocialAccount
 
+from django.contrib.auth import login
+
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Video
 from api.tasks import encode_ffmpeg
+
+from celery import result
 
 # straight imports
 from django.conf import settings
@@ -61,6 +65,12 @@ def user_logged_in_receiver(request, user, **kwargs):
     try:
         # social_account = SocialAccount.objects.get(id=user)
         custom_user = custUser.objects.get(username=user)
+
+        # login(request=request, user=custom_user)
+
+        logger.info(f'SESSION USER: {request.COOKIES.get('sessionid')}')
+
+        # logger.info()
         
         # Check if the student's number is empty
         if custom_user.student_number:
@@ -77,12 +87,17 @@ def user_logged_in_receiver(request, user, **kwargs):
         return False
 
 
+# @receiver(post_save, sender=SocialAccount)
+# def get_user_data(sender, instance, created, **kwargs):
+#     requests.post('http://localhost:3000/api/notify', json={'user_id': user.id})
+
 # video signals
 @receiver(post_save, sender=Video)
 def create_video(sender, instance, created, **kwargs):
     if created:
         logger.info(f'Name of VIDEO {instance.cmp_video.name}')
         logger.info(f'ID: {instance.id} - {instance.title}')
+        logger.info(f'PATH: {instance.cmp_video.path}')
 
         # Use regex to find the numeric part at the end of the filename
         title_code = instance.title[:3].upper()
@@ -98,7 +113,7 @@ def create_video(sender, instance, created, **kwargs):
             
         logger.info(f'Added video {instance.user.id}_{title_code}{str(numeric_part)} - now creating a task to generate .m3u8')
         # Trigger the background task to create the .m3u8 playlist
-        encode_ffmpeg.delay(instance.id)
+        encode_ffmpeg.delay(instance.id, instance.cmp_video.path)
 
 @receiver(post_delete, sender=Video)
 def delete_related_files(sender, instance, **kwargs):

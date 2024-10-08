@@ -11,10 +11,13 @@ from django.contrib.sessions.models import Session
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth import logout
+
 
 # dajngo auth
 from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate, login
+
 
 # rest framework imports
 from rest_framework import viewsets, permissions, generics, permissions, status
@@ -41,6 +44,7 @@ from .models import FeedbackMessage, Grade,PasswordResetToken, Submission
 import os
 import random
 import csv
+import m3u8
 
 # settings
 from django.conf import settings
@@ -99,6 +103,8 @@ class UserCreateView(generics.CreateAPIView):
         send_mail(subject, message, sender, [f'{email}'], fail_silently=False)
 
         return Response({'Success': "Verification email sent"}, status=status.HTTP_200_OK)
+
+
 
 class VerificationView(generics.GenericAPIView):
     queryset = custUser.objects.all()
@@ -173,7 +179,7 @@ class AddStudentNumberView(generics.UpdateAPIView):
 
 
 class UserProfileView(generics.GenericAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         user = request.user
@@ -183,6 +189,7 @@ class UserProfileView(generics.GenericAPIView):
         'username': user.username,
         'first_name': user.first_name,
         'email': user.email,
+        'student_number':user.student_number
         # Add any other user fields you need
         }
         
@@ -238,6 +245,7 @@ class LoginAPIView(generics.GenericAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 # class verify Email view 
 class VerifyEmailView(generics.GenericAPIView):
 
@@ -268,13 +276,35 @@ class UserListViewSet(APIView):
 
         return Response(serializer.data)
 
-class GoogAftermathView(generics.GenericAPIView):
+from rest_framework_simplejwt.tokens import RefreshToken
+from .signals import user_logged_in_receiver
 
-    def get_queryset(self):
-        return custUser.objects.all()
+class GoogAftermathView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self, id):
+        return custUser.objects.get(id=id)
         # return custUser.objects.get(id=request['user'].id)
     
     def get(self, request, *args, **kwargs):
+        # Save the logged-in user to a variable
+        logged_user = request.user
+
+        # Clear the session
+        # logout(request)
+
+        # Create a response object
+        response = HttpResponse("All sessions and cookies have been cleared.")
+
+        # Clear all cookies
+        for cookie in request.COOKIES:
+            response.delete_cookie(cookie)
+
+        # Specifically delete the 'messages' cookie
+        response.delete_cookie('messages')
+
+        logger.info(f'USER: {logged_user}')
+
         return render(request, 'thank_you.html')
 
 class UploadVideoView(generics.CreateAPIView):
@@ -329,26 +359,94 @@ class VideoPlayView(generics.GenericAPIView):
             video = self.get_queryset(id)
 
             logger.info(f'Requesting video {video.title}')
-            return FileResponse(video.cmp_video.open(), content_type='video/mp4')
+
+            if os.path.exists(video.cmp_video.path):
+                response = FileResponse(open(video.cmp_video.path, 'rb'), content_type='video/mp4')
+                response['Content-Disposition'] = 'inline; filename="video.mp4"'
+                response['Accept-Ranges'] = 'bytes'
+                return response
+            else:
+                return Response({'Video not found'}, status=status.HTTP_404_NOT_FOUND)
+
+            # return Response({'messsage':"loosing battle"},status=status.HTTP_200_OK)
+            # return StreamingHttpResponse(video.cmp_video.open(), content_type='video/mp4')
         except Video.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class VideoStreamView(generics.GenericAPIView):
-
-    # any one can view or stream
     permission_classes = [permissions.AllowAny]
-
 
     def get(self, request, video_id, quality):
         try:
             video = Video.objects.get(id=video_id)
-        except Video.DoesNotExist:
-            logger.error(f"Video with ID {video_id} not found")
-            raise Http404("Video not found")
-        
-        return Response({},status=status.HTTP_200_OK)
+            title_code = video.title[:3].upper()
+            full_name = video.cmp_video.name
+            filename = full_name.split('/')[-1]
 
+            pos = filename.find(title_code)
+            numeric_part = filename[pos + len(title_code):] if pos != -1 else ""
+
+            fullvid = f'{video.user.id}_{title_code}{numeric_part}'
+            name_without_extension = fullvid.rsplit('.', 1)[0]
+            output_dir = os.path.join(settings.MEDIA_ROOT, 'hls_videos', name_without_extension)
+            hls_vid = os.path.join(output_dir, f'{quality}')
+
+            logger.info(f'Serving HLS video from: {hls_vid}')
+
+            if os.path.exists(hls_vid):
+                return StreamingHttpResponse(open(hls_vid, 'rb'), content_type='application/vnd.apple.mpegurl')
+            else:
+                logger.error(f'File not found: {hls_vid}')
+                return Response({'error': 'Video not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Video.DoesNotExist:
+            logger.error(f'Video not found: {video_id}')
+            return Response({'error': 'Video not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            logger.error(f'Error: {str(e)}')
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class VideoStreamSegmentsView(generics.GenericAPIView):
+
+    # any one can view or stream
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, video_id, quality):
+        try:
+            video = Video.objects.get(id=video_id)
+            title_code = video.title[:3].upper()
+            full_name = video.cmp_video.name
+            filename = full_name.split('/')[-1]
+
+            pos = filename.find(title_code)
+            numeric_part = filename[pos + len(title_code):] if pos != -1 else ""
+
+            fullvid = f'{video.user.id}_{title_code}{numeric_part}'
+            name_without_extension = fullvid.rsplit('.', 1)[0]
+            output_dir = os.path.join(settings.MEDIA_ROOT, 'hls_videos', name_without_extension)
+            hls_vid = os.path.join(output_dir, f'{quality}_000.ts')
+
+            if os.path.exists(hls_vid):
+                return StreamingHttpResponse(open(hls_vid, 'rb'), content_type='application/vnd.apple.mpegurl')
+            else:
+                return Response({'error': 'Video not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Video.DoesNotExist:
+            return Response({'error': 'Video not found'}, status=status.HTTP_404_NOT_FOUND)
+
+class DownloadVideoView(generics.GenericAPIView):
+    # any one can view or stream
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, video_id):
+        try:
+            # get video
+            video = Video.objects.get(id=video_id)
+            file_path = video.cmp_video.path
+            return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=video.cmp_video.name)
+        except Video.DoesNotExist:
+            return Response({"error": "Video not found"}, status=status.HTTP_404_NOT_FOUND)
     
 class DeleteVideoView(generics.DestroyAPIView):
     # a class the views all the videos

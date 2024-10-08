@@ -4,7 +4,7 @@
 please dont be in the core folder
 
 ```plaintext
-├── DjangoMainFolder
+├── core_hms_final
     └── api
         ├── admin.py
         ├── models.py
@@ -19,6 +19,7 @@ please dont be in the core folder
     ├── Dockerfile
     ├── entrypoint.sh
     ├── manage.py
+    ├── setup.py
     └── requirements.txt
 
 HMS-app/
@@ -35,37 +36,179 @@ HMS-app/
 └── docker-compose.yml
 ```
 
-run this command in the DjangoMainFolder
+```plaintext
+run this command in the core_hms_final
+for easy access our code, basically let us set it up for you
+all you need to run is the ./setup.sh file in Gitbash
 
-```bash
-    python -m venv hms-venv
 ```
 
-2.install requirements
+Sure, let's go through the steps to fix the errors and set up your Django project with Docker.
 
-```bash
-    pip install -r requirements.txt
+### Setting Up Your Environment
+
+1. **Ensure you're not in the `core` folder**:
+
+   - Your project structure should look like this:
+
+     ```plaintext
+     ├── core_hms_final
+         └── api
+             ├── admin.py
+             ├── models.py
+             ├── urls.py
+             ├── views.py
+             └── wsgi.py
+         ├── core
+             ├── setting.py
+             ├── urls.py
+             └── wsgi.py
+         ├── README.md
+         ├── Dockerfile
+         ├── entrypoint.sh
+         ├── manage.py
+         ├── setup.py
+         └── requirements.txt
+     ```
+
+2. **Run the setup script**:
+   - If you're using Gitbash, run:
+
+     ```bash
+     ./setup.sh
+     ```
+
+   - This script sets up the environment as it was in development.
+
+### Manual Setup (if `setup.sh` fails)
+
+1. **Create a Python virtual environment**:
+
+   ```bash
+   python -m venv hms_venv
+   ```
+
+2. **Rename `core_hms_final` to `core`**:
+   - This is for a cleaner structure.
+
+3. **Change directory to `core`**:
+
+   ```bash
+   cd core
+   ```
+
+4. **Install requirements**:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. **Clear any running Docker containers**:
+
+   ```bash
+   docker-compose down
+   ```
+
+6. **Build and run the Docker containers**:
+
+   ```bash
+   docker-compose up --build -d
+   ```
+
+### Handling `entrypoint.sh` Errors
+
+1. **Check for errors in `entrypoint.sh`**:
+   - If the script wasn't copied correctly, you might need to handle migrations manually.
+
+2. **Run migrations**:
+
+   ```bash
+   python manage.py makemigrations
+   ```
+
+3. **Delete old migration files (except `__init__.py`)**:
+   - Navigate to:
+
+     ```plaintext
+     ├── api
+         └── migrations
+     ```
+
+   - Delete all files except `__init__.py`.
+
+4. **Run migrations again**:
+
+   ```bash
+   python manage.py migrate
+   ```
+
+5. **Run the application**:
+
+   ```bash
+   docker-compose up -d
+   ```
+
+### Final Steps
+
+1. **Create a superuser**:
+
+   ```bash
+   python manage.py createsuperuser
+   ```
+
+
+   - Use your student number as the username for simplicity.
+
+2. **Add sites to the Settings.py
+
+```python
+    SITE_ID = 10
 ```
 
-NB:Ignore
+ - it might be that you have to add "127.0.0.1" in the sites
 
-```bash
-    pip freeze > requirements.txt
+ - go to social applications
+
+ - add NEW SOCIAL APPLICATION
+
+   - for testing purposes
+   
+```python 
+    NAME = 'hms-gitgang-app'
+    GOOGLE_KEY= '979126883974-8n6macqjc0uibb9hit6188i8bqs7vjb8.apps.googleusercontent.com '
+    GOOGLE_SECRET='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'
 ```
 
-creating a new nextjs app
+5. **Access the local server**:
+   - Open your browser and go to `localhost:8000/admin/` to log into the admin side.
 
-```bash
-    npx create-next-app@latest hms-web
-```
+7. **Check API documentation for database requests**.
 
-docker-compose up -d --build
-docker-compose down
-// open terminal in the docker container
-docker exec -it hms_core /bin/sh
+### Additional Commands Please ignore
 
-// to invoke daphne
-daphne daphne.asgi:application
+- **Create a new Next.js app**:
 
-// uvicorn server
-uvicorn core.asgi:application --port 8000 --workers 4 --log-level debug --reload
+  ```bash
+  npx create-next-app@latest hms-web
+  ```
+
+- **Docker commands**:
+
+  ```bash
+  docker-compose up -d --build
+  docker-compose down
+  docker exec -it hms_core /bin/sh
+  ```
+
+- **Run Daphne server**:
+
+  ```bash
+
+  daphne daphne.asgi:application
+  ```
+
+- **Run Uvicorn server**:
+
+  ```bash
+  uvicorn core.asgi:application --port 8000 --workers 4 --log-level debug --reload
+  ```
