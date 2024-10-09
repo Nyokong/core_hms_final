@@ -181,7 +181,7 @@ class VideoSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Video
-        fields = ['title', 'description', 'cmp_video', 'thumbnail','hls_name' ,'hls_path','status','is_running']
+        fields = ['assignment','title', 'description', 'cmp_video', 'thumbnail','hls_name' ,'hls_path','status','is_running']
 
     def validate(self, data):
         validate_file_size(data['cmp_video'])
@@ -210,7 +210,7 @@ class VideoSerializer(serializers.ModelSerializer):
 class Videoviewlist(serializers.ModelSerializer):
     class Meta:
         model = Video
-        fields = ['id','title', 'description', 'cmp_video', 'thumbnail','hls_name' ,'hls_path','status','is_running']
+        fields = ['id','assignment','title', 'description', 'cmp_video', 'thumbnail','hls_name' ,'hls_path','status','is_running']
 
 
 # feedback serializer goes here

@@ -325,7 +325,8 @@ SOCIALACCOUNT_PROVIDERS = {
             'client_id': '979126883974-8n6macqjc0uibb9hit6188i8bqs7vjb8.apps.googleusercontent.com',
             'secret': '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',
             'key': ''
-        }
+        },
+        'ADAPTER': 'core.adapters.CustomGoogleOAuth2Adapter',
     }
 }
 
@@ -333,7 +334,7 @@ SOCIALACCOUNT_PROVIDERS = {
 LOGIN_REDIRECT_URL = 'http://localhost:8000/api/thank-you'
 # SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
-SITE_ID = 11
+SITE_ID = 1
 
 
 # Internationalization
