@@ -313,7 +313,7 @@ SOCIALACCOUNT_PROVIDERS = {
             'email',
         ],
         'AUTH_PARAMS': {
-            'access_type': 'offline',
+            'access_type': 'online',
         },
         'OAUTH_PKCE_ENABLED': True,
     }
@@ -325,7 +325,8 @@ SOCIALACCOUNT_PROVIDERS = {
             'client_id': '979126883974-8n6macqjc0uibb9hit6188i8bqs7vjb8.apps.googleusercontent.com',
             'secret': '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',
             'key': ''
-        }
+        },
+        'ADAPTER': 'core.adapters.CustomGoogleOAuth2Adapter',
     }
 }
 

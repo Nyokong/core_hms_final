@@ -13,6 +13,9 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import logout
 
+# caching
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 
 # dajngo auth
 from django.utils.crypto import get_random_string
@@ -335,6 +338,7 @@ class VideoView(generics.GenericAPIView):
     def get_queryset(self):
         return Video.objects.all()
 
+    @method_decorator(cache_page(60*15))  # cache for 15 minutes
     def get(self, request, format=None):
         query = self.get_queryset()
 
@@ -511,6 +515,7 @@ class AssignmentListView(generics.GenericAPIView):
         def get_queryset(self):
             return Assignment.objects.all() 
 
+        @method_decorator(cache_page(60*15))  
         def get(self, request, format=None):
             queryset = self.get_queryset() 
             serializer = AssignmentForm(queryset, many=True)
