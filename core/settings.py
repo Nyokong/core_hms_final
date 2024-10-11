@@ -53,6 +53,11 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8000",
+    #'http://localhost:your-flutter-app-port', 
+    # # Replace with your Flutter app's port
+    'http://localhost:3000',   # For Flutter Web (if used)
+    'http://127.0.0.1:3000',   # Another possible localhost
+    'http://10.0.2.2:3000',    # For Android Emulator
 ]
 
 # Allow CORS for localhost:3000 (Next.js)
@@ -77,7 +82,6 @@ AUTH_USER_MODEL = 'api.custUser'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100MB in bytes
 FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100MB in bytes
-
 
 # Application definition
 
@@ -105,8 +109,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework_simplejwt',
-    'rest_framework.authtoken',
-    'dj_rest_auth',
 
     # install app api
     'api',
@@ -117,14 +119,12 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
 
-    # storages 
-    'storages',
+    # tailwind modules
+    # 'tailwind',
+    # 'new_theme', 
 ]
 
-REST_AUTH = {
-    'USE_JWT': True,
-    'JWT_AUTH_COOKIE': 'jwt-auth',
-}
+TAILWIND_APP_NAME = 'theme'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -185,7 +185,7 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
 
     # my redirect middleware
-    'api.middleware.CustomRedirectMiddleware',
+    # 'api.middleware.CustomRedirectMiddleware',
     # 'api.middleware.DeleteMessagesCookieMiddleware',
 ]
 
@@ -218,34 +218,32 @@ ASGI_APPLICATION = "core.asgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
-DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
-
-AZURE_ACCOUNT_NAME=os.getenv("AZURE_ACCOUNT_NAME")
-AZURE_ACCOUNT_KEY=os.getenv("AZURE_ACCOUNT_KEY")
-AZURE_CONTAINER=os.getenv("AZURE_CONTAINER")
-# AZURE_CONNECTION_STRING = os.getenv("AZURE_CONNECTION_STRING")
+# DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+# AZURE_ACCOUNT_NAME = os.getenv('AZURE_ACCOUNT_NAME')
+# AZURE_ACCOUNT_KEY = os.getenv('AZURE_ACCOUNT_KEY')
+# AZURE_CONTAINER = os.getenv('AZURE_CONTAINER')
 
 # DATABASES = {
 #     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv("DB_NAME"),
-        'USER': os.getenv("DB_USER"),
-        'PASSWORD': os.getenv("DB_PASSWORD"),
-        'HOST': os.getenv("DB_HOST"),  # This should match the service name in docker-compose.yml
-        'PORT': os.getenv("DB_PORT"),
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': os.getenv("DB_NAME"),
+#         'USER': os.getenv("DB_USER"),
+#         'PASSWORD': os.getenv("DB_PASSWORD"),
+#         'HOST': 'db',  # This should match the service name in docker-compose.yml
+#         'PORT': '5432',
+#     }
+# }
 
 CELERY_IMPORTS = ('api.tasks',)
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
@@ -319,22 +317,11 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': '979126883974-8n6macqjc0uibb9hit6188i8bqs7vjb8.apps.googleusercontent.com',
-            'secret': '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',
-            'key': ''
-        },
-        'ADAPTER': 'core.adapters.CustomGoogleOAuth2Adapter',
-    }
-}
+ACCOUNT_ADAPTER = 'api.account_adapter.MyAccountAdapter'
+# LOGIN_REDIRECT_URL = 'http://localhost:3000'
+SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
-# ACCOUNT_ADAPTER = 'api.account_adapter.MyAccountAdapter'
-LOGIN_REDIRECT_URL = 'http://localhost:8000/api/thank-you'
-# SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
-
-SITE_ID = 1
+SITE_ID = 8
 
 
 # Internationalization
@@ -422,3 +409,4 @@ LOGGING = {
     },
 }
 
+ALLOWED_HOSTS = ['*']
