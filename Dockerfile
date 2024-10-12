@@ -47,5 +47,5 @@ WORKDIR /django
 COPY entrypoint.sh /django/entrypoint.sh
 RUN chmod +x /django/entrypoint.sh
 
-ENTRYPOINT ["/django/entrypoint.sh"]
+# ENTRYPOINT ["/django/entrypoint.sh"]
 

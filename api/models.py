@@ -211,6 +211,7 @@ class FeedbackMessage(models.Model):
     # logic is one user ia student and the other is a lecturer
     sender = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='sender_of_message')
     message = models.TextField()
+    grade=models.ForeignKey(Grade, on_delete=models.CASCADE, related_name ='feedback_message', null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
             
 

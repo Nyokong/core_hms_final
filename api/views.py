@@ -554,9 +554,9 @@ class ExportCSVView(APIView):
 
         writer = csv.writer(response)
 
-        writer.writerow(['Feedback  Room', 'Sender', 'Feedback', 'Timestamp'])
+        writer.writerow(['Feedback  Room', 'Sender', 'Feedback','Grade', 'Timestamp'])
 
-        data = FeedbackMessage.objects.all().values_list('feedback_room','sender', 'message', 'timestamp')
+        data = FeedbackMessage.objects.all().values_list('feedback_room','sender', 'message','grade', 'timestamp')
 
         for row in data:
             writer.writerow(row)
