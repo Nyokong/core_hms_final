@@ -19,6 +19,7 @@ from .models import Video
 from api.tasks import encode_ffmpeg
 
 from celery import result
+from celery.signals import task_postrun
 
 # straight imports
 from django.conf import settings

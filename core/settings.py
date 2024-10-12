@@ -53,6 +53,9 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8000",
+
+    'http://localhost:8081',
+    "http://localhost:19006",
 ]
 
 # Allow CORS for localhost:3000 (Next.js)
@@ -334,7 +337,7 @@ SOCIALACCOUNT_PROVIDERS = {
 LOGIN_REDIRECT_URL = 'http://localhost:8000/api/thank-you'
 # SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
-SITE_ID = 1
+SITE_ID = 2
 
 
 # Internationalization

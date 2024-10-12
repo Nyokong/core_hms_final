@@ -9,6 +9,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from allauth.account.models import EmailAddress
 
+# from the api module
+from api.models import custUser
+
 from rest_framework import status
 import requests
 
@@ -37,6 +40,8 @@ class GoogleLogin(SocialLoginView): # if you want to use Authorization Code Gran
         access_token = request.data.get('access_token')
         id_token = request.data.get('id_token')
 
+        is_lecturer = False
+
         if not access_token or not id_token:
             return Response({"error": "Missing tokens"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -46,12 +51,27 @@ class GoogleLogin(SocialLoginView): # if you want to use Authorization Code Gran
             user = self.authenticate_user(access_token, id_token)
             logger.info(f'USER DATA AUTH: {user}')
 
-            # Generate JWT tokens
+            custom = custUser.objects.get(id=user.id)
+
             refresh = RefreshToken.for_user(user)
-            return Response({
-                'access_token': str(refresh.access_token),
-                'refresh_token': str(refresh),
-            }, status=status.HTTP_200_OK)
+
+            # if lecturer return the login tokens
+            # if not then just send a is_lecturer
+            if custom.is_lecturer:
+                logger.info('a lecturer FOUND')
+                is_lecturer = True
+                
+                # Generate JWT tokens
+                return Response({
+                    'access_token': str(refresh.access_token),
+                    'refresh_token': str(refresh),
+                    'is_lecturer':is_lecturer
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    'is_lecturer':is_lecturer
+                }, status=status.HTTP_200_OK)
+
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 

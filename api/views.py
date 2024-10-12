@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import logout
+from django.core.exceptions import ObjectDoesNotExist
 
 # caching
 from django.views.decorators.cache import cache_page
@@ -30,6 +31,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import NotFound
 
 
 # serializers
@@ -37,6 +39,7 @@ from .serializers import UserSerializer, UserUpdateSerializer, Videoviewlist,Log
 from .serializers import UserDeleteSerializer, AssignmentForm , VideoSerializer, AssignUpdateSerializer
 from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer
 from .serializers import PasswordResetRequestSerializer, GradeSerializer, PasswordResetConfirmSerializer, SubmissionSerializer
+from .serializers import AssignmentLectureViewSerializer
 
 # models
 from .models import custUser, Video, Assignment
@@ -515,11 +518,32 @@ class AssignmentListView(generics.GenericAPIView):
         def get_queryset(self):
             return Assignment.objects.all() 
 
-        @method_decorator(cache_page(60*15))  
+        # @method_decorator(cache_page(60*15))  
         def get(self, request, format=None):
             queryset = self.get_queryset() 
-            serializer = AssignmentForm(queryset, many=True)
+            serializer = AssignmentLectureViewSerializer(queryset, many=True)
             return Response(serializer.data)
+
+# AssignmentLecturerView
+class AssignmentLecturerView(generics.GenericAPIView):
+        permission_classes = [permissions.AllowAny]
+        serializer_class = AssignmentLectureViewSerializer
+
+        def get_queryset(self, created_by):
+            return Assignment.objects.get(created_by=created_by)
+
+        # @method_decorator(cache_page(60*15))  
+        def get(self, request, created_by, *args, **kwargs):
+            # get assignment by specific lecturer
+            # that made them
+
+            try:
+                queryset = self.get_queryset(created_by)
+                serializer = AssignmentLectureViewSerializer(queryset)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except ObjectDoesNotExist:
+                return Response({}, status=status.HTTP_404_NOT_FOUND)
+
 
 # update assignments - only logged the lecturer
 class AssignmentUpdateView(generics.RetrieveUpdateAPIView):

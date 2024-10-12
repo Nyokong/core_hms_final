@@ -175,6 +175,12 @@ class  AssignmentForm(serializers.Serializer):
         model = Assignment
         fields = ['title', 'description', 'due_date', 'attachment']
 
+class AssignmentLectureViewSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Assignment
+        fields = '__all__'
+
 # video create serializer - only students can see this
 class VideoSerializer(serializers.ModelSerializer):
     cmp_video = serializers.FileField(validators=[validate_file_size])

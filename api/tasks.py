@@ -98,7 +98,8 @@ def encode_ffmpeg(video_id, input_file_path):
             with open(output_file, 'w') as f:
                 f.write(master_playlist_content)
 
-            print(f"Master playlist created at {output_file}")
+            logger.info(f"Master playlist created at {output_file}")
+
 
         outpit_json = json.loads(result.stdout)
 
