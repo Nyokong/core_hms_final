@@ -68,6 +68,26 @@ class Student(models.Model):
     def __str__(self):
         return f'{self.student_num}'
 
+# assignment
+class Assignment(models.Model):
+    created_by = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='lecturer_creator')
+    title = models.CharField(verbose_name="title", max_length=255)
+    description = models.TextField(verbose_name="description", blank=True, null=True)
+
+    # attachment is optional
+    attachment= models.FileField(verbose_name="attachment",upload_to='attachments/', unique=False, null=True, blank=True)
+    # the time it was created
+    due_date = models.DateTimeField(verbose_name="due_date")
+    created_at = models.DateTimeField(auto_now_add=True)
+    # student = models.ForeignKey(Student, on_delete=models.CASCADE, default=1)
+
+    def __str__(self):
+        return f'{self.title} - created: {self.created_at}'
+
+    def clean(self):
+        if not self.created_by.is_lecturer:
+            raise ValidationError("Only lecturers can create assignments.")
+
 
 # video uploading model
 class Video(models.Model):
@@ -82,6 +102,7 @@ class Video(models.Model):
     )
 
     user = models.ForeignKey(custUser, on_delete=models.CASCADE)
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE,verbose_name="assignment", related_name='assignment', default=None)
     title = models.CharField(verbose_name="title", max_length=255)
     description = models.TextField(verbose_name="description", blank=True, null=True)
     cmp_video = models.FileField(verbose_name="cmp_video",upload_to='compressed_videos/', null=True, blank=False,)
@@ -141,25 +162,6 @@ class Video(models.Model):
         filename = f"{user_id}_{title_code}{new_id}.mp4"
         return filename
 
-# assignment
-class Assignment(models.Model):
-    created_by = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='lecturer_creator')
-    title = models.CharField(verbose_name="title", max_length=255)
-    description = models.TextField(verbose_name="description", blank=True, null=True)
-
-    # attachment is optional
-    attachment= models.FileField(verbose_name="attachment",upload_to='attachments/', unique=False, null=True, blank=True)
-    # the time it was created
-    due_date = models.DateTimeField(verbose_name="due_date")
-    created_at = models.DateTimeField(auto_now_add=True)
-    # student = models.ForeignKey(Student, on_delete=models.CASCADE, default=1)
-
-    def __str__(self):
-        return f'{self.title} - created: {self.created_at}'
-
-    def clean(self):
-        if not self.created_by.is_lecturer:
-            raise ValidationError("Only lecturers can create assignments.")
 
 # submitted
 class Submission(models.Model):
