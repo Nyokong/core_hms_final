@@ -175,13 +175,19 @@ class  AssignmentForm(serializers.Serializer):
         model = Assignment
         fields = ['title', 'description', 'due_date', 'attachment']
 
+class AssignmentLectureViewSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Assignment
+        fields = '__all__'
+
 # video create serializer - only students can see this
 class VideoSerializer(serializers.ModelSerializer):
     cmp_video = serializers.FileField(validators=[validate_file_size])
     
     class Meta:
         model = Video
-        fields = ['title', 'description', 'cmp_video', 'thumbnail','hls_name' ,'hls_path','status','is_running']
+        fields = ['assignment','title', 'description', 'cmp_video', 'thumbnail','hls_name' ,'hls_path','status','is_running']
 
     def validate(self, data):
         validate_file_size(data['cmp_video'])
@@ -210,7 +216,7 @@ class VideoSerializer(serializers.ModelSerializer):
 class Videoviewlist(serializers.ModelSerializer):
     class Meta:
         model = Video
-        fields = ['id','title', 'description', 'cmp_video', 'thumbnail','hls_name' ,'hls_path','status','is_running']
+        fields = ['id','assignment','title', 'description', 'cmp_video', 'thumbnail','hls_name' ,'hls_path','status','is_running']
 
 
 # feedback serializer goes here

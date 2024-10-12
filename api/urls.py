@@ -24,6 +24,7 @@ urlpatterns = [
     path('usr/reset-password', views.PasswordResetRequestView.as_view(), name ='reset-password'),
     path('usr/reset-password-confirm', views.PasswordResetConfirmView.as_view(), name ='reset-password-confirm'),
 
+
     # i hate allatuh urls
     path('thank-you', views.GoogAftermathView.as_view(), name='thank-you'),
 
@@ -32,7 +33,8 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # assignments endpoints
-    path('list/assign/',views.AssignmentListView.as_view(), name='list-assignment'),
+    path('assign/view/',views.AssignmentListView.as_view(), name='list-assignment'),
+    path('assign/view/<int:created_by>',views.AssignmentLecturerView.as_view(), name='lecturer-assignment'),
     path('assign/create',views. AssignmentCreateView.as_view(), name='create-assignments'),
     path('assign/update/<int:id>', views.AssignmentUpdateView.as_view(), name='assignment-update'),
     path('assign/delete/<int:pk>',views.AssignmentDeleteView.as_view(), name= 'assignment-delete'),
@@ -42,7 +44,10 @@ urlpatterns = [
     path('vd/view/<int:id>', views.VideoPlayView.as_view(), name='video-Play'), 
     path('vd/upload',views.UploadVideoView.as_view(), name='video-upload'),
     path('vd/del/<int:pk>',views.DeleteVideoView.as_view(), name='video-delete'),
+    path('vd/download/<int:video_id>/', views.DownloadVideoView.as_view(), name='download_video'),
+
     path('vd/stream/<int:video_id>/<str:quality>', views.VideoStreamView.as_view(), name='stream_video'),
+    path('vd/stream/<int:video_id>/<str:segment>', views.VideoStreamSegmentsView.as_view(), name='segments_video'),
 
     # feedback http endpoints
     path('feedback/msgs', views.FeedbackMessages.as_view(), name='feedback-msgs-read'),
