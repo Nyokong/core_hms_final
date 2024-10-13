@@ -338,7 +338,7 @@ LOGIN_REDIRECT_URL = 'http://localhost:8000/api/thank-you'
 # SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
 SITE_ID = 3
-
+# have been tested
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
