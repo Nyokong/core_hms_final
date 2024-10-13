@@ -43,7 +43,7 @@ from .serializers import AssignmentLectureViewSerializer
 
 # models
 from .models import custUser, Video, Assignment
-from .models import VerificationToken
+from .models import VerificationToken, Lecturer
 from .models import FeedbackMessage, Grade,PasswordResetToken, Submission
 
 # straight imports
@@ -176,12 +176,44 @@ import requests
 
 class AddStudentNumberView(generics.UpdateAPIView):
 
-    queryset = custUser.objects.all()
+    # queryset = custUser.objects.all()
     serializer_class = UserUpdateSerializer 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
-    def get_object(self):
-        return self.request.user
+    def post(self, request, *args, **kwargs):
+        number = request.data.get('student_number')
+        id = request.data.get('id')
+        
+        logger.info(f'id: {id}\nstd_numb: {number}')
+
+        try:
+            customuser = custUser.objects.get(id=id)
+            lecuter = Lecturer.objects.get(emp_num=number)
+
+
+            # if lecturer return login tokens
+            if lecuter and customuser:
+                customuser.student_number = number
+                customuser.username = number
+                customuser.save()
+                refresh = RefreshToken.for_user(customuser)
+                
+                # send access tokens back
+                return Response({
+                    'access_token': str(refresh.access_token),
+                    'refresh_token': str(refresh),
+                }, status=status.HTTP_200_OK)
+                
+            return Response({
+                # 'access_token': str(refresh.access_token),
+                # 'refresh_token': str(refresh),
+                # 'is_lecturer':is_lecturer
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        
+            
 
 
 class UserProfileView(generics.GenericAPIView):

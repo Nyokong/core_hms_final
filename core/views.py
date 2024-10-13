@@ -69,7 +69,8 @@ class GoogleLogin(SocialLoginView): # if you want to use Authorization Code Gran
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({
-                    'is_lecturer':is_lecturer
+                    'is_lecturer':is_lecturer,
+                    'id': user.id
                 }, status=status.HTTP_200_OK)
 
         except Exception as e:

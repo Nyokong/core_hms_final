@@ -49,7 +49,7 @@ services:
       dockerfile: Dockerfile
     command: python manage.py runserver 0.0.0.0:8000 
     image: app:django
-    entrypoint: /django/entrypoint.sh
+    # entrypoint: /django/entrypoint.sh
     volumes:
       - .:/django:rw
       - ./staticfiles:/code/staticfiles

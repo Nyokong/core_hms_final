@@ -5,6 +5,7 @@ from .validators import validate_file_size
 from django.utils import timezone
 
 from .models import FeedbackMessage, custUser, Assignment, Video, Grade, Submission
+from .models import Lecturer
 
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
@@ -110,7 +111,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 class StudentNumberUpdateSerializer(serializers.ModelSerializer):
     
     class Meta:
-        model = custUser
+        model = Lecturer
         fields = ('student_number',)
         extra_kwargs = {
             'student_number': {'required': True}
