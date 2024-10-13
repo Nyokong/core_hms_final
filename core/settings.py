@@ -337,7 +337,7 @@ SOCIALACCOUNT_PROVIDERS = {
 LOGIN_REDIRECT_URL = 'http://localhost:8000/api/thank-you'
 # SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
-SITE_ID = 2
+SITE_ID = 3
 
 
 # Internationalization
