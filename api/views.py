@@ -195,6 +195,7 @@ class AddStudentNumberView(generics.UpdateAPIView):
             if lecuter and customuser:
                 customuser.student_number = number
                 customuser.username = number
+                customuser.is_lecturer = True
                 customuser.save()
                 refresh = RefreshToken.for_user(customuser)
                 
