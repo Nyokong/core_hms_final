@@ -49,6 +49,10 @@ def create_feedback_room(sender, instance, created, **kwargs):
         lecturer = assignment.created_by
         student = instance.student
 
+        assignment = instance.assignment
+        assignment.total_submissions += 1
+        assignment.save()
+
         if not FeedbackRoom.objects.filter(lecturer=lecturer, student=student, submission=instance).exists():
             FeedbackRoom.objects.create(
                 lecturer=lecturer,

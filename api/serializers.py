@@ -155,26 +155,31 @@ class  AssignmentForm(serializers.Serializer):
     description= serializers.CharField()
     due_date = serializers.DateTimeField(default=timezone.now)
     # created_by
+    
 
-    def create(self, validated_data):
-        assignment = Assignment(
-            created_by=self.context['request'].user,
-            title=validated_data['title'],
-            description=validated_data['description'],
-            due_date=validated_data.get('due_date', timezone.now()),  # Ensure due_date is included
-            attachment=validated_data.get('attachment')  # Include attachment if necessary
-        )
+    # def create(self, validated_data):
+    #     assignment = Assignment(
+    #         created_by=self.context['request'].user,
+    #         title=validated_data['title'],
+    #         description=validated_data['description'],
+    #         due_date=validated_data.get('due_date', timezone.now()),  # Ensure due_date is included
+    #         attachment=validated_data.get('attachment')  # Include attachment if necessary
+    #     )
 
-        # save the video if is succesful
-        assignment.save()
-        # after all return user
-        return assignment
+    #     # save the video if is succesful
+    #     assignment.save()
+    #     # after all return user
+    #     return assignment
 
         # return Assignment.objects.create(**validated_data)
 
     class Meta:
         model = Assignment
-        fields = ['title', 'description', 'due_date', 'attachment']
+        fields = ['title', 'description', 'due_date', 'attachment','status','total_submissions']
+        read_only_fields = ['total_submissions']
+
+    def create(self, validated_data):
+        return Assignment.objects.create(**validated_data)
 
 class AssignmentLectureViewSerializer(serializers.ModelSerializer):
 

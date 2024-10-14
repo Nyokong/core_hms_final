@@ -535,7 +535,7 @@ class AssignmentCreateView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
-            video = serializer.save()
+            assignment = serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             logger.info(f'serializer is not valid {request.data}')
@@ -546,31 +546,36 @@ class AssignmentListView(generics.GenericAPIView):
         permission_classes = [permissions.AllowAny]
 
         def get_queryset(self):
-            return Assignment.objects.all() 
+            return Assignment.objects.all()
 
-        # @method_decorator(cache_page(60*15))  
         def get(self, request, format=None):
-            queryset = self.get_queryset() 
+            queryset = self.get_queryset()
+        
             serializer = AssignmentLectureViewSerializer(queryset, many=True)
-            return Response(serializer.data)
+        
+            return Response(serializer.data,  status=status.HTTP_200_OK)
+           
 
 # AssignmentLecturerView
 class AssignmentLecturerView(generics.GenericAPIView):
         permission_classes = [permissions.AllowAny]
         serializer_class = AssignmentLectureViewSerializer
 
-        def get_queryset(self, created_by):
-            return Assignment.objects.get(created_by=created_by)
+        def get_queryset(self):
+            created_by = self.kwargs.get('created_by')
+            return Assignment.objects.filter(created_by=created_by)
 
         # @method_decorator(cache_page(60*15))  
         def get(self, request, created_by, *args, **kwargs):
             # get assignment by specific lecturer
-            # that made them
 
             try:
-                queryset = self.get_queryset(created_by)
-                serializer = AssignmentLectureViewSerializer(queryset)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                queryset = self.get_queryset()
+            
+                serializer = AssignmentLectureViewSerializer(queryset, many=True)
+            
+                return Response(serializer.data,  status=status.HTTP_200_OK)
+                
             except ObjectDoesNotExist:
                 return Response({}, status=status.HTTP_404_NOT_FOUND)
 

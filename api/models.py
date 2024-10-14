@@ -3,6 +3,8 @@ from django.core.exceptions import ValidationError
 
 from django.db import models
 
+# from datetime import datetime
+
 import os
 import logging
 logger = logging.getLogger('api')
@@ -70,23 +72,40 @@ class Student(models.Model):
 
 # assignment
 class Assignment(models.Model):
+    DRAFT = 'draft'
+    ACTIVE = 'active'
+    FINISHED = 'finished'
+    STATUS_CHOICES = [
+        (DRAFT, 'Draft'),
+        (ACTIVE, 'Active'),
+        (FINISHED, 'Finished'),
+    ]
     created_by = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='lecturer_creator')
     title = models.CharField(verbose_name="title", max_length=255)
     description = models.TextField(verbose_name="description", blank=True, null=True)
 
     # attachment is optional
     attachment= models.FileField(verbose_name="attachment",upload_to='attachments/', unique=False, null=True, blank=True)
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default=DRAFT,
+    )
+    total_submissions = models.PositiveIntegerField(default=0)
     # the time it was created
     due_date = models.DateTimeField(verbose_name="due_date")
     created_at = models.DateTimeField(auto_now_add=True)
     # student = models.ForeignKey(Student, on_delete=models.CASCADE, default=1)
 
     def __str__(self):
-        return f'{self.title} - created: {self.created_at}'
+        return f"{self.id}: {self.status} - {self.total_submissions} submissions - created: {self.created_at}"
 
     def clean(self):
         if not self.created_by.is_lecturer:
             raise ValidationError("Only lecturers can create assignments.")
+    
+    def formatted_date(self):
+        return self.created_at.strftime("%Y-%m-%d %I:%M %p")
 
 
 # video uploading model
@@ -175,6 +194,9 @@ class Submission(models.Model):
     def clean(self):
         if self.student.is_lecturer:
             raise ValidationError("Only students can submit assignments.")
+
+    def __str__(self):
+        return f"Submission for assignment {self.assignment.id} time: {self.submitted_at}"
 
 # Grade
 class Grade(models.Model):
