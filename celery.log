@@ -54860,3 +54860,139 @@ DEBUG 2024-10-13 20:23:19,390 bootsteps ^-- substep ok
 DEBUG 2024-10-13 20:23:19,391 bootsteps | Consumer: Starting event loop
 DEBUG 2024-10-13 20:23:19,392 bootsteps | Worker: Hub.register Pool...
 INFO 2024-10-13 20:23:19,395 worker celery@60f44c809c30 ready.
+DEBUG 2024-10-13 21:17:42,460 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+
+DEBUG 2024-10-13 21:17:42,462 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-10-13 21:17:42,463 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-10-13 21:17:42,464 functional 
+def chain(*args, **kwargs):
+    return 1
+
+DEBUG 2024-10-13 21:17:42,465 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-10-13 21:17:42,467 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-10-13 21:17:42,468 functional 
+def encode_ffmpeg(video_id, input_file_path):
+    return 1
+
+DEBUG 2024-10-13 21:17:42,469 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-10-13 21:17:42,470 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-10-13 21:17:42,472 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-10-13 21:17:42,495 bootsteps | Worker: Preparing bootsteps.
+DEBUG 2024-10-13 21:17:42,501 bootsteps | Worker: Building graph...
+DEBUG 2024-10-13 21:17:42,502 bootsteps | Worker: New boot order: {StateDB, Timer, Hub, Pool, Autoscaler, Beat, Consumer}
+DEBUG 2024-10-13 21:17:42,515 bootsteps | Consumer: Preparing bootsteps.
+DEBUG 2024-10-13 21:17:42,516 bootsteps | Consumer: Building graph...
+DEBUG 2024-10-13 21:17:42,538 bootsteps | Consumer: New boot order: {Connection, Events, Heart, Mingle, Tasks, Control, Agent, Gossip, event loop}
+DEBUG 2024-10-13 21:17:42,564 bootsteps | Worker: Starting Hub
+DEBUG 2024-10-13 21:17:42,565 bootsteps ^-- substep ok
+DEBUG 2024-10-13 21:17:42,566 bootsteps | Worker: Starting Pool
+DEBUG 2024-10-13 21:17:43,291 bootsteps ^-- substep ok
+DEBUG 2024-10-13 21:17:43,292 bootsteps | Worker: Starting Consumer
+DEBUG 2024-10-13 21:17:43,293 bootsteps | Consumer: Starting Connection
+DEBUG 2024-10-13 21:17:48,303 bootsteps | Worker: Closing Hub...
+DEBUG 2024-10-13 21:17:48,304 bootsteps | Worker: Closing Pool...
+DEBUG 2024-10-13 21:17:48,306 bootsteps | Worker: Closing Consumer...
+DEBUG 2024-10-13 21:17:48,307 bootsteps | Worker: Stopping Consumer...
+DEBUG 2024-10-13 21:17:48,308 bootsteps | Worker: Stopping Pool...
+DEBUG 2024-10-13 21:17:49,336 bootsteps | Worker: Stopping Hub...
+DEBUG 2024-10-13 21:17:49,337 bootsteps | Consumer: Shutdown Gossip...
+DEBUG 2024-10-13 21:17:49,340 bootsteps | Consumer: Shutdown Control...
+DEBUG 2024-10-13 21:17:49,342 bootsteps | Consumer: Shutdown Tasks...
+DEBUG 2024-10-13 21:17:49,344 bootsteps | Consumer: Shutdown Heart...
+DEBUG 2024-10-13 21:17:49,345 bootsteps | Consumer: Shutdown Events...
+DEBUG 2024-10-13 21:17:49,347 bootsteps | Consumer: Shutdown Connection...
+DEBUG 2024-10-13 21:17:49,348 asynpool removing tasks from inqueue until task handler finished
+DEBUG 2024-10-13 21:18:19,468 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+
+DEBUG 2024-10-13 21:18:19,471 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-10-13 21:18:19,472 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-10-13 21:18:19,474 functional 
+def chain(*args, **kwargs):
+    return 1
+
+DEBUG 2024-10-13 21:18:19,476 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-10-13 21:18:19,477 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-10-13 21:18:19,478 functional 
+def encode_ffmpeg(video_id, input_file_path):
+    return 1
+
+DEBUG 2024-10-13 21:18:19,480 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-10-13 21:18:19,481 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-10-13 21:18:19,483 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-10-13 21:18:19,498 bootsteps | Worker: Preparing bootsteps.
+DEBUG 2024-10-13 21:18:19,503 bootsteps | Worker: Building graph...
+DEBUG 2024-10-13 21:18:19,504 bootsteps | Worker: New boot order: {Timer, Hub, Pool, Autoscaler, Beat, StateDB, Consumer}
+DEBUG 2024-10-13 21:18:19,512 bootsteps | Consumer: Preparing bootsteps.
+DEBUG 2024-10-13 21:18:19,513 bootsteps | Consumer: Building graph...
+DEBUG 2024-10-13 21:18:19,534 bootsteps | Consumer: New boot order: {Connection, Events, Mingle, Gossip, Heart, Tasks, Control, Agent, event loop}
+DEBUG 2024-10-13 21:18:19,552 bootsteps | Worker: Starting Hub
+DEBUG 2024-10-13 21:18:19,553 bootsteps ^-- substep ok
+DEBUG 2024-10-13 21:18:19,554 bootsteps | Worker: Starting Pool
+DEBUG 2024-10-13 21:18:20,764 bootsteps ^-- substep ok
+DEBUG 2024-10-13 21:18:20,767 bootsteps | Worker: Starting Consumer
+DEBUG 2024-10-13 21:18:20,768 bootsteps | Consumer: Starting Connection
+INFO 2024-10-13 21:18:20,784 connection Connected to redis://redis:6379/0
+DEBUG 2024-10-13 21:18:20,785 bootsteps ^-- substep ok
+DEBUG 2024-10-13 21:18:20,786 bootsteps | Consumer: Starting Events
+DEBUG 2024-10-13 21:18:20,794 bootsteps ^-- substep ok
+DEBUG 2024-10-13 21:18:20,795 bootsteps | Consumer: Starting Mingle
+INFO 2024-10-13 21:18:20,797 mingle mingle: searching for neighbors
+INFO 2024-10-13 21:18:21,816 mingle mingle: all alone
+DEBUG 2024-10-13 21:18:21,817 bootsteps ^-- substep ok
+DEBUG 2024-10-13 21:18:21,817 bootsteps | Consumer: Starting Gossip
+DEBUG 2024-10-13 21:18:21,823 bootsteps ^-- substep ok
+DEBUG 2024-10-13 21:18:21,823 bootsteps | Consumer: Starting Heart
+DEBUG 2024-10-13 21:18:21,827 bootsteps ^-- substep ok
+DEBUG 2024-10-13 21:18:21,828 bootsteps | Consumer: Starting Tasks
+DEBUG 2024-10-13 21:18:21,834 bootsteps ^-- substep ok
+DEBUG 2024-10-13 21:18:21,835 bootsteps | Consumer: Starting Control
+DEBUG 2024-10-13 21:18:21,841 bootsteps ^-- substep ok
+DEBUG 2024-10-13 21:18:21,842 bootsteps | Consumer: Starting event loop
+DEBUG 2024-10-13 21:18:21,843 bootsteps | Worker: Hub.register Pool...
+INFO 2024-10-13 21:18:21,845 worker celery@60f44c809c30 ready.

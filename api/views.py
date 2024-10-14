@@ -188,28 +188,25 @@ class AddStudentNumberView(generics.UpdateAPIView):
 
         try:
             customuser = custUser.objects.get(id=id)
-            lecuter = Lecturer.objects.get(emp_num=number)
+            lecturer = Lecturer.objects.get(emp_num=number)
 
-
-            # if lecturer return login tokens
-            if lecuter and customuser:
-                customuser.student_number = number
-                customuser.username = number
-                customuser.is_lecturer = True
-                customuser.save()
-                refresh = RefreshToken.for_user(customuser)
+            try:
+                user = custUser.objects.get(student_number=number)
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            except custUser.DoesNotExist:
+                if lecturer and customuser:
+                    customuser.student_number = number
+                    customuser.username = number
+                    customuser.is_lecturer = True
+                    customuser.save()
+                    refresh = RefreshToken.for_user(customuser)
+                    
+                    # send access tokens back
+                    return Response({
+                        'access_token': str(refresh.access_token),
+                        'refresh_token': str(refresh),
+                    }, status=status.HTTP_200_OK)
                 
-                # send access tokens back
-                return Response({
-                    'access_token': str(refresh.access_token),
-                    'refresh_token': str(refresh),
-                }, status=status.HTTP_200_OK)
-                
-            return Response({
-                # 'access_token': str(refresh.access_token),
-                # 'refresh_token': str(refresh),
-                # 'is_lecturer':is_lecturer
-            }, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 

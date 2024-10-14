@@ -53,6 +53,14 @@ class GoogleLogin(SocialLoginView): # if you want to use Authorization Code Gran
 
             custom = custUser.objects.get(id=user.id)
 
+            user_data = {
+                'id': custom.id,
+                'username': custom.username,
+                'first_name': custom.first_name,
+                'email': custom.email,
+                'student_number':custom.student_number
+                }
+
             refresh = RefreshToken.for_user(user)
 
             # if lecturer return the login tokens
@@ -65,7 +73,7 @@ class GoogleLogin(SocialLoginView): # if you want to use Authorization Code Gran
                 return Response({
                     'access_token': str(refresh.access_token),
                     'refresh_token': str(refresh),
-                    'is_lecturer':is_lecturer
+                    'user':user_data
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({
