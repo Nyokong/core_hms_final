@@ -525,17 +525,22 @@ class DeleteVideoView(generics.DestroyAPIView):
 # create assignments
 class AssignmentCreateView(generics.CreateAPIView):
     serializer_class = AssignmentForm
-    permission_class = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return Assignment.objects.all()
+    
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
 
     # post 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 
+        logger.info(f'FRONTEND assignment {request.data}')
+
         if serializer.is_valid():
-            assignment = serializer.save()
+            self.perform_create(serializer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             logger.info(f'serializer is not valid {request.data}')
