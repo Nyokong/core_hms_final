@@ -627,13 +627,14 @@ class AssignmentCreateView(generics.CreateAPIView):
         return Assignment.objects.all()
     
     def perform_create(self, serializer):
+        logger.info(f'DATA FROM NEXT {serializer}')
         serializer.save(created_by=self.request.user)
 
     # post 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 
-        logger.info(f'FRONTEND assignment {serializer}')
+        # logger.info(f'FRONTEND assignment {serializer}')
 
         if serializer.is_valid():
             self.perform_create(serializer)
