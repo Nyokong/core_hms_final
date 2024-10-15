@@ -55,75 +55,81 @@ def encode_ffmpeg(video_id, input_file_path):
             for chunk in video.cmp_video.chunks():
                 temp_file.write(chunk)
 
-        logger.info(f'FILE PATH CELERY: {temp_file_path}')
 
+        # create_master_playlist(temp_file_path, output_hls_path)
         # media\hls_videos\1_TES5\360p_000.ts
         
         # FFmpeg command to create a playlist with multiple bitrates
         command = [
             'ffmpeg', '-y', '-i', temp_file_path,
-            '-vf', 'scale=w=1280:h=720', '-c:v', 'libx264', '-b:v', '3000k', '-hls_time', '2', '-hls_playlist_type', 'vod',
+            '-vf', 'scale=w=1280:h=720', '-c:v', 'libx264', '-b:v', '3000k', '-c:a', 'aac', '-b:a', '128k','-hls_time', '5', '-hls_playlist_type', 'vod',
             '-hls_segment_filename', os.path.join(output_dir, '720p_%03d.ts'), os.path.join(output_dir, '720p.m3u8'),
-            '-vf', 'scale=w=854:h=480', '-c:v', 'libx264', '-b:v', '1500k', '-hls_time', '2', '-hls_playlist_type', 'vod',
+            '-vf', 'scale=w=854:h=480', '-c:v', 'libx264', '-b:v', '1500k', '-c:a', 'aac', '-b:a', '128k','-hls_time', '5', '-hls_playlist_type', 'vod',
             '-hls_segment_filename', os.path.join(output_dir, '480p_%03d.ts'), os.path.join(output_dir, '480p.m3u8'),
-            '-vf', 'scale=w=640:h=360', '-c:v', 'libx264', '-b:v', '800k', '-hls_time', '2', '-hls_playlist_type', 'vod',
+            '-vf', 'scale=w=640:h=360', '-c:v', 'libx264', '-b:v', '800k','-c:a', 'aac', '-b:a', '128k', '-hls_time', '5', '-hls_playlist_type', 'vod',
             '-hls_segment_filename', os.path.join(output_dir, '360p_%03d.ts'), os.path.join(output_dir, '360p.m3u8'),
-            '-vf', 'scale=w=426:h=240', '-c:v', 'libx264', '-b:v', '550k', '-hls_time', '2', '-hls_playlist_type', 'vod',
+            
+            '-vf', 'scale=w=426:h=240', '-c:v', 'libx264', '-b:v', '550k', '-c:a', 'aac', '-b:a', '128k','-hls_time', '5', '-hls_playlist_type', 'vod',
             '-hls_segment_filename', os.path.join(output_dir, '240p_%03d.ts'), os.path.join(output_dir, '240p.m3u8')
         ]
 
         # Execute the FFmpeg command
-        result = subprocess.run(command, check=True, stdout=subprocess.PIPE)
-
-        def create_master_playlist(directory, output_file):
-            # Define the resolutions and corresponding bandwidths
-            resolutions = {
-                '240p': 550000,
-                '360p': 800000,
-                '480p': 1500000,
-                '720p': 3000000
-            }
-
-            # Start the master playlist content
-            master_playlist_content = "#EXTM3U\n"
-
-            # Iterate over the resolutions and create the EXT-X-STREAM-INF entries
-            for resolution, bandwidth in resolutions.items():
-                playlist_file = f"{resolution}.m3u8"
-                if os.path.exists(os.path.join(directory, playlist_file)):
-                    master_playlist_content += f"#EXT-X-STREAM-INF:BANDWIDTH={bandwidth},RESOLUTION={resolution}\n"
-                    master_playlist_content += f"{playlist_file}\n"
-
-            # Write the master playlist to the output file
-            with open(output_file, 'w') as f:
-                f.write(master_playlist_content)
-
-            logger.info(f"Master playlist created at {output_file}")
-
-
-        outpit_json = json.loads(result.stdout)
-
-        video_length = None
-
-        for stream in outpit_json['streams']:
-            if stream['codec_type'] == 'video':
-                video_length = float(stream['duration'])
-                logger.info(f'VIDEO LENGTH: {video_length}')
+        result = subprocess.run(command, check=True)
 
         # and result_thumbnail.returncode !=0
         if result.returncode != 0 :
             logger.error('FFmpeg command failed')
             return None
-
-        video.hls_name = "SAVED"
-        video.is_running = False
-        video.save()
+        else:
+            logger.info('saved video here')
+            video.hls_name = "SAVED"
+            video.is_running = False
+            video.save()
 
         data = {'temp_path': f'{temp_file_path}', '720p_Path': f'{os.path.join(output_dir, '720p.m3u8')}'}
-        return data
-
         # os.remove(temp_file_path)
-
+        return background_check(output_hls_path)
         # return output_dir
     except Exception as e:
         logger.error(f"Error during video processing: {e}")
+
+
+@shared_task
+def background_check(input_file_path):
+    # for i in range(20):
+    #     logger.info(f'{i} DELETED PATH {input_file_path}')
+    
+    # Ensure the file has an .m3u8 extension
+    if not input_file_path.endswith('.m3u8'):
+        input_file_path += '.m3u8'
+        
+    # logger.info(f'FROM PATH: {input_file_path}')
+
+    # Define the resolutions and corresponding bandwidths
+    resolutions = {
+        '240p': 550000,
+        '360p': 800000,
+        '480p': 1500000,
+        '720p': 3000000
+    }
+
+    # Start the master playlist content
+    master_playlist_content = "#EXTM3U\n"
+
+    # Iterate over the resolutions and create the EXT-X-STREAM-INF entries
+    for resolution, bandwidth in resolutions.items():
+        playlist_file = f"{resolution}.m3u8"
+        # if os.path.exists(os.path.join(input_file_path, playlist_file)):
+        master_playlist_content += f"#EXT-X-STREAM-INF:BANDWIDTH={bandwidth},RESOLUTION={resolution}\n"
+        master_playlist_content += f"{playlist_file}\n"
+        # else:
+        #     master_playlist_content += f"{playlist_file}\n"
+        #     logger.info(master_playlist_content)
+            
+    # logger.info(master_playlist_content)
+
+    # Write the master playlist to the output file
+    with open(input_file_path, 'w') as f:
+        f.write(master_playlist_content)
+
+    logger.info(f"Master playlist created at {input_file_path}")

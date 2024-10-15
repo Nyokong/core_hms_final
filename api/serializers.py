@@ -151,27 +151,11 @@ class AssignUpdateSerializer(serializers.ModelSerializer):
 
 # create assignment serializer - only lecturer can access this.
 class  AssignmentForm(serializers.Serializer):
-    title=serializers.CharField(max_length=240)
-    description= serializers.CharField()
+    title = serializers.CharField(max_length=240)
+    description = serializers.CharField()
     due_date = serializers.DateTimeField(default=timezone.now)
-    # created_by
-    
-
-    # def create(self, validated_data):
-    #     assignment = Assignment(
-    #         created_by=self.context['request'].user,
-    #         title=validated_data['title'],
-    #         description=validated_data['description'],
-    #         due_date=validated_data.get('due_date', timezone.now()),  # Ensure due_date is included
-    #         attachment=validated_data.get('attachment')  # Include attachment if necessary
-    #     )
-
-    #     # save the video if is succesful
-    #     assignment.save()
-    #     # after all return user
-    #     return assignment
-
-        # return Assignment.objects.create(**validated_data)
+    attachment = serializers.CharField(allow_blank=True, required=False)
+    status = serializers.CharField(max_length=10)
 
     class Meta:
         model = Assignment
@@ -179,7 +163,15 @@ class  AssignmentForm(serializers.Serializer):
         read_only_fields = ['total_submissions']
 
     def create(self, validated_data):
-        return Assignment.objects.create(**validated_data)
+        assignment = Assignment.objects.create(
+            created_by=self.context['request'].user,
+            title=validated_data['title'],
+            description=validated_data['description'],
+            due_date=validated_data.get('due_date', timezone.now()),  # Ensure due_date is included
+            attachment=validated_data.get('attachment', ''),  # Include attachment if necessary
+            status=validated_data['status']
+        )
+        return assignment
 
 class AssignmentLectureViewSerializer(serializers.ModelSerializer):
 

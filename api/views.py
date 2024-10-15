@@ -445,7 +445,6 @@ class VideoStreamView(generics.GenericAPIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class VideoStreamSegmentsView(generics.GenericAPIView):
-
     # any one can view or stream
     permission_classes = [permissions.AllowAny]
 
@@ -471,6 +470,103 @@ class VideoStreamSegmentsView(generics.GenericAPIView):
 
         except Video.DoesNotExist:
             return Response({'error': 'Video not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+# master streaming
+class MasterVideoStreamView(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, video_id):
+        # try:
+        video = Video.objects.get(id=video_id)
+        
+        logger.info(f'Found Video {video.cmp_video}')
+        
+        # processsing
+        title_code = video.title[:3].upper()
+        full_name = video.cmp_video.name
+        filename = full_name.split('/')[-1]
+
+        pos = filename.find(title_code)
+        numeric_part = filename[pos + len(title_code):] if pos != -1 else ""
+
+        # gets file path
+        fullvid = f'{video.user.id}_{title_code}{numeric_part}'
+        name_without_extension = fullvid.rsplit('.', 1)[0]
+        output_dir = os.path.join(settings.MEDIA_ROOT, 'hls_videos', name_without_extension)
+        master_playlist_path = os.path.join(output_dir, f'{name_without_extension}.m3u8')
+
+        # master_playlist_path = os.path.join(settings.MEDIA_ROOT, f'{video_id}_master.m3u8')
+
+        try:
+            with open(master_playlist_path, 'r') as f:
+                master_playlist_content = f.read()
+            # Modify the master playlist to point to the correct segment URLs
+            modified_playlist_content = ""
+            for line in master_playlist_content.splitlines():
+                if line.startswith("#EXT-X-STREAM-INF"):
+                    modified_playlist_content += line + "\n"
+                elif line.endswith(".m3u8"):
+                    segment_url = request.build_absolute_uri(f'/vd/stream/{video_id}/{line}')
+                    modified_playlist_content += segment_url + "\n"
+
+            logger.info(modified_playlist_content)
+
+            return HttpResponse(modified_playlist_content, content_type='application/vnd.apple.mpegurl')
+        except FileNotFoundError:
+            return HttpResponse("Master playlist not found", status=404)
+        except Exception as e:
+            return HttpResponse(f"Error reading master playlist: {e}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            # # logs the file path
+            # logger.info(f'Serving HLS video from: {hls_vid}')
+
+            # if os.path.exists(hls_vid):
+            #     return StreamingHttpResponse(open(hls_vid, 'rb'), content_type='application/vnd.apple.mpegurl')
+            # else:
+            #     logger.error(f'File not found: {hls_vid}')
+            #     return Response({'error': 'Video not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # except Video.DoesNotExist:
+        #     logger.error(f'Video not found: {video_id}')
+        #     return Response({'error': 'Video not found'}, status=status.HTTP_404_NOT_FOUND)
+        # except Exception as e:
+        #     logger.error(f'Error: {str(e)}')
+        #     return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class MasterVideoStreamSegmentsView(generics.GenericAPIView):
+    # any one can view or stream
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, video_id):
+        try:
+            video = Video.objects.get(id=video_id)
+            
+            # processsing
+            title_code = video.title[:3].upper()
+            full_name = video.cmp_video.name
+            filename = full_name.split('/')[-1]
+
+            pos = filename.find(title_code)
+            numeric_part = filename[pos + len(title_code):] if pos != -1 else ""
+
+            fullvid = f'{video.user.id}_{title_code}{numeric_part}'
+            name_without_extension = fullvid.rsplit('.', 1)[0]
+            
+            output_dir = os.path.join(settings.MEDIA_ROOT, 'hls_videos', name_without_extension)
+
+            hls_vid = os.path.join(output_dir, f'360p_000.ts')
+            
+            logger.info(f'Found Segment Video {video.cmp_video}')
+
+            if os.path.exists(hls_vid):
+                return StreamingHttpResponse(open(hls_vid, 'rb'), content_type='application/vnd.apple.mpegurl')
+            else:
+                return Response({'error': 'Segment Video not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Video.DoesNotExist:
+            return Response({'error': 'Segment Video not found'}, status=status.HTTP_404_NOT_FOUND)
+
 
 class DownloadVideoView(generics.GenericAPIView):
     # any one can view or stream
@@ -537,7 +633,7 @@ class AssignmentCreateView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 
-        logger.info(f'FRONTEND assignment {request.data}')
+        logger.info(f'FRONTEND assignment {serializer}')
 
         if serializer.is_valid():
             self.perform_create(serializer)

@@ -7,7 +7,7 @@ from django.shortcuts import redirect
 
 from allauth.socialaccount.signals import social_account_added
 from allauth.account.signals import user_logged_in
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_delete
 from allauth.socialaccount.models import SocialAccount
 
 from django.contrib.auth import login
@@ -120,31 +120,37 @@ def create_video(sender, instance, created, **kwargs):
         # Trigger the background task to create the .m3u8 playlist
         encode_ffmpeg.delay(instance.id, instance.cmp_video.path)
 
-@receiver(post_delete, sender=Video)
+@receiver(pre_delete, sender=Video)
 def delete_related_files(sender, instance, **kwargs):
-    # if instance.cmp_video:
-    pass
-    #     video_path = instance.cmp_video.path
-    #     if os.path.isfile(video_path):
-    #         os.remove(video_path)
-    #         logger.info(f'video is deleted is deleted')
+    if instance.cmp_video:
+        video_path = instance.cmp_video.path
+        if os.path.isfile(video_path):
+            os.remove(video_path)
+            logger.info(f'video is deleted is deleted')
 
-    #     # Deleting any other related files
-    #     # Delete the thumbnail
-    #     if instance.thumbnail:
-    #         thumbnail_path = instance.thumbnail.path
-    #         if os.path.isfile(thumbnail_path):
-    #             os.remove(thumbnail_path)
-    #             logger.info(f'thumbnail is deleted')
+        # Deleting any other related files
+        # Delete the thumbnail
+        if instance.thumbnail:
+            thumbnail_path = instance.thumbnail.path
+            if os.path.isfile(thumbnail_path):
+                os.remove(thumbnail_path)
+                logger.info(f'thumbnail is deleted')
+                
+        title_code = instance.title[:3].upper()
+        full_name = instance.cmp_video.name
+        filename = full_name.split('/')[-1]
 
-    #     # Delete the HLS folder
-    #     hls_folder_name = f"{instance.id}_{instance.title}"
-    #     hls_folder_path = os.path.join(settings.MEDIA_ROOT, 'hls_videos', hls_folder_name)
-    #     if os.path.isdir(hls_folder_path):
-    #         shutil.rmtree(hls_folder_path)
-    #         logger.info(f'hls folder for {hls_folder_name} is deleted')
-    #     else:
-    #         logger.warning(f"HLS folder not found: {hls_folder_path}")
+        pos = filename.find(title_code)
+        numeric_part = filename[pos + len(title_code):] if pos != -1 else ""
+
+        fullvid = f'{instance.user.id}_{title_code}{numeric_part}'
+        name_without_extension = fullvid.rsplit('.', 1)[0]
+        output_dir = os.path.join(settings.MEDIA_ROOT, 'hls_videos', name_without_extension)
+
+        if os.path.isdir(output_dir):
+            shutil.rmtree(output_dir)
+            logger.info(f'Video directory {output_dir} deleted')
+
 
 
 

@@ -49,6 +49,9 @@ urlpatterns = [
     path('vd/stream/<int:video_id>/<str:quality>', views.VideoStreamView.as_view(), name='stream_video'),
     path('vd/stream/<int:video_id>/<str:segment>', views.VideoStreamSegmentsView.as_view(), name='segments_video'),
 
+    path('vd/masterstream/<int:video_id>', views.MasterVideoStreamView.as_view(), name='masterstream_video'),
+    # path('vd/masterstream/<int:video_id>', views.MasterVideoStreamSegmentsView.as_view(), name='mastersegments_video'),
+
     # feedback http endpoints
     path('feedback/msgs', views.FeedbackMessages.as_view(), name='feedback-msgs-read'),
     # make update of feedback
