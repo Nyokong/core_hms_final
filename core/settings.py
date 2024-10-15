@@ -53,17 +53,9 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8000",
-<<<<<<< HEAD
-    # for emulator
-   'http://localhost:8081',
-    "http://localhost:19006",
-    
-
-=======
 
     'http://localhost:8081',
     "http://localhost:19006",
->>>>>>> 4b373047279bc9e0226d5485a9b1f2a1b7f2e6fe
 ]
 
 # Allow CORS for localhost:3000 (Next.js)

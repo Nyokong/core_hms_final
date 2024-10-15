@@ -56074,3 +56074,1040 @@ DEBUG 2024-10-12 14:31:59,779 bootsteps | Consumer: Starting event loop
 DEBUG 2024-10-12 14:31:59,780 bootsteps | Worker: Hub.register Pool...
 INFO 2024-10-12 14:31:59,784 worker celery@82d3d9888786 ready.
 >>>>>>> 4b373047279bc9e0226d5485a9b1f2a1b7f2e6fe
+ERROR 2024-10-12 22:24:03,945 signal Signal handler <bound method DjangoFixup.on_import_modules of <celery.fixups.django.DjangoFixup object at 0x7f8774f91700>> raised: ModuleNotFoundError("No module named 'dj_rest_auth'")
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/celery/utils/dispatch/signal.py", line 276, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/fixups/django.py", line 100, in on_import_modules
+    self.worker_fixup.validate_models()
+  File "/usr/local/lib/python3.12/site-packages/celery/fixups/django.py", line 138, in validate_models
+    self.django_setup()
+  File "/usr/local/lib/python3.12/site-packages/celery/fixups/django.py", line 134, in django_setup
+    django.setup()
+  File "/usr/local/lib/python3.12/site-packages/django/__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "/usr/local/lib/python3.12/site-packages/django/apps/registry.py", line 91, in populate
+    app_config = AppConfig.create(entry)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/apps/config.py", line 193, in create
+    import_module(entry)
+  File "/usr/local/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'dj_rest_auth'
+ERROR 2024-10-12 22:24:03,952 signal Signal handler <promise@0x7f8774f77a70 --> <bound method Celery._autodiscover_tasks of <Celery core at 0x7f8774f91190>>> raised: AppRegistryNotReady("Apps aren't loaded yet.")
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/celery/utils/dispatch/signal.py", line 276, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/vine/promises.py", line 161, in __call__
+    return self.throw()
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/vine/promises.py", line 158, in __call__
+    retval = fun(*final_args, **final_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/app/base.py", line 694, in _autodiscover_tasks
+    return self._autodiscover_tasks_from_fixups(related_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/app/base.py", line 706, in _autodiscover_tasks_from_fixups
+    for pkg in fixup.autodiscover_tasks()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/fixups/django.py", line 110, in autodiscover_tasks
+    return [config.name for config in apps.get_app_configs()]
+                                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/apps/registry.py", line 147, in get_app_configs
+    self.check_apps_ready()
+  File "/usr/local/lib/python3.12/site-packages/django/apps/registry.py", line 138, in check_apps_ready
+    raise AppRegistryNotReady("Apps aren't loaded yet.")
+django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
+ERROR 2024-10-12 22:24:03,958 signal Signal handler <promise@0x7f8774fe4a50 --> <bound method Celery._autodiscover_tasks of <Celery core at 0x7f8774f91190>>> raised: ModuleNotFoundError("No module named 'dj_rest_auth'")
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/celery/utils/dispatch/signal.py", line 276, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/vine/promises.py", line 161, in __call__
+    return self.throw()
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/vine/promises.py", line 158, in __call__
+    retval = fun(*final_args, **final_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/app/base.py", line 693, in _autodiscover_tasks
+    return self._autodiscover_tasks_from_names(packages, related_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/app/base.py", line 698, in _autodiscover_tasks_from_names
+    return self.loader.autodiscover_tasks(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/loaders/base.py", line 220, in autodiscover_tasks
+    mod.__name__ for mod in autodiscover_tasks(packages or (),
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/loaders/base.py", line 246, in autodiscover_tasks
+    return [find_related_module(pkg, related_name) for pkg in packages]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/loaders/base.py", line 257, in find_related_module
+    module = importlib.import_module(package)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'dj_rest_auth'
+ERROR 2024-10-12 22:24:07,562 signal Signal handler <bound method DjangoFixup.on_import_modules of <celery.fixups.django.DjangoFixup object at 0x7fc1093e8200>> raised: ModuleNotFoundError("No module named 'dj_rest_auth'")
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/celery/utils/dispatch/signal.py", line 276, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/fixups/django.py", line 100, in on_import_modules
+    self.worker_fixup.validate_models()
+  File "/usr/local/lib/python3.12/site-packages/celery/fixups/django.py", line 138, in validate_models
+    self.django_setup()
+  File "/usr/local/lib/python3.12/site-packages/celery/fixups/django.py", line 134, in django_setup
+    django.setup()
+  File "/usr/local/lib/python3.12/site-packages/django/__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "/usr/local/lib/python3.12/site-packages/django/apps/registry.py", line 91, in populate
+    app_config = AppConfig.create(entry)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/apps/config.py", line 193, in create
+    import_module(entry)
+  File "/usr/local/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'dj_rest_auth'
+ERROR 2024-10-12 22:24:07,566 signal Signal handler <promise@0x7fc10926fa70 --> <bound method Celery._autodiscover_tasks of <Celery core at 0x7fc109289280>>> raised: AppRegistryNotReady("Apps aren't loaded yet.")
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/celery/utils/dispatch/signal.py", line 276, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/vine/promises.py", line 161, in __call__
+    return self.throw()
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/vine/promises.py", line 158, in __call__
+    retval = fun(*final_args, **final_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/app/base.py", line 694, in _autodiscover_tasks
+    return self._autodiscover_tasks_from_fixups(related_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/app/base.py", line 706, in _autodiscover_tasks_from_fixups
+    for pkg in fixup.autodiscover_tasks()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/fixups/django.py", line 110, in autodiscover_tasks
+    return [config.name for config in apps.get_app_configs()]
+                                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/apps/registry.py", line 147, in get_app_configs
+    self.check_apps_ready()
+  File "/usr/local/lib/python3.12/site-packages/django/apps/registry.py", line 138, in check_apps_ready
+    raise AppRegistryNotReady("Apps aren't loaded yet.")
+django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
+ERROR 2024-10-12 22:24:07,571 signal Signal handler <promise@0x7fc1092dca50 --> <bound method Celery._autodiscover_tasks of <Celery core at 0x7fc109289280>>> raised: ModuleNotFoundError("No module named 'dj_rest_auth'")
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/celery/utils/dispatch/signal.py", line 276, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/vine/promises.py", line 161, in __call__
+    return self.throw()
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/vine/promises.py", line 158, in __call__
+    retval = fun(*final_args, **final_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/app/base.py", line 693, in _autodiscover_tasks
+    return self._autodiscover_tasks_from_names(packages, related_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/app/base.py", line 698, in _autodiscover_tasks_from_names
+    return self.loader.autodiscover_tasks(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/loaders/base.py", line 220, in autodiscover_tasks
+    mod.__name__ for mod in autodiscover_tasks(packages or (),
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/loaders/base.py", line 246, in autodiscover_tasks
+    return [find_related_module(pkg, related_name) for pkg in packages]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/loaders/base.py", line 257, in find_related_module
+    module = importlib.import_module(package)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'dj_rest_auth'
+ERROR 2024-10-12 22:24:11,490 signal Signal handler <bound method DjangoFixup.on_import_modules of <celery.fixups.django.DjangoFixup object at 0x7efcfaf742f0>> raised: ModuleNotFoundError("No module named 'dj_rest_auth'")
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/celery/utils/dispatch/signal.py", line 276, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/fixups/django.py", line 100, in on_import_modules
+    self.worker_fixup.validate_models()
+  File "/usr/local/lib/python3.12/site-packages/celery/fixups/django.py", line 138, in validate_models
+    self.django_setup()
+  File "/usr/local/lib/python3.12/site-packages/celery/fixups/django.py", line 134, in django_setup
+    django.setup()
+  File "/usr/local/lib/python3.12/site-packages/django/__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "/usr/local/lib/python3.12/site-packages/django/apps/registry.py", line 91, in populate
+    app_config = AppConfig.create(entry)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/apps/config.py", line 193, in create
+    import_module(entry)
+  File "/usr/local/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'dj_rest_auth'
+ERROR 2024-10-12 22:24:11,492 signal Signal handler <promise@0x7efcfa79ba70 --> <bound method Celery._autodiscover_tasks of <Celery core at 0x7efcfa7b5490>>> raised: AppRegistryNotReady("Apps aren't loaded yet.")
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/celery/utils/dispatch/signal.py", line 276, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/vine/promises.py", line 161, in __call__
+    return self.throw()
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/vine/promises.py", line 158, in __call__
+    retval = fun(*final_args, **final_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/app/base.py", line 694, in _autodiscover_tasks
+    return self._autodiscover_tasks_from_fixups(related_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/app/base.py", line 706, in _autodiscover_tasks_from_fixups
+    for pkg in fixup.autodiscover_tasks()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/fixups/django.py", line 110, in autodiscover_tasks
+    return [config.name for config in apps.get_app_configs()]
+                                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/apps/registry.py", line 147, in get_app_configs
+    self.check_apps_ready()
+  File "/usr/local/lib/python3.12/site-packages/django/apps/registry.py", line 138, in check_apps_ready
+    raise AppRegistryNotReady("Apps aren't loaded yet.")
+django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
+ERROR 2024-10-12 22:24:11,497 signal Signal handler <promise@0x7efcfa808a50 --> <bound method Celery._autodiscover_tasks of <Celery core at 0x7efcfa7b5490>>> raised: ModuleNotFoundError("No module named 'dj_rest_auth'")
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/celery/utils/dispatch/signal.py", line 276, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/vine/promises.py", line 161, in __call__
+    return self.throw()
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/vine/promises.py", line 158, in __call__
+    retval = fun(*final_args, **final_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/app/base.py", line 693, in _autodiscover_tasks
+    return self._autodiscover_tasks_from_names(packages, related_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/app/base.py", line 698, in _autodiscover_tasks_from_names
+    return self.loader.autodiscover_tasks(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/loaders/base.py", line 220, in autodiscover_tasks
+    mod.__name__ for mod in autodiscover_tasks(packages or (),
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/loaders/base.py", line 246, in autodiscover_tasks
+    return [find_related_module(pkg, related_name) for pkg in packages]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/loaders/base.py", line 257, in find_related_module
+    module = importlib.import_module(package)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'dj_rest_auth'
+ERROR 2024-10-12 22:24:15,988 signal Signal handler <bound method DjangoFixup.on_import_modules of <celery.fixups.django.DjangoFixup object at 0x7fb3edf9d700>> raised: ModuleNotFoundError("No module named 'dj_rest_auth'")
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/celery/utils/dispatch/signal.py", line 276, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/fixups/django.py", line 100, in on_import_modules
+    self.worker_fixup.validate_models()
+  File "/usr/local/lib/python3.12/site-packages/celery/fixups/django.py", line 138, in validate_models
+    self.django_setup()
+  File "/usr/local/lib/python3.12/site-packages/celery/fixups/django.py", line 134, in django_setup
+    django.setup()
+  File "/usr/local/lib/python3.12/site-packages/django/__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "/usr/local/lib/python3.12/site-packages/django/apps/registry.py", line 91, in populate
+    app_config = AppConfig.create(entry)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/apps/config.py", line 193, in create
+    import_module(entry)
+  File "/usr/local/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'dj_rest_auth'
+ERROR 2024-10-12 22:24:15,993 signal Signal handler <promise@0x7fb3edf83a70 --> <bound method Celery._autodiscover_tasks of <Celery core at 0x7fb3ee5b7440>>> raised: AppRegistryNotReady("Apps aren't loaded yet.")
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/celery/utils/dispatch/signal.py", line 276, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/vine/promises.py", line 161, in __call__
+    return self.throw()
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/vine/promises.py", line 158, in __call__
+    retval = fun(*final_args, **final_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/app/base.py", line 694, in _autodiscover_tasks
+    return self._autodiscover_tasks_from_fixups(related_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/app/base.py", line 706, in _autodiscover_tasks_from_fixups
+    for pkg in fixup.autodiscover_tasks()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/fixups/django.py", line 110, in autodiscover_tasks
+    return [config.name for config in apps.get_app_configs()]
+                                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/apps/registry.py", line 147, in get_app_configs
+    self.check_apps_ready()
+  File "/usr/local/lib/python3.12/site-packages/django/apps/registry.py", line 138, in check_apps_ready
+    raise AppRegistryNotReady("Apps aren't loaded yet.")
+django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
+ERROR 2024-10-12 22:24:16,000 signal Signal handler <promise@0x7fb3edff0a50 --> <bound method Celery._autodiscover_tasks of <Celery core at 0x7fb3ee5b7440>>> raised: ModuleNotFoundError("No module named 'dj_rest_auth'")
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/celery/utils/dispatch/signal.py", line 276, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/vine/promises.py", line 161, in __call__
+    return self.throw()
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/vine/promises.py", line 158, in __call__
+    retval = fun(*final_args, **final_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/app/base.py", line 693, in _autodiscover_tasks
+    return self._autodiscover_tasks_from_names(packages, related_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/app/base.py", line 698, in _autodiscover_tasks_from_names
+    return self.loader.autodiscover_tasks(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/loaders/base.py", line 220, in autodiscover_tasks
+    mod.__name__ for mod in autodiscover_tasks(packages or (),
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/loaders/base.py", line 246, in autodiscover_tasks
+    return [find_related_module(pkg, related_name) for pkg in packages]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/celery/loaders/base.py", line 257, in find_related_module
+    module = importlib.import_module(package)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'dj_rest_auth'
+DEBUG 2024-10-12 22:27:16,565 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+
+DEBUG 2024-10-12 22:27:16,567 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-10-12 22:27:16,569 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-10-12 22:27:16,574 functional 
+def chain(*args, **kwargs):
+    return 1
+
+DEBUG 2024-10-12 22:27:16,575 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-10-12 22:27:16,577 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-10-12 22:27:16,578 functional 
+def encode_ffmpeg(video_id, input_file_path):
+    return 1
+
+DEBUG 2024-10-12 22:27:16,579 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-10-12 22:27:16,580 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-10-12 22:27:16,582 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-10-12 22:27:16,598 bootsteps | Worker: Preparing bootsteps.
+DEBUG 2024-10-12 22:27:16,600 bootsteps | Worker: Building graph...
+DEBUG 2024-10-12 22:27:16,601 bootsteps | Worker: New boot order: {Timer, Hub, Pool, Autoscaler, StateDB, Beat, Consumer}
+DEBUG 2024-10-12 22:27:16,606 bootsteps | Consumer: Preparing bootsteps.
+DEBUG 2024-10-12 22:27:16,607 bootsteps | Consumer: Building graph...
+DEBUG 2024-10-12 22:27:16,625 bootsteps | Consumer: New boot order: {Connection, Agent, Events, Heart, Mingle, Tasks, Control, Gossip, event loop}
+DEBUG 2024-10-12 22:27:16,647 bootsteps | Worker: Starting Hub
+DEBUG 2024-10-12 22:27:16,648 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:27:16,649 bootsteps | Worker: Starting Pool
+DEBUG 2024-10-12 22:27:17,438 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:27:17,439 bootsteps | Worker: Starting Consumer
+DEBUG 2024-10-12 22:27:17,443 bootsteps | Consumer: Starting Connection
+INFO 2024-10-12 22:27:17,484 connection Connected to redis://redis:6379/0
+DEBUG 2024-10-12 22:27:17,485 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:27:17,486 bootsteps | Consumer: Starting Events
+DEBUG 2024-10-12 22:27:17,491 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:27:17,492 bootsteps | Consumer: Starting Heart
+DEBUG 2024-10-12 22:27:17,499 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:27:17,502 bootsteps | Consumer: Starting Mingle
+INFO 2024-10-12 22:27:17,503 mingle mingle: searching for neighbors
+INFO 2024-10-12 22:27:18,523 mingle mingle: all alone
+DEBUG 2024-10-12 22:27:18,524 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:27:18,532 bootsteps | Consumer: Starting Tasks
+DEBUG 2024-10-12 22:27:18,544 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:27:18,548 bootsteps | Consumer: Starting Control
+DEBUG 2024-10-12 22:27:18,568 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:27:18,569 bootsteps | Consumer: Starting Gossip
+DEBUG 2024-10-12 22:27:18,580 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:27:18,582 bootsteps | Consumer: Starting event loop
+DEBUG 2024-10-12 22:27:18,583 bootsteps | Worker: Hub.register Pool...
+INFO 2024-10-12 22:27:18,587 worker celery@760fc93d2e2b ready.
+DEBUG 2024-10-12 22:29:45,691 bootsteps | Worker: Closing Hub...
+DEBUG 2024-10-12 22:29:45,715 bootsteps | Worker: Closing Pool...
+DEBUG 2024-10-12 22:29:45,729 bootsteps | Worker: Closing Consumer...
+DEBUG 2024-10-12 22:29:45,731 bootsteps | Worker: Stopping Consumer...
+DEBUG 2024-10-12 22:29:45,738 bootsteps | Consumer: Closing Connection...
+DEBUG 2024-10-12 22:29:45,740 bootsteps | Consumer: Closing Events...
+DEBUG 2024-10-12 22:29:45,741 bootsteps | Consumer: Closing Heart...
+DEBUG 2024-10-12 22:29:45,741 bootsteps | Consumer: Closing Mingle...
+DEBUG 2024-10-12 22:29:45,742 bootsteps | Consumer: Closing Tasks...
+DEBUG 2024-10-12 22:29:45,746 bootsteps | Consumer: Closing Control...
+DEBUG 2024-10-12 22:29:45,746 bootsteps | Consumer: Closing Gossip...
+DEBUG 2024-10-12 22:29:45,748 bootsteps | Consumer: Closing event loop...
+DEBUG 2024-10-12 22:29:45,751 bootsteps | Consumer: Stopping event loop...
+DEBUG 2024-10-12 22:29:45,752 bootsteps | Consumer: Stopping Gossip...
+DEBUG 2024-10-12 22:29:45,797 bootsteps | Consumer: Stopping Control...
+DEBUG 2024-10-12 22:29:45,805 bootsteps | Consumer: Stopping Tasks...
+DEBUG 2024-10-12 22:29:45,806 tasks Canceling task consumer...
+DEBUG 2024-10-12 22:29:45,808 bootsteps | Consumer: Stopping Mingle...
+DEBUG 2024-10-12 22:29:45,809 bootsteps | Consumer: Stopping Heart...
+DEBUG 2024-10-12 22:29:45,812 bootsteps | Consumer: Stopping Events...
+DEBUG 2024-10-12 22:29:45,813 bootsteps | Consumer: Stopping Connection...
+DEBUG 2024-10-12 22:29:45,815 bootsteps | Worker: Stopping Pool...
+DEBUG 2024-10-12 22:29:46,925 bootsteps | Worker: Stopping Hub...
+DEBUG 2024-10-12 22:29:46,927 bootsteps | Consumer: Shutdown Gossip...
+DEBUG 2024-10-12 22:29:46,929 bootsteps | Consumer: Shutdown Control...
+DEBUG 2024-10-12 22:29:46,930 bootsteps | Consumer: Shutdown Tasks...
+DEBUG 2024-10-12 22:29:46,931 tasks Canceling task consumer...
+DEBUG 2024-10-12 22:29:46,932 tasks Closing consumer channel...
+DEBUG 2024-10-12 22:29:46,936 bootsteps | Consumer: Shutdown Heart...
+DEBUG 2024-10-12 22:29:46,936 bootsteps | Consumer: Shutdown Events...
+DEBUG 2024-10-12 22:29:46,942 bootsteps | Consumer: Shutdown Connection...
+DEBUG 2024-10-12 22:29:47,019 asynpool removing tasks from inqueue until task handler finished
+DEBUG 2024-10-12 22:30:05,362 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+
+DEBUG 2024-10-12 22:30:05,363 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-10-12 22:30:05,364 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-10-12 22:30:05,365 functional 
+def chain(*args, **kwargs):
+    return 1
+
+DEBUG 2024-10-12 22:30:05,367 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-10-12 22:30:05,368 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-10-12 22:30:05,368 functional 
+def encode_ffmpeg(video_id, input_file_path):
+    return 1
+
+DEBUG 2024-10-12 22:30:05,370 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-10-12 22:30:05,371 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-10-12 22:30:05,373 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-10-12 22:30:05,401 bootsteps | Worker: Preparing bootsteps.
+DEBUG 2024-10-12 22:30:05,405 bootsteps | Worker: Building graph...
+DEBUG 2024-10-12 22:30:05,405 bootsteps | Worker: New boot order: {StateDB, Timer, Hub, Pool, Autoscaler, Beat, Consumer}
+DEBUG 2024-10-12 22:30:05,418 bootsteps | Consumer: Preparing bootsteps.
+DEBUG 2024-10-12 22:30:05,418 bootsteps | Consumer: Building graph...
+DEBUG 2024-10-12 22:30:05,444 bootsteps | Consumer: New boot order: {Connection, Events, Heart, Agent, Mingle, Tasks, Control, Gossip, event loop}
+DEBUG 2024-10-12 22:30:05,469 bootsteps | Worker: Starting Hub
+DEBUG 2024-10-12 22:30:05,470 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:30:05,471 bootsteps | Worker: Starting Pool
+DEBUG 2024-10-12 22:30:07,126 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:30:07,127 bootsteps | Worker: Starting Consumer
+DEBUG 2024-10-12 22:30:07,131 bootsteps | Consumer: Starting Connection
+INFO 2024-10-12 22:30:07,175 connection Connected to redis://redis:6379/0
+DEBUG 2024-10-12 22:30:07,176 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:30:07,176 bootsteps | Consumer: Starting Events
+DEBUG 2024-10-12 22:30:07,183 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:30:07,184 bootsteps | Consumer: Starting Heart
+DEBUG 2024-10-12 22:30:07,198 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:30:07,198 bootsteps | Consumer: Starting Mingle
+INFO 2024-10-12 22:30:07,200 mingle mingle: searching for neighbors
+INFO 2024-10-12 22:30:08,218 mingle mingle: all alone
+DEBUG 2024-10-12 22:30:08,219 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:30:08,220 bootsteps | Consumer: Starting Tasks
+DEBUG 2024-10-12 22:30:08,229 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:30:08,230 bootsteps | Consumer: Starting Control
+DEBUG 2024-10-12 22:30:08,241 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:30:08,242 bootsteps | Consumer: Starting Gossip
+DEBUG 2024-10-12 22:30:08,254 bootsteps ^-- substep ok
+DEBUG 2024-10-12 22:30:08,255 bootsteps | Consumer: Starting event loop
+DEBUG 2024-10-12 22:30:08,256 bootsteps | Worker: Hub.register Pool...
+INFO 2024-10-12 22:30:08,258 worker celery@760fc93d2e2b ready.
+DEBUG 2024-10-13 11:31:38,342 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+
+DEBUG 2024-10-13 11:31:38,346 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-10-13 11:31:38,347 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-10-13 11:31:38,348 functional 
+def chain(*args, **kwargs):
+    return 1
+
+DEBUG 2024-10-13 11:31:38,349 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-10-13 11:31:38,350 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-10-13 11:31:38,351 functional 
+def encode_ffmpeg(video_id, input_file_path):
+    return 1
+
+DEBUG 2024-10-13 11:31:38,352 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-10-13 11:31:38,354 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-10-13 11:31:38,355 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-10-13 11:31:38,448 bootsteps | Worker: Preparing bootsteps.
+DEBUG 2024-10-13 11:31:38,455 bootsteps | Worker: Building graph...
+DEBUG 2024-10-13 11:31:38,456 bootsteps | Worker: New boot order: {Timer, Hub, Pool, Autoscaler, StateDB, Beat, Consumer}
+DEBUG 2024-10-13 11:31:38,498 bootsteps | Consumer: Preparing bootsteps.
+DEBUG 2024-10-13 11:31:38,499 bootsteps | Consumer: Building graph...
+DEBUG 2024-10-13 11:31:38,531 bootsteps | Consumer: New boot order: {Connection, Events, Mingle, Tasks, Control, Gossip, Heart, Agent, event loop}
+DEBUG 2024-10-13 11:31:38,594 bootsteps | Worker: Starting Hub
+DEBUG 2024-10-13 11:31:38,595 bootsteps ^-- substep ok
+DEBUG 2024-10-13 11:31:38,595 bootsteps | Worker: Starting Pool
+DEBUG 2024-10-13 11:31:40,014 bootsteps ^-- substep ok
+DEBUG 2024-10-13 11:31:40,016 bootsteps | Worker: Starting Consumer
+DEBUG 2024-10-13 11:31:40,018 bootsteps | Consumer: Starting Connection
+INFO 2024-10-13 11:31:40,087 connection Connected to redis://redis:6379/0
+DEBUG 2024-10-13 11:31:40,088 bootsteps ^-- substep ok
+DEBUG 2024-10-13 11:31:40,089 bootsteps | Consumer: Starting Events
+DEBUG 2024-10-13 11:31:40,096 bootsteps ^-- substep ok
+DEBUG 2024-10-13 11:31:40,097 bootsteps | Consumer: Starting Mingle
+INFO 2024-10-13 11:31:40,097 mingle mingle: searching for neighbors
+INFO 2024-10-13 11:31:41,117 mingle mingle: all alone
+DEBUG 2024-10-13 11:31:41,118 bootsteps ^-- substep ok
+DEBUG 2024-10-13 11:31:41,119 bootsteps | Consumer: Starting Tasks
+DEBUG 2024-10-13 11:31:41,128 bootsteps ^-- substep ok
+DEBUG 2024-10-13 11:31:41,128 bootsteps | Consumer: Starting Control
+DEBUG 2024-10-13 11:31:41,140 bootsteps ^-- substep ok
+DEBUG 2024-10-13 11:31:41,141 bootsteps | Consumer: Starting Gossip
+DEBUG 2024-10-13 11:31:41,157 bootsteps ^-- substep ok
+DEBUG 2024-10-13 11:31:41,158 bootsteps | Consumer: Starting Heart
+DEBUG 2024-10-13 11:31:41,164 bootsteps ^-- substep ok
+DEBUG 2024-10-13 11:31:41,165 bootsteps | Consumer: Starting event loop
+DEBUG 2024-10-13 11:31:41,166 bootsteps | Worker: Hub.register Pool...
+INFO 2024-10-13 11:31:41,167 worker celery@760fc93d2e2b ready.
+DEBUG 2024-10-14 06:34:42,577 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+
+DEBUG 2024-10-14 06:34:42,579 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-10-14 06:34:42,579 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-10-14 06:34:42,580 functional 
+def chain(*args, **kwargs):
+    return 1
+
+DEBUG 2024-10-14 06:34:42,581 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-10-14 06:34:42,582 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-10-14 06:34:42,585 functional 
+def encode_ffmpeg(video_id, input_file_path):
+    return 1
+
+DEBUG 2024-10-14 06:34:42,586 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-10-14 06:34:42,587 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-10-14 06:34:42,589 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-10-14 06:34:42,621 bootsteps | Worker: Preparing bootsteps.
+DEBUG 2024-10-14 06:34:42,625 bootsteps | Worker: Building graph...
+DEBUG 2024-10-14 06:34:42,627 bootsteps | Worker: New boot order: {StateDB, Beat, Timer, Hub, Pool, Autoscaler, Consumer}
+DEBUG 2024-10-14 06:34:42,645 bootsteps | Consumer: Preparing bootsteps.
+DEBUG 2024-10-14 06:34:42,646 bootsteps | Consumer: Building graph...
+DEBUG 2024-10-14 06:34:42,668 bootsteps | Consumer: New boot order: {Connection, Agent, Events, Mingle, Tasks, Control, Gossip, Heart, event loop}
+DEBUG 2024-10-14 06:34:42,696 bootsteps | Worker: Starting Hub
+DEBUG 2024-10-14 06:34:42,697 bootsteps ^-- substep ok
+DEBUG 2024-10-14 06:34:42,697 bootsteps | Worker: Starting Pool
+DEBUG 2024-10-14 06:34:43,579 bootsteps ^-- substep ok
+DEBUG 2024-10-14 06:34:43,583 bootsteps | Worker: Starting Consumer
+DEBUG 2024-10-14 06:34:43,585 bootsteps | Consumer: Starting Connection
+ERROR 2024-10-14 06:34:47,365 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 2.00 seconds... (1/100)
+
+ERROR 2024-10-14 06:34:53,078 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 4.00 seconds... (2/100)
+
+ERROR 2024-10-14 06:35:00,812 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 6.00 seconds... (3/100)
+
+ERROR 2024-10-14 06:35:10,576 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 8.00 seconds... (4/100)
+
+ERROR 2024-10-14 06:35:22,315 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 10.00 seconds... (5/100)
+
+ERROR 2024-10-14 06:35:36,079 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 12.00 seconds... (6/100)
+
+INFO 2024-10-14 06:35:48,248 connection Connected to redis://redis:6379/0
+DEBUG 2024-10-14 06:35:48,255 bootsteps ^-- substep ok
+DEBUG 2024-10-14 06:35:48,261 bootsteps | Consumer: Starting Events
+DEBUG 2024-10-14 06:35:48,321 bootsteps ^-- substep ok
+DEBUG 2024-10-14 06:35:48,328 bootsteps | Consumer: Starting Mingle
+INFO 2024-10-14 06:35:48,331 mingle mingle: searching for neighbors
+INFO 2024-10-14 06:35:49,467 mingle mingle: all alone
+DEBUG 2024-10-14 06:35:49,469 bootsteps ^-- substep ok
+DEBUG 2024-10-14 06:35:49,470 bootsteps | Consumer: Starting Tasks
+DEBUG 2024-10-14 06:35:49,568 bootsteps ^-- substep ok
+DEBUG 2024-10-14 06:35:49,569 bootsteps | Consumer: Starting Control
+DEBUG 2024-10-14 06:35:49,586 bootsteps ^-- substep ok
+DEBUG 2024-10-14 06:35:49,587 bootsteps | Consumer: Starting Gossip
+DEBUG 2024-10-14 06:35:49,604 bootsteps ^-- substep ok
+DEBUG 2024-10-14 06:35:49,607 bootsteps | Consumer: Starting Heart
+DEBUG 2024-10-14 06:35:49,621 bootsteps ^-- substep ok
+DEBUG 2024-10-14 06:35:49,622 bootsteps | Consumer: Starting event loop
+DEBUG 2024-10-14 06:35:49,627 bootsteps | Worker: Hub.register Pool...
+INFO 2024-10-14 06:35:49,640 worker celery@760fc93d2e2b ready.
+DEBUG 2024-10-14 13:31:36,767 bootsteps | Worker: Closing Hub...
+DEBUG 2024-10-14 13:31:36,857 bootsteps | Worker: Closing Pool...
+DEBUG 2024-10-14 13:31:36,919 bootsteps | Worker: Closing Consumer...
+DEBUG 2024-10-14 13:31:36,921 bootsteps | Worker: Stopping Consumer...
+DEBUG 2024-10-14 13:31:36,973 bootsteps | Consumer: Closing Connection...
+DEBUG 2024-10-14 13:31:36,983 bootsteps | Consumer: Closing Events...
+DEBUG 2024-10-14 13:31:36,988 bootsteps | Consumer: Closing Mingle...
+DEBUG 2024-10-14 13:31:36,989 bootsteps | Consumer: Closing Tasks...
+DEBUG 2024-10-14 13:31:36,991 bootsteps | Consumer: Closing Control...
+DEBUG 2024-10-14 13:31:36,994 bootsteps | Consumer: Closing Gossip...
+DEBUG 2024-10-14 13:31:36,996 bootsteps | Consumer: Closing Heart...
+DEBUG 2024-10-14 13:31:37,002 bootsteps | Consumer: Closing event loop...
+DEBUG 2024-10-14 13:31:37,004 bootsteps | Consumer: Stopping event loop...
+DEBUG 2024-10-14 13:31:37,006 bootsteps | Consumer: Stopping Heart...
+DEBUG 2024-10-14 13:31:37,015 bootsteps | Consumer: Stopping Gossip...
+DEBUG 2024-10-14 13:31:37,263 bootsteps | Consumer: Stopping Control...
+DEBUG 2024-10-14 13:31:37,283 bootsteps | Consumer: Stopping Tasks...
+DEBUG 2024-10-14 13:31:37,294 tasks Canceling task consumer...
+DEBUG 2024-10-14 13:31:37,297 bootsteps | Consumer: Stopping Mingle...
+DEBUG 2024-10-14 13:31:37,302 bootsteps | Consumer: Stopping Events...
+DEBUG 2024-10-14 13:31:37,306 bootsteps | Consumer: Stopping Connection...
+DEBUG 2024-10-14 13:31:37,325 bootsteps | Worker: Stopping Pool...
+DEBUG 2024-10-14 13:31:39,087 bootsteps | Worker: Stopping Hub...
+DEBUG 2024-10-14 13:31:39,096 bootsteps | Consumer: Shutdown Heart...
+DEBUG 2024-10-14 13:31:39,097 bootsteps | Consumer: Shutdown Gossip...
+DEBUG 2024-10-14 13:31:39,100 bootsteps | Consumer: Shutdown Control...
+DEBUG 2024-10-14 13:31:39,103 bootsteps | Consumer: Shutdown Tasks...
+DEBUG 2024-10-14 13:31:39,105 tasks Canceling task consumer...
+DEBUG 2024-10-14 13:31:39,106 tasks Closing consumer channel...
+DEBUG 2024-10-14 13:31:39,114 bootsteps | Consumer: Shutdown Events...
+DEBUG 2024-10-14 13:31:39,131 bootsteps | Consumer: Shutdown Connection...
+DEBUG 2024-10-14 13:31:39,272 asynpool removing tasks from inqueue until task handler finished
+DEBUG 2024-10-14 13:32:05,288 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+
+DEBUG 2024-10-14 13:32:05,292 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-10-14 13:32:05,293 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-10-14 13:32:05,296 functional 
+def chain(*args, **kwargs):
+    return 1
+
+DEBUG 2024-10-14 13:32:05,298 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-10-14 13:32:05,299 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-10-14 13:32:05,301 functional 
+def encode_ffmpeg(video_id, input_file_path):
+    return 1
+
+DEBUG 2024-10-14 13:32:05,303 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-10-14 13:32:05,304 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-10-14 13:32:05,306 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-10-14 13:32:05,366 bootsteps | Worker: Preparing bootsteps.
+DEBUG 2024-10-14 13:32:05,373 bootsteps | Worker: Building graph...
+DEBUG 2024-10-14 13:32:05,376 bootsteps | Worker: New boot order: {StateDB, Beat, Timer, Hub, Pool, Autoscaler, Consumer}
+DEBUG 2024-10-14 13:32:05,405 bootsteps | Consumer: Preparing bootsteps.
+DEBUG 2024-10-14 13:32:05,406 bootsteps | Consumer: Building graph...
+DEBUG 2024-10-14 13:32:05,441 bootsteps | Consumer: New boot order: {Connection, Events, Mingle, Tasks, Control, Gossip, Heart, Agent, event loop}
+DEBUG 2024-10-14 13:32:05,488 bootsteps | Worker: Starting Hub
+DEBUG 2024-10-14 13:32:05,489 bootsteps ^-- substep ok
+DEBUG 2024-10-14 13:32:05,492 bootsteps | Worker: Starting Pool
+DEBUG 2024-10-14 13:32:08,667 bootsteps ^-- substep ok
+DEBUG 2024-10-14 13:32:08,668 bootsteps | Worker: Starting Consumer
+DEBUG 2024-10-14 13:32:08,669 bootsteps | Consumer: Starting Connection
+INFO 2024-10-14 13:32:08,708 connection Connected to redis://redis:6379/0
+DEBUG 2024-10-14 13:32:08,710 bootsteps ^-- substep ok
+DEBUG 2024-10-14 13:32:08,711 bootsteps | Consumer: Starting Events
+DEBUG 2024-10-14 13:32:08,717 bootsteps ^-- substep ok
+DEBUG 2024-10-14 13:32:08,718 bootsteps | Consumer: Starting Mingle
+INFO 2024-10-14 13:32:08,718 mingle mingle: searching for neighbors
+INFO 2024-10-14 13:32:09,741 mingle mingle: all alone
+DEBUG 2024-10-14 13:32:09,743 bootsteps ^-- substep ok
+DEBUG 2024-10-14 13:32:09,744 bootsteps | Consumer: Starting Tasks
+DEBUG 2024-10-14 13:32:09,750 bootsteps ^-- substep ok
+DEBUG 2024-10-14 13:32:09,751 bootsteps | Consumer: Starting Control
+DEBUG 2024-10-14 13:32:09,762 bootsteps ^-- substep ok
+DEBUG 2024-10-14 13:32:09,763 bootsteps | Consumer: Starting Gossip
+DEBUG 2024-10-14 13:32:09,778 bootsteps ^-- substep ok
+DEBUG 2024-10-14 13:32:09,780 bootsteps | Consumer: Starting Heart
+DEBUG 2024-10-14 13:32:09,785 bootsteps ^-- substep ok
+DEBUG 2024-10-14 13:32:09,786 bootsteps | Consumer: Starting event loop
+DEBUG 2024-10-14 13:32:09,788 bootsteps | Worker: Hub.register Pool...
+INFO 2024-10-14 13:32:09,795 worker celery@760fc93d2e2b ready.
+DEBUG 2024-10-14 19:56:59,718 bootsteps | Worker: Closing Hub...
+DEBUG 2024-10-14 19:56:59,799 bootsteps | Worker: Closing Pool...
+DEBUG 2024-10-14 19:56:59,837 bootsteps | Worker: Closing Consumer...
+DEBUG 2024-10-14 19:56:59,838 bootsteps | Worker: Stopping Consumer...
+DEBUG 2024-10-14 19:56:59,865 bootsteps | Consumer: Closing Connection...
+DEBUG 2024-10-14 19:56:59,867 bootsteps | Consumer: Closing Events...
+DEBUG 2024-10-14 19:56:59,870 bootsteps | Consumer: Closing Mingle...
+DEBUG 2024-10-14 19:56:59,870 bootsteps | Consumer: Closing Tasks...
+DEBUG 2024-10-14 19:56:59,871 bootsteps | Consumer: Closing Control...
+DEBUG 2024-10-14 19:56:59,873 bootsteps | Consumer: Closing Gossip...
+DEBUG 2024-10-14 19:56:59,873 bootsteps | Consumer: Closing Heart...
+DEBUG 2024-10-14 19:56:59,874 bootsteps | Consumer: Closing event loop...
+DEBUG 2024-10-14 19:56:59,878 bootsteps | Consumer: Stopping event loop...
+DEBUG 2024-10-14 19:56:59,881 bootsteps | Consumer: Stopping Heart...
+DEBUG 2024-10-14 19:56:59,888 bootsteps | Consumer: Stopping Gossip...
+DEBUG 2024-10-14 19:57:00,036 bootsteps | Consumer: Stopping Control...
+DEBUG 2024-10-14 19:57:00,049 bootsteps | Consumer: Stopping Tasks...
+DEBUG 2024-10-14 19:57:00,053 tasks Canceling task consumer...
+DEBUG 2024-10-14 19:57:00,058 bootsteps | Consumer: Stopping Mingle...
+DEBUG 2024-10-14 19:57:00,059 bootsteps | Consumer: Stopping Events...
+DEBUG 2024-10-14 19:57:00,059 bootsteps | Consumer: Stopping Connection...
+DEBUG 2024-10-14 19:57:00,063 bootsteps | Worker: Stopping Pool...
+DEBUG 2024-10-14 19:57:01,425 bootsteps | Worker: Stopping Hub...
+DEBUG 2024-10-14 19:57:01,431 bootsteps | Consumer: Shutdown Heart...
+DEBUG 2024-10-14 19:57:01,433 bootsteps | Consumer: Shutdown Gossip...
+DEBUG 2024-10-14 19:57:01,436 bootsteps | Consumer: Shutdown Control...
+DEBUG 2024-10-14 19:57:01,437 bootsteps | Consumer: Shutdown Tasks...
+DEBUG 2024-10-14 19:57:01,438 tasks Canceling task consumer...
+DEBUG 2024-10-14 19:57:01,440 tasks Closing consumer channel...
+DEBUG 2024-10-14 19:57:01,442 bootsteps | Consumer: Shutdown Events...
+DEBUG 2024-10-14 19:57:01,450 bootsteps | Consumer: Shutdown Connection...
+DEBUG 2024-10-14 19:57:01,537 asynpool removing tasks from inqueue until task handler finished
+DEBUG 2024-10-15 08:49:45,758 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+
+DEBUG 2024-10-15 08:49:45,760 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-10-15 08:49:45,761 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-10-15 08:49:45,761 functional 
+def chain(*args, **kwargs):
+    return 1
+
+DEBUG 2024-10-15 08:49:45,762 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-10-15 08:49:45,762 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-10-15 08:49:45,763 functional 
+def encode_ffmpeg(video_id, input_file_path):
+    return 1
+
+DEBUG 2024-10-15 08:49:45,764 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-10-15 08:49:45,765 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-10-15 08:49:45,766 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-10-15 08:49:45,803 bootsteps | Worker: Preparing bootsteps.
+DEBUG 2024-10-15 08:49:45,809 bootsteps | Worker: Building graph...
+DEBUG 2024-10-15 08:49:45,810 bootsteps | Worker: New boot order: {Beat, Timer, Hub, Pool, Autoscaler, StateDB, Consumer}
+DEBUG 2024-10-15 08:49:45,830 bootsteps | Consumer: Preparing bootsteps.
+DEBUG 2024-10-15 08:49:45,831 bootsteps | Consumer: Building graph...
+DEBUG 2024-10-15 08:49:45,860 bootsteps | Consumer: New boot order: {Connection, Agent, Events, Mingle, Gossip, Heart, Tasks, Control, event loop}
+DEBUG 2024-10-15 08:49:45,894 bootsteps | Worker: Starting Hub
+DEBUG 2024-10-15 08:49:45,895 bootsteps ^-- substep ok
+DEBUG 2024-10-15 08:49:45,895 bootsteps | Worker: Starting Pool
+DEBUG 2024-10-15 08:49:47,812 bootsteps ^-- substep ok
+DEBUG 2024-10-15 08:49:47,825 bootsteps | Worker: Starting Consumer
+DEBUG 2024-10-15 08:49:47,827 bootsteps | Consumer: Starting Connection
+ERROR 2024-10-15 08:49:51,669 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 2.00 seconds... (1/100)
+
+ERROR 2024-10-15 08:49:57,400 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 4.00 seconds... (2/100)
+
+ERROR 2024-10-15 08:50:05,112 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 6.00 seconds... (3/100)
+
+ERROR 2024-10-15 08:50:14,868 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 8.00 seconds... (4/100)
+
+ERROR 2024-10-15 08:50:26,631 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 10.00 seconds... (5/100)
+
+ERROR 2024-10-15 08:50:40,348 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 12.00 seconds... (6/100)
+
+ERROR 2024-10-15 08:50:56,164 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 14.00 seconds... (7/100)
+
+ERROR 2024-10-15 08:51:13,958 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 16.00 seconds... (8/100)
+
+ERROR 2024-10-15 08:51:33,936 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 18.00 seconds... (9/100)
+
+ERROR 2024-10-15 08:51:55,859 consumer consumer: Cannot connect to redis://redis:6379/0: Error -2 connecting to redis:6379. Name does not resolve..
+Trying again in 20.00 seconds... (10/100)
+
+INFO 2024-10-15 08:52:16,113 connection Connected to redis://redis:6379/0
+DEBUG 2024-10-15 08:52:16,123 bootsteps ^-- substep ok
+DEBUG 2024-10-15 08:52:16,133 bootsteps | Consumer: Starting Events
+DEBUG 2024-10-15 08:52:16,218 bootsteps ^-- substep ok
+DEBUG 2024-10-15 08:52:16,220 bootsteps | Consumer: Starting Mingle
+INFO 2024-10-15 08:52:16,223 mingle mingle: searching for neighbors
+INFO 2024-10-15 08:52:17,361 mingle mingle: all alone
+DEBUG 2024-10-15 08:52:17,362 bootsteps ^-- substep ok
+DEBUG 2024-10-15 08:52:17,364 bootsteps | Consumer: Starting Gossip
+DEBUG 2024-10-15 08:52:17,375 bootsteps ^-- substep ok
+DEBUG 2024-10-15 08:52:17,376 bootsteps | Consumer: Starting Heart
+DEBUG 2024-10-15 08:52:17,400 bootsteps ^-- substep ok
+DEBUG 2024-10-15 08:52:17,402 bootsteps | Consumer: Starting Tasks
+DEBUG 2024-10-15 08:52:17,521 bootsteps ^-- substep ok
+DEBUG 2024-10-15 08:52:17,522 bootsteps | Consumer: Starting Control
+DEBUG 2024-10-15 08:52:17,535 bootsteps ^-- substep ok
+DEBUG 2024-10-15 08:52:17,535 bootsteps | Consumer: Starting event loop
+DEBUG 2024-10-15 08:52:17,539 bootsteps | Worker: Hub.register Pool...
+INFO 2024-10-15 08:52:17,573 worker celery@760fc93d2e2b ready.
+DEBUG 2024-10-15 16:12:08,415 bootsteps | Worker: Closing Hub...
+DEBUG 2024-10-15 16:12:08,468 bootsteps | Worker: Closing Pool...
+DEBUG 2024-10-15 16:12:08,494 bootsteps | Worker: Closing Consumer...
+DEBUG 2024-10-15 16:12:08,496 bootsteps | Worker: Stopping Consumer...
+DEBUG 2024-10-15 16:12:08,510 bootsteps | Consumer: Closing Connection...
+DEBUG 2024-10-15 16:12:08,512 bootsteps | Consumer: Closing Events...
+DEBUG 2024-10-15 16:12:08,513 bootsteps | Consumer: Closing Mingle...
+DEBUG 2024-10-15 16:12:08,515 bootsteps | Consumer: Closing Gossip...
+DEBUG 2024-10-15 16:12:08,516 bootsteps | Consumer: Closing Heart...
+DEBUG 2024-10-15 16:12:08,517 bootsteps | Consumer: Closing Tasks...
+DEBUG 2024-10-15 16:12:08,518 bootsteps | Consumer: Closing Control...
+DEBUG 2024-10-15 16:12:08,519 bootsteps | Consumer: Closing event loop...
+DEBUG 2024-10-15 16:12:08,519 bootsteps | Consumer: Stopping event loop...
+DEBUG 2024-10-15 16:12:08,520 bootsteps | Consumer: Stopping Control...
+DEBUG 2024-10-15 16:12:08,595 bootsteps | Consumer: Stopping Tasks...
+DEBUG 2024-10-15 16:12:08,597 tasks Canceling task consumer...
+DEBUG 2024-10-15 16:12:08,600 bootsteps | Consumer: Stopping Heart...
+DEBUG 2024-10-15 16:12:08,604 bootsteps | Consumer: Stopping Gossip...
+DEBUG 2024-10-15 16:12:08,620 bootsteps | Consumer: Stopping Mingle...
+DEBUG 2024-10-15 16:12:08,621 bootsteps | Consumer: Stopping Events...
+DEBUG 2024-10-15 16:12:08,622 bootsteps | Consumer: Stopping Connection...
+DEBUG 2024-10-15 16:12:08,623 bootsteps | Worker: Stopping Pool...
+DEBUG 2024-10-15 16:12:09,876 bootsteps | Worker: Stopping Hub...
+DEBUG 2024-10-15 16:12:09,880 bootsteps | Consumer: Shutdown Control...
+DEBUG 2024-10-15 16:12:09,883 bootsteps | Consumer: Shutdown Tasks...
+DEBUG 2024-10-15 16:12:09,885 tasks Canceling task consumer...
+DEBUG 2024-10-15 16:12:09,886 tasks Closing consumer channel...
+DEBUG 2024-10-15 16:12:09,887 bootsteps | Consumer: Shutdown Heart...
+DEBUG 2024-10-15 16:12:09,888 bootsteps | Consumer: Shutdown Gossip...
+DEBUG 2024-10-15 16:12:09,888 bootsteps | Consumer: Shutdown Events...
+DEBUG 2024-10-15 16:12:09,897 bootsteps | Consumer: Shutdown Connection...
+DEBUG 2024-10-15 16:12:09,969 asynpool removing tasks from inqueue until task handler finished
+DEBUG 2024-10-15 16:14:14,738 functional 
+def group(self, tasks, result, group_id, partial_args, add_to_parent=0):
+    return 1
+
+DEBUG 2024-10-15 16:14:14,739 functional 
+def xmap(task, it):
+    return 1
+
+DEBUG 2024-10-15 16:14:14,740 functional 
+def backend_cleanup():
+    return 1
+
+DEBUG 2024-10-15 16:14:14,741 functional 
+def chain(*args, **kwargs):
+    return 1
+
+DEBUG 2024-10-15 16:14:14,742 functional 
+def xstarmap(task, it):
+    return 1
+
+DEBUG 2024-10-15 16:14:14,743 functional 
+def accumulate(self, *args, **kwargs):
+    return 1
+
+DEBUG 2024-10-15 16:14:14,744 functional 
+def encode_ffmpeg(video_id, input_file_path):
+    return 1
+
+DEBUG 2024-10-15 16:14:14,745 functional 
+def chord(self, header, body, partial_args=0, interval=1, countdown=2, max_retries=3, eager=4, **kwargs):
+    return 1
+
+DEBUG 2024-10-15 16:14:14,747 functional 
+def chunks(task, it, n):
+    return 1
+
+DEBUG 2024-10-15 16:14:14,747 functional 
+def unlock_chord(self, group_id, callback, interval=0, max_retries=1, result=2, Result=3, GroupResult=4, result_from_tuple=5, **kwargs):
+    return 1
+
+DEBUG 2024-10-15 16:14:14,771 bootsteps | Worker: Preparing bootsteps.
+DEBUG 2024-10-15 16:14:14,775 bootsteps | Worker: Building graph...
+DEBUG 2024-10-15 16:14:14,775 bootsteps | Worker: New boot order: {Beat, Timer, Hub, Pool, Autoscaler, StateDB, Consumer}
+DEBUG 2024-10-15 16:14:14,788 bootsteps | Consumer: Preparing bootsteps.
+DEBUG 2024-10-15 16:14:14,789 bootsteps | Consumer: Building graph...
+DEBUG 2024-10-15 16:14:14,808 bootsteps | Consumer: New boot order: {Connection, Events, Heart, Agent, Mingle, Gossip, Tasks, Control, event loop}
+DEBUG 2024-10-15 16:14:14,829 bootsteps | Worker: Starting Hub
+DEBUG 2024-10-15 16:14:14,830 bootsteps ^-- substep ok
+DEBUG 2024-10-15 16:14:14,830 bootsteps | Worker: Starting Pool
+DEBUG 2024-10-15 16:14:15,594 bootsteps ^-- substep ok
+DEBUG 2024-10-15 16:14:15,596 bootsteps | Worker: Starting Consumer
+DEBUG 2024-10-15 16:14:15,600 bootsteps | Consumer: Starting Connection
+INFO 2024-10-15 16:14:15,627 connection Connected to redis://redis:6379/0
+DEBUG 2024-10-15 16:14:15,628 bootsteps ^-- substep ok
+DEBUG 2024-10-15 16:14:15,628 bootsteps | Consumer: Starting Events
+DEBUG 2024-10-15 16:14:15,636 bootsteps ^-- substep ok
+DEBUG 2024-10-15 16:14:15,637 bootsteps | Consumer: Starting Heart
+DEBUG 2024-10-15 16:14:15,641 bootsteps ^-- substep ok
+DEBUG 2024-10-15 16:14:15,642 bootsteps | Consumer: Starting Mingle
+INFO 2024-10-15 16:14:15,643 mingle mingle: searching for neighbors
+INFO 2024-10-15 16:14:16,657 mingle mingle: all alone
+DEBUG 2024-10-15 16:14:16,658 bootsteps ^-- substep ok
+DEBUG 2024-10-15 16:14:16,658 bootsteps | Consumer: Starting Gossip
+DEBUG 2024-10-15 16:14:16,666 bootsteps ^-- substep ok
+DEBUG 2024-10-15 16:14:16,667 bootsteps | Consumer: Starting Tasks
+DEBUG 2024-10-15 16:14:16,671 bootsteps ^-- substep ok
+DEBUG 2024-10-15 16:14:16,672 bootsteps | Consumer: Starting Control
+DEBUG 2024-10-15 16:14:16,678 bootsteps ^-- substep ok
+DEBUG 2024-10-15 16:14:16,679 bootsteps | Consumer: Starting event loop
+DEBUG 2024-10-15 16:14:16,680 bootsteps | Worker: Hub.register Pool...
+INFO 2024-10-15 16:14:16,681 worker celery@760fc93d2e2b ready.
+DEBUG 2024-10-15 16:18:44,063 bootsteps | Worker: Closing Hub...
+DEBUG 2024-10-15 16:18:44,098 bootsteps | Worker: Closing Pool...
+DEBUG 2024-10-15 16:18:44,112 bootsteps | Worker: Closing Consumer...
+DEBUG 2024-10-15 16:18:44,113 bootsteps | Worker: Stopping Consumer...
+DEBUG 2024-10-15 16:18:44,131 bootsteps | Consumer: Closing Connection...
+DEBUG 2024-10-15 16:18:44,132 bootsteps | Consumer: Closing Events...
+DEBUG 2024-10-15 16:18:44,133 bootsteps | Consumer: Closing Heart...
+DEBUG 2024-10-15 16:18:44,134 bootsteps | Consumer: Closing Mingle...
+DEBUG 2024-10-15 16:18:44,135 bootsteps | Consumer: Closing Gossip...
+DEBUG 2024-10-15 16:18:44,136 bootsteps | Consumer: Closing Tasks...
+DEBUG 2024-10-15 16:18:44,138 bootsteps | Consumer: Closing Control...
+DEBUG 2024-10-15 16:18:44,139 bootsteps | Consumer: Closing event loop...
+DEBUG 2024-10-15 16:18:44,141 bootsteps | Consumer: Stopping event loop...
+DEBUG 2024-10-15 16:18:44,142 bootsteps | Consumer: Stopping Control...
+DEBUG 2024-10-15 16:18:44,214 bootsteps | Consumer: Stopping Tasks...
+DEBUG 2024-10-15 16:18:44,217 tasks Canceling task consumer...
+DEBUG 2024-10-15 16:18:44,219 bootsteps | Consumer: Stopping Gossip...
+DEBUG 2024-10-15 16:18:44,233 bootsteps | Consumer: Stopping Mingle...
+DEBUG 2024-10-15 16:18:44,234 bootsteps | Consumer: Stopping Heart...
+DEBUG 2024-10-15 16:18:44,239 bootsteps | Consumer: Stopping Events...
+DEBUG 2024-10-15 16:18:44,240 bootsteps | Consumer: Stopping Connection...
+DEBUG 2024-10-15 16:18:44,242 bootsteps | Worker: Stopping Pool...
+DEBUG 2024-10-15 16:18:45,414 bootsteps | Worker: Stopping Hub...
+DEBUG 2024-10-15 16:18:45,416 bootsteps | Consumer: Shutdown Control...
+DEBUG 2024-10-15 16:18:45,416 bootsteps | Consumer: Shutdown Tasks...
+DEBUG 2024-10-15 16:18:45,417 tasks Canceling task consumer...
+DEBUG 2024-10-15 16:18:45,418 tasks Closing consumer channel...
+DEBUG 2024-10-15 16:18:45,418 bootsteps | Consumer: Shutdown Gossip...
+DEBUG 2024-10-15 16:18:45,419 bootsteps | Consumer: Shutdown Heart...
+DEBUG 2024-10-15 16:18:45,419 bootsteps | Consumer: Shutdown Events...
+DEBUG 2024-10-15 16:18:45,425 bootsteps | Consumer: Shutdown Connection...
+DEBUG 2024-10-15 16:18:45,468 asynpool removing tasks from inqueue until task handler finished
