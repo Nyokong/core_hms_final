@@ -43,7 +43,7 @@ from .serializers import AssignmentLectureViewSerializer
 
 # models
 from .models import custUser, Video, Assignment
-from .models import VerificationToken
+from .models import VerificationToken, Lecturer
 from .models import FeedbackMessage, Grade,PasswordResetToken, Submission
 
 # straight imports
@@ -176,12 +176,42 @@ import requests
 
 class AddStudentNumberView(generics.UpdateAPIView):
 
-    queryset = custUser.objects.all()
+    # queryset = custUser.objects.all()
     serializer_class = UserUpdateSerializer 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
-    def get_object(self):
-        return self.request.user
+    def post(self, request, *args, **kwargs):
+        number = request.data.get('student_number')
+        id = request.data.get('id')
+        
+        logger.info(f'id: {id}\nstd_numb: {number}')
+
+        try:
+            customuser = custUser.objects.get(id=id)
+            lecturer = Lecturer.objects.get(emp_num=number)
+
+            try:
+                user = custUser.objects.get(student_number=number)
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            except custUser.DoesNotExist:
+                if lecturer and customuser:
+                    customuser.student_number = number
+                    customuser.username = number
+                    customuser.is_lecturer = True
+                    customuser.save()
+                    refresh = RefreshToken.for_user(customuser)
+                    
+                    # send access tokens back
+                    return Response({
+                        'access_token': str(refresh.access_token),
+                        'refresh_token': str(refresh),
+                    }, status=status.HTTP_200_OK)
+                
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        
+            
 
 
 class UserProfileView(generics.GenericAPIView):
@@ -415,7 +445,6 @@ class VideoStreamView(generics.GenericAPIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class VideoStreamSegmentsView(generics.GenericAPIView):
-
     # any one can view or stream
     permission_classes = [permissions.AllowAny]
 
@@ -441,6 +470,103 @@ class VideoStreamSegmentsView(generics.GenericAPIView):
 
         except Video.DoesNotExist:
             return Response({'error': 'Video not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+# master streaming
+class MasterVideoStreamView(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, video_id):
+        # try:
+        video = Video.objects.get(id=video_id)
+        
+        logger.info(f'Found Video {video.cmp_video}')
+        
+        # processsing
+        title_code = video.title[:3].upper()
+        full_name = video.cmp_video.name
+        filename = full_name.split('/')[-1]
+
+        pos = filename.find(title_code)
+        numeric_part = filename[pos + len(title_code):] if pos != -1 else ""
+
+        # gets file path
+        fullvid = f'{video.user.id}_{title_code}{numeric_part}'
+        name_without_extension = fullvid.rsplit('.', 1)[0]
+        output_dir = os.path.join(settings.MEDIA_ROOT, 'hls_videos', name_without_extension)
+        master_playlist_path = os.path.join(output_dir, f'{name_without_extension}.m3u8')
+
+        # master_playlist_path = os.path.join(settings.MEDIA_ROOT, f'{video_id}_master.m3u8')
+
+        try:
+            with open(master_playlist_path, 'r') as f:
+                master_playlist_content = f.read()
+            # Modify the master playlist to point to the correct segment URLs
+            modified_playlist_content = ""
+            for line in master_playlist_content.splitlines():
+                if line.startswith("#EXT-X-STREAM-INF"):
+                    modified_playlist_content += line + "\n"
+                elif line.endswith(".m3u8"):
+                    segment_url = request.build_absolute_uri(f'/vd/stream/{video_id}/{line}')
+                    modified_playlist_content += segment_url + "\n"
+
+            logger.info(modified_playlist_content)
+
+            return HttpResponse(modified_playlist_content, content_type='application/vnd.apple.mpegurl')
+        except FileNotFoundError:
+            return HttpResponse("Master playlist not found", status=404)
+        except Exception as e:
+            return HttpResponse(f"Error reading master playlist: {e}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            # # logs the file path
+            # logger.info(f'Serving HLS video from: {hls_vid}')
+
+            # if os.path.exists(hls_vid):
+            #     return StreamingHttpResponse(open(hls_vid, 'rb'), content_type='application/vnd.apple.mpegurl')
+            # else:
+            #     logger.error(f'File not found: {hls_vid}')
+            #     return Response({'error': 'Video not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # except Video.DoesNotExist:
+        #     logger.error(f'Video not found: {video_id}')
+        #     return Response({'error': 'Video not found'}, status=status.HTTP_404_NOT_FOUND)
+        # except Exception as e:
+        #     logger.error(f'Error: {str(e)}')
+        #     return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class MasterVideoStreamSegmentsView(generics.GenericAPIView):
+    # any one can view or stream
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, video_id):
+        try:
+            video = Video.objects.get(id=video_id)
+            
+            # processsing
+            title_code = video.title[:3].upper()
+            full_name = video.cmp_video.name
+            filename = full_name.split('/')[-1]
+
+            pos = filename.find(title_code)
+            numeric_part = filename[pos + len(title_code):] if pos != -1 else ""
+
+            fullvid = f'{video.user.id}_{title_code}{numeric_part}'
+            name_without_extension = fullvid.rsplit('.', 1)[0]
+            
+            output_dir = os.path.join(settings.MEDIA_ROOT, 'hls_videos', name_without_extension)
+
+            hls_vid = os.path.join(output_dir, f'360p_000.ts')
+            
+            logger.info(f'Found Segment Video {video.cmp_video}')
+
+            if os.path.exists(hls_vid):
+                return StreamingHttpResponse(open(hls_vid, 'rb'), content_type='application/vnd.apple.mpegurl')
+            else:
+                return Response({'error': 'Segment Video not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Video.DoesNotExist:
+            return Response({'error': 'Segment Video not found'}, status=status.HTTP_404_NOT_FOUND)
+
 
 class DownloadVideoView(generics.GenericAPIView):
     # any one can view or stream
@@ -495,17 +621,22 @@ class DeleteVideoView(generics.DestroyAPIView):
 # create assignments
 class AssignmentCreateView(generics.CreateAPIView):
     serializer_class = AssignmentForm
-    permission_class = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return Assignment.objects.all()
+    
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
 
     # post 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 
+        logger.info(f'FRONTEND assignment {serializer}')
+
         if serializer.is_valid():
-            video = serializer.save()
+            self.perform_create(serializer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             logger.info(f'serializer is not valid {request.data}')
@@ -516,31 +647,36 @@ class AssignmentListView(generics.GenericAPIView):
         permission_classes = [permissions.AllowAny]
 
         def get_queryset(self):
-            return Assignment.objects.all() 
+            return Assignment.objects.all()
 
-        # @method_decorator(cache_page(60*15))  
         def get(self, request, format=None):
-            queryset = self.get_queryset() 
+            queryset = self.get_queryset()
+        
             serializer = AssignmentLectureViewSerializer(queryset, many=True)
-            return Response(serializer.data)
+        
+            return Response(serializer.data,  status=status.HTTP_200_OK)
+           
 
 # AssignmentLecturerView
 class AssignmentLecturerView(generics.GenericAPIView):
         permission_classes = [permissions.AllowAny]
         serializer_class = AssignmentLectureViewSerializer
 
-        def get_queryset(self, created_by):
-            return Assignment.objects.get(created_by=created_by)
+        def get_queryset(self):
+            created_by = self.kwargs.get('created_by')
+            return Assignment.objects.filter(created_by=created_by)
 
         # @method_decorator(cache_page(60*15))  
         def get(self, request, created_by, *args, **kwargs):
             # get assignment by specific lecturer
-            # that made them
 
             try:
-                queryset = self.get_queryset(created_by)
-                serializer = AssignmentLectureViewSerializer(queryset)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                queryset = self.get_queryset()
+            
+                serializer = AssignmentLectureViewSerializer(queryset, many=True)
+            
+                return Response(serializer.data,  status=status.HTTP_200_OK)
+                
             except ObjectDoesNotExist:
                 return Response({}, status=status.HTTP_404_NOT_FOUND)
 

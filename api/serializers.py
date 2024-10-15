@@ -5,6 +5,7 @@ from .validators import validate_file_size
 from django.utils import timezone
 
 from .models import FeedbackMessage, custUser, Assignment, Video, Grade, Submission
+from .models import Lecturer
 
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
@@ -110,7 +111,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 class StudentNumberUpdateSerializer(serializers.ModelSerializer):
     
     class Meta:
-        model = custUser
+        model = Lecturer
         fields = ('student_number',)
         extra_kwargs = {
             'student_number': {'required': True}
@@ -150,30 +151,27 @@ class AssignUpdateSerializer(serializers.ModelSerializer):
 
 # create assignment serializer - only lecturer can access this.
 class  AssignmentForm(serializers.Serializer):
-    title=serializers.CharField(max_length=240)
-    description= serializers.CharField()
+    title = serializers.CharField(max_length=240)
+    description = serializers.CharField()
     due_date = serializers.DateTimeField(default=timezone.now)
-    # created_by
+    attachment = serializers.CharField(allow_blank=True, required=False)
+    status = serializers.CharField(max_length=10)
+
+    class Meta:
+        model = Assignment
+        fields = ['title', 'description', 'due_date', 'attachment','status','total_submissions']
+        read_only_fields = ['total_submissions']
 
     def create(self, validated_data):
-        assignment = Assignment(
+        assignment = Assignment.objects.create(
             created_by=self.context['request'].user,
             title=validated_data['title'],
             description=validated_data['description'],
             due_date=validated_data.get('due_date', timezone.now()),  # Ensure due_date is included
-            attachment=validated_data.get('attachment')  # Include attachment if necessary
+            attachment=validated_data.get('attachment', ''),  # Include attachment if necessary
+            status=validated_data['status']
         )
-
-        # save the video if is succesful
-        assignment.save()
-        # after all return user
         return assignment
-
-        # return Assignment.objects.create(**validated_data)
-
-    class Meta:
-        model = Assignment
-        fields = ['title', 'description', 'due_date', 'attachment']
 
 class AssignmentLectureViewSerializer(serializers.ModelSerializer):
 

@@ -19,7 +19,7 @@ urlpatterns = [
     path('verify-email/<uidb64>/<token>/', views.VerifyEmailView.as_view(), name='verify-email'),
     path('usr/delete/<int:pk>/', views.DeleteUserView.as_view(), name='user-delete'),
     path('usr/profile', views.UserProfileView.as_view(), name='user-profile-read'),
-    path('usr/update-std-number', views.AddStudentNumberView.as_view(), name="add-student-number"),
+    path('usr/update-std-number/', views.AddStudentNumberView.as_view(), name="add-student-number"),
     path('usr/change-password', views.ChangePasswordView.as_view(), name ='change-password'),
     path('usr/reset-password', views.PasswordResetRequestView.as_view(), name ='reset-password'),
     path('usr/reset-password-confirm', views.PasswordResetConfirmView.as_view(), name ='reset-password-confirm'),
@@ -48,6 +48,9 @@ urlpatterns = [
 
     path('vd/stream/<int:video_id>/<str:quality>', views.VideoStreamView.as_view(), name='stream_video'),
     path('vd/stream/<int:video_id>/<str:segment>', views.VideoStreamSegmentsView.as_view(), name='segments_video'),
+
+    path('vd/masterstream/<int:video_id>', views.MasterVideoStreamView.as_view(), name='masterstream_video'),
+    # path('vd/masterstream/<int:video_id>', views.MasterVideoStreamSegmentsView.as_view(), name='mastersegments_video'),
 
     # feedback http endpoints
     path('feedback/msgs', views.FeedbackMessages.as_view(), name='feedback-msgs-read'),

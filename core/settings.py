@@ -337,8 +337,8 @@ SOCIALACCOUNT_PROVIDERS = {
 LOGIN_REDIRECT_URL = 'http://localhost:8000/api/thank-you'
 # SOCIALACCOUNT_ADAPTER = 'api.social_adapter.MySocialAccountAdapter'
 
-SITE_ID = 2
-
+SITE_ID = 5
+# have been tested
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -366,19 +366,28 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 # Check if the media folder exists, if not, create it
 if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
+else:
+    pass
 
 if not os.path.exists(f'{MEDIA_ROOT}/compressed_videos'):
     os.makedirs(f'{MEDIA_ROOT}/compressed_videos')
+else:
+    pass
 
 if not os.path.exists(f'{MEDIA_ROOT}/attachments'):
     os.makedirs(f'{MEDIA_ROOT}/attachments')
+else:
+    pass
 
 if not os.path.exists(f'{MEDIA_ROOT}/hls_videos'):
     os.makedirs(f'{MEDIA_ROOT}/hls_videos')
+else:
+    pass
 
 
 # logging settings
