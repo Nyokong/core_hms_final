@@ -195,6 +195,7 @@ class VideoSerializer(serializers.ModelSerializer):
         
         file = Video(
             user=self.context['request'].user,
+            assignment=validated_data['assignment',]
             title=validated_data['title'],
             description=validated_data['description'],
             cmp_video=validated_data['cmp_video'],
