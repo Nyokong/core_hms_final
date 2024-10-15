@@ -11,3 +11,4 @@ media/*
 
 api/migrations/__pycache__
 celery.log
+celery.log
