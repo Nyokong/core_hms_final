@@ -236,14 +236,34 @@ class UserProfileView(generics.GenericAPIView):
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from rest_framework.response import Response
+from rest_framework import status
+
+class CustomJWTAuthentication(JWTAuthentication):
+    def authenticate(self, request):
+        try:
+            return super().authenticate(request)
+        except TokenError as e:
+            return None
+
+    def handle_exception(self, exc):
+        if isinstance(exc, (TokenError, InvalidToken)):
+            return Response({"message": "Token is invalid or expired."}, status=status.HTTP_401_UNAUTHORIZED)
+        return super().handle_exception(exc)
+
 class CheckTokenValid(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         token = request.auth
-        
-        logger.info('token')
         try:
             # If token is valid, do nothing and return a success response
             token.verify()
