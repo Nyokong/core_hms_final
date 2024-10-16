@@ -878,17 +878,14 @@ class DeleteFeedbackMessage (generics.DestroyAPIView):
 
 
 class FeedbackMessages(generics.GenericAPIView):
-    # gets users who are authenticated
-    # for later purpose permissions might change
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.AllowAny]  # Modify permissions as needed
     serializer_class = FeebackListSerializer
 
-    def get_queryset(self):
-        room_id = self.kwargs['room_id']
-        return FeedbackMessage.objects.filter(feedback_room=room_id)
+    def get_queryset(self, id):
+        return FeedbackMessage.objects.filter(sender=id)
 
-    def get(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+    def get(self, request, id, *args, **kwargs):
+        queryset = self.get_queryset(id)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -899,10 +896,10 @@ class AllRoomsView(generics.GenericAPIView):
     serializer_class = FeebackListSerializer
 
     def get_queryset(self, id):
-        return FeedbackMessage.objects.get(lecturer=id)
+        return FeedbackMessage.objects.get(sender=id)
 
     def get(self, request, id):
-        queryset = self.get_queryset(lecturer=id)
+        queryset = self.get_queryset(id)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
