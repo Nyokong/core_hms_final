@@ -917,9 +917,9 @@ class ExportCSVView(APIView):
 
         writer = csv.writer(response)
 
-        writer.writerow(['Feedback  Room', 'Sender', 'Feedback','Grade', 'Timestamp'])
+        writer.writerow(['Feedback  Room', 'Sender', 'Feedback', 'Timestamp'])
 
-        data = FeedbackMessage.objects.all().values_list('feedback_room','sender', 'message','grade', 'timestamp')
+        data = FeedbackMessage.objects.all().values_list('feedback_room','sender', 'message', 'timestamp')
 
         for row in data:
             writer.writerow(row)
