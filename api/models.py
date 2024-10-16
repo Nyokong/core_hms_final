@@ -111,7 +111,6 @@ class Assignment(models.Model):
 
 # video uploading model
 class Video(models.Model):
-    user = models.ForeignKey(custUser, on_delete=models.CASCADE)
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE,verbose_name="assignment", related_name='assignment', default=None)
     title = models.CharField(verbose_name="title", max_length=255)
     description = models.TextField(verbose_name="description", blank=True, null=True)
@@ -221,6 +220,7 @@ class FeedbackMessage(models.Model):
     # logic is one user ia student and the other is a lecturer
     sender = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='sender_of_message')
     message = models.TextField()
+    grade=models.ForeignKey(Grade, on_delete=models.CASCADE, related_name ='feedback_message', null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
             
 
