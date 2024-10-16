@@ -72,7 +72,7 @@ urlpatterns = [
 
     # submissions
     path('submission/create', views.SubmissionCreateView.as_view(), name='submission-create'),
-    path('submission/list/<int:id>', views.SubmissionListView.as_view(), name='submission-list'),
+    path('submission/list/<int:user_id>', views.SubmissionListView.as_view(), name='submission-list'),
     path('submission/delete/<int:id>', views.SubmissionDeleteView.as_view(), name='submission-delete'),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

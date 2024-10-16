@@ -17,11 +17,11 @@ from django.core.exceptions import ObjectDoesNotExist
 # caching
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
-
 # dajngo auth
 from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate, login
-
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
 
 # rest framework imports
 from rest_framework import viewsets, permissions, generics, permissions, status
@@ -76,7 +76,7 @@ class UserCreateView(generics.CreateAPIView):
 
         # Call the send_verification_email method with the newly created user
         if user:
-            # self.send_verification_email(user)
+            self.send_verification_email(user)
             pass
 
         return Response({
@@ -248,6 +248,7 @@ class DeleteUserView(generics.DestroyAPIView):
 
 
 # this is the Login View
+
 class LoginAPIView(generics.GenericAPIView):
     serializer_class = LoginSerializer
     permission_classes = [permissions.AllowAny]
@@ -344,10 +345,10 @@ class GoogAftermathView(generics.GenericAPIView):
         return render(request, 'thank_you.html')
 
 class UploadVideoView(generics.CreateAPIView):
-    serializer_class = VideoSerializer  
+    serializer_class = VideoSerializer
 
     # only authenticated users can access this page?
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     # post 
     def post(self, request, *args, **kwargs):
@@ -995,8 +996,8 @@ class SubmissionListView(generics. GenericAPIView):
 
 
     def get_queryset(self):
-        submission_id = self.kwargs['id']
-        return Submission.objects.filter(id= submission_id)
+        submission_id = self.kwargs['user_id']
+        return Submission.objects.filter(user_id= user_id)
 
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -1019,5 +1020,4 @@ class SubmissionDeleteView(generics.DestroyAPIView):
         submission =self.get_object()
         submission.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
     

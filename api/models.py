@@ -120,7 +120,7 @@ class Video(models.Model):
         (COMPLETED, 'completed'),
     )
 
-    user = models.ForeignKey(custUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(custUser, null=True, blank=True, on_delete=models.SET_NULL)
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE,verbose_name="assignment", related_name='assignment', default=None)
     title = models.CharField(verbose_name="title", max_length=255)
     description = models.TextField(verbose_name="description", blank=True, null=True)
