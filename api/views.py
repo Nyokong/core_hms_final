@@ -72,11 +72,13 @@ class UserCreateView(generics.CreateAPIView):
         # is not valid = "this data does not match"
         serializer.is_valid(raise_exception=True)
 
+        logger.info(f'user data from nextjs {request.data}')
+
         user = serializer.save()
 
         # Call the send_verification_email method with the newly created user
         if user:
-            # self.send_verification_email(user)
+            self.send_verification_email(user)
             pass
 
         return Response({
