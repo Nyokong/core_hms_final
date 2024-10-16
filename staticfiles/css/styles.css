@@ -1,20 +1,9 @@
-:root {
-  --base-purple: #4b0082; /* Base purple from the image */
-  --light-purple: #9370db; /* Light purple */
-  --light-blue: #87ceeb; /* Light blue */
-}
-
 body {
-  background: linear-gradient(
-    135deg,
-    var(--base-purple),
-    var(--light-purple),
-    var(--light-blue)
-  );
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
   color: white;
+  background: linear-gradient(to right, #ffcc33, #ff6699);
   text-align: center;
 }
 
@@ -38,7 +27,7 @@ body {
 }
 
 .btn {
-  background-color: var(--base-purple);
+  background-color: #1db954;
   color: white;
   padding: 15px 30px;
   font-size: 1.2em;
@@ -52,7 +41,7 @@ body {
 }
 
 .btn:hover {
-  background-color: var(--light-purple);
+  background-color: #1aa34a;
 }
 
 .endpoints {
@@ -75,14 +64,14 @@ body {
 .endpoints a {
   color: white;
   text-decoration: none;
-  background-color: var(--base-purple);
+  background-color: #3b3b3b;
   padding: 10px 20px;
   border-radius: 25px;
   transition: background-color 0.3s;
 }
 
 .endpoints a:hover {
-  background-color: var(--light-purple);
+  background-color: #555;
 }
 
 @keyframes fadeIn {

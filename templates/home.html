@@ -1,13 +1,12 @@
-<!-- templates/items/item_list.html -->
-{% extends "base.html" %}
+{% extends "base.html" %} {% block content %}
 
-{% block content %}
-<div class="container mx-auto px-4 bg-slate-900">
-    <h1 class="text-2xl font-bold mb-4">Home Page</h1>
-    <ul class="list-disc pl-5">
-        {% for item in items %}
-            <li class="mb-2">{{ item.name }}</li>
-        {% endfor %}
-    </ul>
-</div>
+<section class="endpoints">
+  <h2>Available Endpoints</h2>
+  <ul>
+    <li><a href="/api/usrs">all users</a></li>
+    <li style="margin-top: 10px"><a href="/api/usr/create">Create Users</a></li>
+    <li><a href="/api/usr/update">Update Users</a></li>
+    <!-- Add more endpoints as needed -->
+  </ul>
+</section>
 {% endblock %}

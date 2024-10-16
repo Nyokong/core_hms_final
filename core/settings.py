@@ -144,7 +144,7 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60*2),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -389,6 +389,9 @@ if not os.path.exists(f'{MEDIA_ROOT}/hls_videos'):
 else:
     pass
 
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
 
 # logging settings
 LOGGING = {
@@ -411,7 +414,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'celery.log'),
+            'filename': os.path.join(LOG_DIR, 'celery.log'),
             'formatter': 'verbose',
         },
     },
@@ -420,6 +423,11 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'DEBUG',  
             'propagate': False,
+        },
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
         'api': { 
             'handlers': ['console'],

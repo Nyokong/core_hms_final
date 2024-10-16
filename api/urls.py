@@ -16,6 +16,7 @@ urlpatterns = [
     path('usr/update', views.UserUpdateView.as_view(), name='user-update'),
     path('usr/login', views.LoginAPIView.as_view(), name="login-user"),
     path('usrs', views.UserListViewSet.as_view(), name='users'),
+    path('usrs/students', views.UserListStudentsView.as_view(), name='users'),
     path('verify-email/<uidb64>/<token>/', views.VerifyEmailView.as_view(), name='verify-email'),
     path('usr/delete/<int:pk>/', views.DeleteUserView.as_view(), name='user-delete'),
     path('usr/profile', views.UserProfileView.as_view(), name='user-profile-read'),
@@ -24,19 +25,21 @@ urlpatterns = [
     path('usr/reset-password', views.PasswordResetRequestView.as_view(), name ='reset-password'),
     path('usr/reset-password-confirm', views.PasswordResetConfirmView.as_view(), name ='reset-password-confirm'),
 
-
     # i hate allatuh urls
     path('thank-you', views.GoogAftermathView.as_view(), name='thank-you'),
 
     # token login
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('check-token', views.CheckTokenValid.as_view(), name='token_refresh'),
 
     # assignments endpoints
     path('assign/view/',views.AssignmentListView.as_view(), name='list-assignment'),
+    path('assign/viewing/<int:id>',views.AssignmentIdView.as_view(), name='lecturer-assignment'),
     path('assign/view/<int:created_by>',views.AssignmentLecturerView.as_view(), name='lecturer-assignment'),
     path('assign/create',views. AssignmentCreateView.as_view(), name='create-assignments'),
     path('assign/update/<int:id>', views.AssignmentUpdateView.as_view(), name='assignment-update'),
+    path('assign/update/<int:id>/<int:created_by>',views.AssignmenIDView.as_view(), name='view-update-assignment'),
     path('assign/delete/<int:pk>',views.AssignmentDeleteView.as_view(), name= 'assignment-delete'),
 
     # video views
@@ -64,15 +67,11 @@ urlpatterns = [
     path('download/csv', views.ExportCSVView.as_view(), name='export-csv'),
     # path('download/video/<int:id>', views.DownloadVideoView.as_view(), name='export-video'),
 
-    #grade
-    path('grades/create', views.GradeCreateView.as_view(), name='grade-create'),
-    path('grades/update/<int:pk>', views.GradeUpdateView.as_view(), name ='grade-update'),
-    path('grades', views.GradeListView.as_view(), name='grade-list'),
-    path('grades/delete/<int:pk>', views.GradeDeleteView.as_view(), name ='grade-delete'),
-
     # submissions
     path('submission/create', views.SubmissionCreateView.as_view(), name='submission-create'),
-    path('submission/list/<int:user_id>', views.SubmissionListView.as_view(), name='submission-list'),
+    path('submission/list/all', views.AllSubmissionListView.as_view(), name='submission-list-all'),
+    path('submission/list/<int:id>', views.SubmissionListView.as_view(), name='submission-list'),
+    path('submission/list/<int:id>/<int:student_id>', views.UpdateSubmissionStudentView.as_view(), name='submission-list-by_student'),
     path('submission/delete/<int:id>', views.SubmissionDeleteView.as_view(), name='submission-delete'),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

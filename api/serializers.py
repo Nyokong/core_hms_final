@@ -4,7 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from .validators import validate_file_size
 from django.utils import timezone
 
-from .models import FeedbackMessage, custUser, Assignment, Video, Grade, Submission
+from .models import FeedbackMessage, custUser, Assignment, Video, Submission
 from .models import Lecturer
 
 from allauth.account.adapter import get_adapter
@@ -74,6 +74,7 @@ class UserSerializer(serializers.ModelSerializer):
             'password2': {'write_only': True},
             'email': {'required': True},
         }
+        
 
     def validate(self, attrs):
         # password = validate_password.pop('password')
@@ -101,12 +102,37 @@ class UserSerializer(serializers.ModelSerializer):
         # after all return user
         return user
 
+class UserProfileSerializer(serializers.ModelSerializer):
+    has_password = serializers.SerializerMethodField()
+
+    class Meta:
+        model = custUser
+        fields = ['first_name', 'last_name', 'has_password']
+
+    def get_has_password(self, obj):
+        return obj.has_usable_password()
+
 # user can only change details password change will done differently
 class UserUpdateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = custUser
-        fields = ('username', )
+        fields = ('username', 'first_name', 'last_name', 'password')
+
+    def validate(self, data):
+        if 'password' in data:
+            if data['password'] != self.initial_data.get('confirm_password'):
+                raise serializers.ValidationError("Passwords do not match.")
+        return data
+
+    def update(self, instance, validated_data):
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        password = validated_data.get('password', None)
+        if password:
+            instance.set_password(password)
+        instance.save()
+        return instance
 
 class StudentNumberUpdateSerializer(serializers.ModelSerializer):
     
@@ -117,6 +143,11 @@ class StudentNumberUpdateSerializer(serializers.ModelSerializer):
             'student_number': {'required': True}
         }
 
+class StudentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = custUser
+        fields = ('id','username', 'first_name', 'last_name', 'email','student_number')
+    
 # delete -serializer
 class UserDeleteSerializer(serializers.ModelSerializer):
     def validate(self, data):
@@ -147,7 +178,7 @@ class AssignUpdateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Assignment
-        fields = ('title', 'description', 'due_date')
+        fields = ('title', 'description', 'status','due_date','attachment')
 
 # create assignment serializer - only lecturer can access this.
 class  AssignmentForm(serializers.Serializer):
@@ -185,7 +216,8 @@ class VideoSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Video
-        fields = ['assignment', 'title', 'description', 'cmp_video', 'thumbnail', 'hls_name', 'hls_path', 'status', 'is_running']
+        fields = ['assignment','title', 'description', 'cmp_video']
+
 
     def validate(self, data):
         validate_file_size(data['cmp_video'])
@@ -196,17 +228,12 @@ class VideoSerializer(serializers.ModelSerializer):
         # Handle unauthenticated users
         user = self.context['request'].user if self.context['request'].user.is_authenticated else None
         
-        video = Video(
-            user=user,  # Allow user to be None for unauthenticated requests
+        file = Video(
+            user=self.context['request'].user,
             assignment=validated_data['assignment'],
             title=validated_data['title'],
             description=validated_data['description'],
             cmp_video=validated_data['cmp_video'],
-            thumbnail=validated_data['thumbnail'],
-            hls_name=validated_data['hls_name'],
-            hls_path=validated_data['hls_path'],
-            status=validated_data['status'],
-            is_running=validated_data['is_running'],
         )
         video.save()
         return video
@@ -221,7 +248,7 @@ class VideoSerializer(serializers.ModelSerializer):
 class Videoviewlist(serializers.ModelSerializer):
     class Meta:
         model = Video
-        fields = ['id','assignment','title', 'description', 'cmp_video', 'thumbnail','hls_name' ,'hls_path','status','is_running']
+        fields = ['id','assignment','title', 'description', 'cmp_video']
 
 
 # feedback serializer goes here
@@ -276,17 +303,6 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-class GradeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Grade
-        fields = ['lecturer', 'submission', 'grade', 'created_at']
-        read_only_fields =['created_at']
-
-    def validate_grade(self, value):
-        if value <0 or value > 100:
-            raise serializers.ValidationError("Grade must be between 0 and 100.")
-        return value
-
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
@@ -331,6 +347,13 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
 
 class SubmissionSerializer(serializers.ModelSerializer):
+
+    def validate_grade(self, value):
+        if value:
+            if value <0 or value > 100:
+                raise serializers.ValidationError("Grade must be between 0 and 100.")
+            return value
+    
     class Meta:
         model = Submission
-        fields = ['assignment','student','video', 'submitted_at']
+        fields = ['id','assignment','student','video','grade', 'letter_grade', 'marked','submitted_at']
