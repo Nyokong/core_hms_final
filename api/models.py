@@ -212,7 +212,6 @@ class FeedbackRoom(models.Model):
     # this is all the conversations they've had
     lecturer = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='lecturer_in_feedback')
     student = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='student_in_feedback')
-    # we want to know what they talking about 
     submission = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name='submission_ref')
 
 class FeedbackMessage(models.Model):
@@ -220,7 +219,6 @@ class FeedbackMessage(models.Model):
     # logic is one user ia student and the other is a lecturer
     sender = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='sender_of_message')
     message = models.TextField()
-    grade=models.ForeignKey(Grade, on_delete=models.CASCADE, related_name ='feedback_message', null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
             
 
