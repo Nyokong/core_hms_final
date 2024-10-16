@@ -1027,23 +1027,28 @@ class SubmissionListView(generics. GenericAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class SubmissionStudentView(generics. GenericAPIView):
+class UpdateSubmissionStudentView(generics.GenericAPIView):
     serializer_class = SubmissionSerializer
-    permission_classes =[permissions.AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
-        # submission_id = self.kwargs['id']id=submission_id,
-        student_id = self.kwargs['student']
-        return Submission.objects.filter( student=student_id)
+        submission_id = self.kwargs.get('id')
+        student_id = self.kwargs['student_id']
+        return Submission.objects.filter(id=submission_id, student=student_id)
 
-    def get(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if not queryset.exists():
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        submission = queryset.first()
+        serializer = self.get_serializer(submission, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
  #deleting assignment
-
-
 class SubmissionDeleteView(generics.DestroyAPIView):
     serializer_class = SubmissionSerializer
     permission_classes =[permissions.AllowAny]

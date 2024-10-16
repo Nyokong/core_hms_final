@@ -71,7 +71,7 @@ urlpatterns = [
     path('submission/create', views.SubmissionCreateView.as_view(), name='submission-create'),
     path('submission/list/all', views.AllSubmissionListView.as_view(), name='submission-list-all'),
     path('submission/list/<int:id>', views.SubmissionListView.as_view(), name='submission-list'),
-    path('submission/list/student/<int:student>', views.SubmissionStudentView.as_view(), name='submission-list-by_student'),
+    path('submission/list/<int:id>/<int:student_id>', views.UpdateSubmissionStudentView.as_view(), name='submission-list-by_student'),
     path('submission/delete/<int:id>', views.SubmissionDeleteView.as_view(), name='submission-delete'),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
