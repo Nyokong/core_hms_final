@@ -342,10 +342,11 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 class SubmissionSerializer(serializers.ModelSerializer):
 
     def validate_grade(self, value):
-        if value <0 or value > 100:
-            raise serializers.ValidationError("Grade must be between 0 and 100.")
-        return value
+        if value:
+            if value <0 or value > 100:
+                raise serializers.ValidationError("Grade must be between 0 and 100.")
+            return value
     
     class Meta:
         model = Submission
-        fields = ['id','assignment','student','video','grade', 'letter_grade', 'submitted_at']
+        fields = ['id','assignment','student','video','grade', 'letter_grade', 'marked','submitted_at']

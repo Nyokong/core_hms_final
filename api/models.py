@@ -175,16 +175,22 @@ class Submission(models.Model):
         max_digits=5, 
         decimal_places=2,
         validators=[MinValueValidator(0), MaxValueValidator(100)],
-        default=None
+        default=0,
+        null=True,
+        blank=True
     )
     letter_grade = models.CharField(max_length=2, blank=True, null=True, default=None)
     submitted_at = models.DateTimeField(auto_now_add=True)
+    marked = models.BooleanField(default=False)
+
 
     def save(self, *args, **kwargs):
         self.letter_grade = self.get_letter_grade()
         super().save(*args, **kwargs)
 
     def get_letter_grade(self):
+        if self.grade is None:
+            return None
         if self.grade >= 90:
             return 'A'
         elif self.grade >= 75:

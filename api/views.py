@@ -236,10 +236,12 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class CheckTokenValid(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         token = request.auth
+        
+        logger.info('token')
         try:
             # If token is valid, do nothing and return a success response
             token.verify()
