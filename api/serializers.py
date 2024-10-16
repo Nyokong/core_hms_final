@@ -218,11 +218,15 @@ class VideoSerializer(serializers.ModelSerializer):
         model = Video
         fields = ['assignment','title', 'description', 'cmp_video']
 
+
     def validate(self, data):
         validate_file_size(data['cmp_video'])
         return data
+        
 
     def create(self, validated_data):
+        # Handle unauthenticated users
+        user = self.context['request'].user if self.context['request'].user.is_authenticated else None
         
         file = Video(
             user=self.context['request'].user,
@@ -231,6 +235,9 @@ class VideoSerializer(serializers.ModelSerializer):
             description=validated_data['description'],
             cmp_video=validated_data['cmp_video'],
         )
+        video.save()
+        return video
+
 
         # save the video if is succesful
         file.save()

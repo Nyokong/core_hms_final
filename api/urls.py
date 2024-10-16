@@ -56,9 +56,9 @@ urlpatterns = [
     # path('vd/masterstream/<int:video_id>', views.MasterVideoStreamSegmentsView.as_view(), name='mastersegments_video'),
 
     # feedback http endpoints
-    path('feedback/msgs', views.FeedbackMessages.as_view(), name='feedback-msgs-read'),
+    path('feedback/messages/<int:id>', views.FeedbackMessages.as_view(), name='feedback-msgs-read'),
     # make update of feedback
-    path('feedback/<int:id>/rooms', views.AllRoomsView.as_view(), name='rooms'),
+    path('feedback/rooms/<int:id>', views.AllRoomsView.as_view(), name='rooms'),
     path('feedback-room/<int:room_id>/messages', views.FeedbackMessages.as_view(), name='feedback_room_messages'),
     path('feedback/update/<int:pk>', views.UpdateFeedbackMessage.as_view(), name ='feedback-update'),
     path('feedback/delete/<int:pk>', views.DeleteFeedbackMessage.as_view(), name ='feedback-delete'),
