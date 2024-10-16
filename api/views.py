@@ -38,13 +38,13 @@ from rest_framework.exceptions import NotFound
 from .serializers import UserSerializer, UserUpdateSerializer, Videoviewlist,LoginSerializer, ChangePasswordSerializer
 from .serializers import UserDeleteSerializer, AssignmentForm , VideoSerializer, AssignUpdateSerializer
 from .serializers import FeedbackMsgSerializer, StudentNumberUpdateSerializer, FeebackListSerializer
-from .serializers import PasswordResetRequestSerializer, GradeSerializer, PasswordResetConfirmSerializer, SubmissionSerializer
-from .serializers import AssignmentLectureViewSerializer
+from .serializers import PasswordResetRequestSerializer,  PasswordResetConfirmSerializer, SubmissionSerializer
+from .serializers import AssignmentLectureViewSerializer, StudentsSerializer
 
 # models
 from .models import custUser, Video, Assignment
 from .models import VerificationToken, Lecturer
-from .models import FeedbackMessage, Grade,PasswordResetToken, Submission
+from .models import FeedbackMessage, PasswordResetToken, Submission
 
 # straight imports
 import os
@@ -167,6 +167,8 @@ class UserUpdateView(generics.RetrieveUpdateAPIView):
         
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST) 
 
+
+
 from django.shortcuts import redirect
 from django.conf import settings
 from django.views import View
@@ -210,9 +212,6 @@ class AddStudentNumberView(generics.UpdateAPIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        
-            
-
 
 class UserProfileView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -224,6 +223,7 @@ class UserProfileView(generics.GenericAPIView):
         'id': user.id,
         'username': user.username,
         'first_name': user.first_name,
+        'last_name': user.last_name,
         'email': user.email,
         'student_number':user.student_number
         # Add any other user fields you need
@@ -312,11 +312,22 @@ class UserListViewSet(APIView):
 
         return Response(serializer.data)
 
+# user display viewset
+class UserListStudentsView(APIView):
+    # gets users who are students
+    # for later purpose permissions might change
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, format=None):
+        query = custUser.objects.filter(is_lecturer=False)
+        serializer = StudentsSerializer(query, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 from rest_framework_simplejwt.tokens import RefreshToken
 from .signals import user_logged_in_receiver
 
 class GoogAftermathView(generics.GenericAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self, id):
         return custUser.objects.get(id=id)
@@ -681,6 +692,47 @@ class AssignmentLecturerView(generics.GenericAPIView):
             except ObjectDoesNotExist:
                 return Response({}, status=status.HTTP_404_NOT_FOUND)
 
+class AssignmentIdView(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = AssignmentLectureViewSerializer
+
+    def get_queryset(self):
+        id = self.kwargs.get('id')
+        return Assignment.objects.filter(id=id)
+
+    def get(self, request, *args, **kwargs):  # Removed 'created_by'
+        try:
+            queryset = self.get_queryset()
+            serializer = AssignmentLectureViewSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+
+# get the specific data
+class AssignmenIDView(generics.GenericAPIView):
+        permission_classes = [permissions.AllowAny]
+        serializer_class = AssignmentLectureViewSerializer
+
+        def get_queryset(self):
+            created_by = self.kwargs.get('created_by')
+            id = self.kwargs.get('id')
+            return Assignment.objects.filter(id=id,created_by=created_by)
+
+        # @method_decorator(cache_page(60*15))  
+        def get(self, request, id,created_by, *args, **kwargs):
+            # get assignment by specific lecturer
+
+            try:
+                queryset = self.get_queryset()
+            
+                serializer = AssignmentLectureViewSerializer(queryset, many=True)
+            
+                return Response(serializer.data,  status=status.HTTP_200_OK)
+                
+            except ObjectDoesNotExist:
+                return Response({}, status=status.HTTP_404_NOT_FOUND)
+
 
 # update assignments - only logged the lecturer
 class AssignmentUpdateView(generics.RetrieveUpdateAPIView):
@@ -848,70 +900,6 @@ class ChangePasswordView(generics.UpdateAPIView):
             return Response({"msg": "Password updated successfully."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#creating grades
-class GradeCreateView(generics.CreateAPIView):
-    queryset = Grade.objects.all()
-    serializer_class = GradeSerializer
-    permission_classes = [permissions.AllowAny,]
-
-    
-
-
-
-#update grades
-class GradeUpdateView(generics.UpdateAPIView):
-    queryset = Grade.objects.all()
-    serializer_class = GradeSerializer
-    permission_classes = [permissions.AllowAny]
-
-    def get_object(self):
-        # Fetch the object based on the primary key (id)
-        obj = get_object_or_404(self.queryset, id=self.kwargs["pk"])
-        return obj
-
-    def update(self, request, *args, **kwargs):
-    
-        grade = self.get_object()
-
-        serializer = self.get_serializer(grade, data=request.data)
-
-      
-        if serializer.is_valid():
-          
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        
-     
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-#delete grades
-
-class GradeDeleteView(generics.DestroyAPIView):
-    queryset = Grade.objects.all()
-    serializer_class = GradeSerializer
-    permission_classes = [permissions.AllowAny,]
-
-
-    def get_object(self):
-        grade_id = self.kwargs.get("pk")
-        return get_object_or_404(Grade, id =grade_id)
-
-    def destroy(self, request, *args, **kwargs):
-        grade=self.get_object()
-        grade.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-#viewing grades
-
-class GradeListView(generics.ListAPIView):
-    queryset = Grade.objects.all()
-    serializer_class = GradeSerializer
-    permission_classes = [permissions.AllowAny,]
-
-
-
 class PasswordResetRequestView(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = PasswordResetRequestSerializer
@@ -978,26 +966,51 @@ class SubmissionCreateView(generics.CreateAPIView):
     def get_queryset(self):
         return Submission.objects.all()
 
-        def post(self, request, *args, **kwargs):
-            serializer = self.get_serializer(data =request.data)
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data =request.data)
 
-            if serializer.is_valid():
-                submission = serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                logger.info(f'serializer is not valid{request.data}')
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if serializer.is_valid():
+            submission = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            logger.info(f'serializer is not valid{request.data}')
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #viewing submission
+class AllSubmissionListView(generics. GenericAPIView):
+    serializer_class = SubmissionSerializer
+    permission_classes =[permissions.AllowAny]
+
+    def get_queryset(self):
+        return Submission.objects.all()
+
+    def get(self, request, format=None):
+        query = Submission.objects.all()
+        query = self.get_queryset()
+        serializer = SubmissionSerializer(query, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class SubmissionListView(generics. GenericAPIView):
     serializer_class = SubmissionSerializer
     permission_classes =[permissions.AllowAny]
 
-
     def get_queryset(self):
         submission_id = self.kwargs['id']
-        return Submission.objects.filter(id= submission_id)
+        return Submission.objects.filter(id=submission_id)
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class SubmissionStudentView(generics. GenericAPIView):
+    serializer_class = SubmissionSerializer
+    permission_classes =[permissions.AllowAny]
+
+    def get_queryset(self):
+        # submission_id = self.kwargs['id']id=submission_id,
+        student_id = self.kwargs['student']
+        return Submission.objects.filter( student=student_id)
 
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()

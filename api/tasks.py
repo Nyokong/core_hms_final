@@ -82,8 +82,6 @@ def encode_ffmpeg(video_id, input_file_path):
             return None
         else:
             logger.info('saved video here')
-            video.hls_name = "SAVED"
-            video.is_running = False
             video.save()
 
         data = {'temp_path': f'{temp_file_path}', '720p_Path': f'{os.path.join(output_dir, '720p.m3u8')}'}

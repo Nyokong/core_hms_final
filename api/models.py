@@ -1,5 +1,6 @@
 import re
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from django.db import models
 
@@ -110,27 +111,11 @@ class Assignment(models.Model):
 
 # video uploading model
 class Video(models.Model):
-    PENDING = 'pending'
-    PROCESSING = 'processing'
-    COMPLETED = 'completed'
-
-    STATUS_CHOICES = (
-        (PENDING, 'pending'),
-        (PROCESSING, 'processing'),
-        (COMPLETED, 'completed'),
-    )
-
     user = models.ForeignKey(custUser, on_delete=models.CASCADE)
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE,verbose_name="assignment", related_name='assignment', default=None)
     title = models.CharField(verbose_name="title", max_length=255)
     description = models.TextField(verbose_name="description", blank=True, null=True)
     cmp_video = models.FileField(verbose_name="cmp_video",upload_to='compressed_videos/', null=True, blank=False,)
-    video_length = models.CharField(verbose_name='video_length', max_length=100, null=True, blank=True)
-    thumbnail = models.FileField(verbose_name="thumbail",upload_to='compressed_videos/thumbnail/', null=True, blank=True,)
-    hls_name = models.CharField(verbose_name="Streaming_Path",max_length=255, blank=True, null=True)
-    hls_path = models.CharField(verbose_name="hls_video",max_length=500, null=True, blank=True,)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=PENDING)
-    is_running = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -141,11 +126,7 @@ class Video(models.Model):
         if not self.pk:  # Check if the object is being created
             self.cmp_video.name = self.generate_filename()
         super(Video, self).save(*args, **kwargs)
-        
-        # save file path for streaming
-        if not self.hls_path:
-            name_without_extension = os.path.splitext(self.generate_filename())[0]
-            self.hls_name = f"hls_videos/{name_without_extension}"
+
         super().save(*args, **kwargs)
 
     # generate a searchable file name
@@ -189,40 +170,39 @@ class Submission(models.Model):
     student = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='student_submitting_assignment')
     # what they submitting
     video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name='video_being_submitted')
+    grade = models.DecimalField(
+        verbose_name="Percentage Grade",
+        max_digits=5, 
+        decimal_places=2,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        default=None
+    )
+    letter_grade = models.CharField(max_length=2, blank=True, null=True, default=None)
     submitted_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        self.letter_grade = self.get_letter_grade()
+        super().save(*args, **kwargs)
+
+    def get_letter_grade(self):
+        if self.grade >= 90:
+            return 'A'
+        elif self.grade >= 75:
+            return 'B'
+        elif self.grade >= 50:
+            return 'C'
+        elif self.grade >= 30:
+            return 'D'
+        else:
+            return 'F'
 
     def clean(self):
         if self.student.is_lecturer:
             raise ValidationError("Only students can submit assignments.")
 
     def __str__(self):
-        return f"Submission for assignment {self.assignment.id} time: {self.submitted_at}"
+        return f"Submission for assignment {self.assignment.id} time: {self.submitted_at} Mark: {self.grade}/100"
 
-# Grade
-class Grade(models.Model):
-    lecturer = models.ForeignKey(custUser, on_delete=models.CASCADE)
-    submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
-    grade = models.DecimalField(verbose_name="Percentage Grade",max_digits=5, decimal_places=2)  # e.g.,'A++', 'A+', 'B-', etc.
-    feedback = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        def __str__(self):
-            return f'Mark: {self.grade}/100'
-
-    # get the letter grade
-    def get_letter_grade(self):
-        if self.grade >= 90:
-            return 'A'
-        elif self.grade >= 80:
-            return 'B'
-        elif self.grade >= 70:
-            return 'C'
-        elif self.grade >= 60:
-            return 'D'
-        else:
-            return 'F'
-        
 class FeedbackRoom(models.Model): 
     # this is all the conversations they've had
     lecturer = models.ForeignKey(custUser, on_delete=models.CASCADE, related_name='lecturer_in_feedback')
