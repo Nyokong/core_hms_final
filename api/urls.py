@@ -15,7 +15,6 @@ urlpatterns = [
     path('usr/create', views.UserCreateView.as_view(), name="create-user"),
     path('usr/update', views.UserUpdateView.as_view(), name='user-update'),
     path('usr/login', views.LoginAPIView.as_view(), name="login-user"),
-    # path('usr/refresh/<int:id>', views.UserRefreshToken.as_view(), name="re-login-user"),
     path('usrs', views.UserListViewSet.as_view(), name='users'),
     path('usrs/students', views.UserListStudentsView.as_view(), name='users'),
     path('verify-email/<uidb64>/<token>/', views.VerifyEmailView.as_view(), name='verify-email'),
@@ -32,6 +31,7 @@ urlpatterns = [
     # token login
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('refresh-token', CheckTokenValid.as_view(), name='token_refresh'),
 
     # assignments endpoints
     path('assign/view/',views.AssignmentListView.as_view(), name='list-assignment'),

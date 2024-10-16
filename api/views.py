@@ -230,6 +230,28 @@ class UserProfileView(generics.GenericAPIView):
         }
         
         return Response(user_data, status=status.HTTP_200_OK)
+    
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+class CheckTokenValid(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        token = request.auth
+        try:
+            # If token is valid, do nothing and return a success response
+            token.verify()
+            return Response({"message": "Token is valid"}, status=status.HTTP_200_OK)
+        except (TokenError, InvalidToken):
+            # If token is invalid, generate a new one
+            refresh = RefreshToken.for_user(request.user)
+            new_token = {
+                'refresh_token': str(refresh),
+                'access_token': str(refresh.access_token),
+            }
+            return Response(new_token, status=status.HTTP_201_CREATED)
 
 # DELETE VIEW USER
 class DeleteUserView(generics.DestroyAPIView):
