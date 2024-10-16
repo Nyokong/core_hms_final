@@ -31,7 +31,7 @@ urlpatterns = [
     # token login
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('refresh-token', CheckTokenValid.as_view(), name='token_refresh'),
+    path('check-token', views.CheckTokenValid.as_view(), name='token_refresh'),
 
     # assignments endpoints
     path('assign/view/',views.AssignmentListView.as_view(), name='list-assignment'),
