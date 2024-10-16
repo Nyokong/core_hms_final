@@ -53,9 +53,10 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8000",
-
     'http://localhost:8081',
     "http://localhost:19006",
+    "http://10.99.58.161:5555",
+    "http://192.168.56.1:8000", 
 ]
 
 # Allow CORS for localhost:3000 (Next.js)
