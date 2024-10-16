@@ -125,12 +125,6 @@ class Video(models.Model):
     title = models.CharField(verbose_name="title", max_length=255)
     description = models.TextField(verbose_name="description", blank=True, null=True)
     cmp_video = models.FileField(verbose_name="cmp_video",upload_to='compressed_videos/', null=True, blank=False,)
-    video_length = models.CharField(verbose_name='video_length', max_length=100, null=True, blank=True)
-    thumbnail = models.FileField(verbose_name="thumbail",upload_to='compressed_videos/thumbnail/', null=True, blank=True,)
-    hls_name = models.CharField(verbose_name="Streaming_Path",max_length=255, blank=True, null=True)
-    hls_path = models.CharField(verbose_name="hls_video",max_length=500, null=True, blank=True,)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=PENDING)
-    is_running = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
